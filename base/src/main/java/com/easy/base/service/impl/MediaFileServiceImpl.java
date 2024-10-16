@@ -1,9 +1,9 @@
-package com.easy.base.media.service.impl;
+package com.easy.base.service.impl;
 
-import com.easy.base.counter.CounterService;
-import com.easy.base.media.entity.MediaFile;
-import com.easy.base.media.repository.MediaFileRepository;
-import com.easy.base.media.service.MediaFileService;
+import com.easy.base.config.counter.CounterService;
+import com.easy.base.entity.MediaFile;
+import com.easy.base.repository.MediaFileRepository;
+import com.easy.base.service.MediaFileService;
 import com.easy.base.media.util.Store;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +21,10 @@ public class MediaFileServiceImpl implements MediaFileService {
 
     @Override
     public MediaFile addMediaFile(String fileName, String mimeType, String filePath, long parentId, InputStream inputStream) {
-        MediaFile mediaFile = mediaFileRepository.findByParentIdAndFileName(parentId, fileName);
-        if(mediaFile != null){
-            return mediaFile;
+        if(mediaFileRepository.findByParentIdAndFileName(parentId, fileName) != null){
+            return mediaFileRepository.findByParentIdAndFileName(parentId, fileName);
         }
-        mediaFile = MediaFile.builder().fileId(counterService.getGeneratedCounter(MediaFile.class.getName())).filePath(filePath).fileName(fileName).mimeType(mimeType).parentId(parentId).build();
+        MediaFile mediaFile = MediaFile.builder().filePath(filePath).fileName(fileName).mimeType(mimeType).parentId(parentId).build();
         System.out.println(mediaFile);
         mediaFile = mediaFileRepository.save(mediaFile);
         System.out.println(mediaFile);

@@ -1,4 +1,4 @@
-package com.easy.base.media.service;
+package com.easy.base.service;
 
 public class MediaFolderService {
 }

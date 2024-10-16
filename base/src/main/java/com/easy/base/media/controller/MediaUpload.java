@@ -1,6 +1,6 @@
 package com.easy.base.media.controller;
 
-import com.easy.base.media.service.MediaFileService;
+import com.easy.base.service.MediaFileService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -46,7 +46,7 @@ public class MediaUpload {
         return new ModelAndView("status", "message", "Your File is Uploaded successfully");
     }
 
-    @GetMapping("/{filename:.+}")
+    @GetMapping("/media/{filename:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
         try {
             Path filePath = Paths.get("upload").resolve(filename);

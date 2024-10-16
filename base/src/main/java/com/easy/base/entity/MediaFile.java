@@ -1,4 +1,4 @@
-package com.easy.base.media.entity;
+package com.easy.base.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +19,7 @@ import java.util.Date;
 public class MediaFile {
 
     @Id
-    private long fileId;
+    private String fileId;
     private String fileName;
     private String mimeType;
     private String filePath;
@@ -27,7 +27,7 @@ public class MediaFile {
 
     @CreatedDate
     private Date createdDate;
-    
+
     @LastModifiedDate
     private Date modifiedDate;
 }

@@ -1,4 +1,4 @@
-package com.easy.base.counter;
+package com.easy.base.config.counter;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

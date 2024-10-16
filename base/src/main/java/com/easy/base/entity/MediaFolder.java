@@ -1,4 +1,4 @@
-package com.easy.base.media.entity;
+package com.easy.base.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

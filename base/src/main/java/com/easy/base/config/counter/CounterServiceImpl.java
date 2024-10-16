@@ -1,4 +1,4 @@
-package com.easy.base.counter;
+package com.easy.base.config.counter;
 
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Update;

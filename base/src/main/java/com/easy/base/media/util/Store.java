@@ -1,7 +1,5 @@
 package com.easy.base.media.util;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
