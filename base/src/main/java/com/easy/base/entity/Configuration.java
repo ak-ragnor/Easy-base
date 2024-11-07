@@ -1,19 +1,19 @@
-package com.easy.base.config.counter;
+package com.easy.base.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document("counters")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class Counter {
-
+@NoArgsConstructor
+@Builder
+@Document("configuration")
+public class Configuration {
     @Id
-    private String id;
-    private long seq;
-
+    private String className;
+    private String config;
 }

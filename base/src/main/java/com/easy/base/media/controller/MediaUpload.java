@@ -26,10 +26,6 @@ public class MediaUpload {
         this.mediaFileService = mediaFileService;
     }
 
-    @RequestMapping("/")
-    public ModelAndView showUpload() {
-        return new ModelAndView("index");
-    }
     @PostMapping("/upload")
     public ModelAndView fileUpload(@RequestParam("file") MultipartFile file) {
 
@@ -38,7 +34,7 @@ public class MediaUpload {
         }
         try {
             InputStream is = file.getInputStream();
-            mediaFileService.addMediaFile(file.getOriginalFilename(), file.getContentType(), "/",0l,is);
+            mediaFileService.addFile(file.getOriginalFilename(), file.getContentType(),is);
         } catch (Exception e) {
             e.printStackTrace();
         }

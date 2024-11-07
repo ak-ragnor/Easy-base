@@ -11,10 +11,7 @@ public class Store {
         try{
             rootDir = "upload";
         File root = new File(rootDir+filePath);
-            System.out.println(rootDir);
-            System.out.println(filePath);
         boolean result = root.mkdirs();
-            System.out.println(result);
         Path file = Paths.get(rootDir+filePath, fileName);
         // Create and write the file
         FileOutputStream outputStream = new FileOutputStream(file.toFile());
@@ -27,12 +24,6 @@ public class Store {
             e.printStackTrace();
         }
         return true;
-    }
-    public static String getFilePath(long parentId){
-        return null;
-    }
-    public static String getFilePathForFolder(long parentId, String folderName){
-        return null;
     }
 
 }

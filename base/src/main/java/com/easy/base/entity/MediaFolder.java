@@ -14,12 +14,11 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Document("mediafolders")
-public class MediaFolder {
+public class MediaFolder extends Auditing{
     @Id
-    private long folderId;
+    private String folderId;
     private String folderName;
     private String folderPath;
-    private long parentId;
-    private Date createdDate;
-    private Date modifiedDate;
+    private String parentId;
+
 }

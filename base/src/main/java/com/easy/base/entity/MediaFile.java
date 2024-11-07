@@ -16,18 +16,12 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MediaFile {
+public class MediaFile extends Auditing{
 
     @Id
     private String fileId;
     private String fileName;
     private String mimeType;
     private String filePath;
-    private long parentId;
-
-    @CreatedDate
-    private Date createdDate;
-
-    @LastModifiedDate
-    private Date modifiedDate;
+    private String parentId;
 }
