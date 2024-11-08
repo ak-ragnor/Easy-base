@@ -9,5 +9,4 @@ public interface MediaFileService {
     public MediaFile addFile(String fileName, String mimeType, InputStream is);
     public String findPath(String fileId);
     public String createPath(String parentId);
-    public void deleteFile(String fileId);
 }
