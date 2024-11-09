@@ -55,8 +55,9 @@ public class Store {
         mediaFolderService.deleteFolders(folderId);
     }
     public static void deleteFromServer(String path) throws IOException {
-        File rootDerectory = FileUtils.getFile(rootDir);
+        File rootDerectory = new File(rootDir);
         File child = new File(rootDir+path);
+        System.out.println(FileUtils.directoryContains(rootDerectory,child));
         if(FileUtils.directoryContains(rootDerectory,child)){
             FileUtils.deleteQuietly(child);
         }

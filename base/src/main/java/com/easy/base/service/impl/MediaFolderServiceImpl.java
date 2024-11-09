@@ -4,9 +4,11 @@ import com.easy.base.entity.MediaFolder;
 import com.easy.base.repository.MediaFileRepository;
 import com.easy.base.repository.MediaFolderRepository;
 import com.easy.base.service.MediaFolderService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class MediaFolderServiceImpl implements MediaFolderService {
     private final MediaFolderRepository mediaFolderRepository;
     private final MediaFileRepository mediaFileRepository;

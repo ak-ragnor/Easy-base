@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Document("mediafolders")
+@Document("mediaFolders")
 public class MediaFolder extends Auditing{
     @Id
     private String folderId;
