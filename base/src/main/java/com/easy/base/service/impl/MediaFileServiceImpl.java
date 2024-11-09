@@ -8,6 +8,7 @@ import com.easy.base.media.util.Store;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.util.List;
 
 @Service
 public class MediaFileServiceImpl implements MediaFileService {
@@ -44,5 +45,10 @@ public class MediaFileServiceImpl implements MediaFileService {
     @Override
     public String createPath(String parentId) {
         return mediaFolderRepository.findById(parentId).orElse(null).getFolderPath()+parentId+"/";
+    }
+
+    @Override
+    public List<MediaFile> findByParentId(String parentId) {
+        return mediaFileRepository.findByParentId(parentId);
     }
 }

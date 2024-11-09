@@ -4,6 +4,7 @@ import com.easy.base.entity.MediaFolder;
 import com.easy.base.media.dto.FolderDto;
 import com.easy.base.service.MediaFileService;
 import com.easy.base.service.MediaFolderService;
+import org.apache.commons.io.FileUtils;
 import org.springframework.http.ResponseEntity;
 
 import java.io.*;
@@ -13,11 +14,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Store {
-    private static String rootDir;
+    private static final String rootDir="upload";
 
     public static boolean saveFile(InputStream inputStream,String filePath,String fileName, String mimeType){
         try{
-            rootDir = "upload";
         File root = new File(rootDir+filePath);
         boolean result = root.mkdirs();
         Path file = Paths.get(rootDir+filePath, fileName);
@@ -51,7 +51,14 @@ public class Store {
         return folderId == null?mediaFolderService.findByparentId(""):mediaFolderService.findByparentId(folderId);
     }
 
-    public static void deleteFolderContent(String folderId, MediaFolderService mediaFolderService, MediaFileService mediaFileService) {
-
+    public static void deleteFolderContent(String folderId, MediaFolderService mediaFolderService) {
+        mediaFolderService.deleteFolders(folderId);
+    }
+    public static void deleteFromServer(String path) throws IOException {
+        File rootDerectory = FileUtils.getFile(rootDir);
+        File child = new File(rootDir+path);
+        if(FileUtils.directoryContains(rootDerectory,child)){
+            FileUtils.deleteQuietly(child);
+        }
     }
 }

@@ -7,6 +7,7 @@ import com.easy.base.service.MediaFolderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -29,7 +30,8 @@ public class FolderController {
         return Store.getFoldesInFolder(folderId,mediaFolderService);
     }
     @DeleteMapping
-    public void deleteFolders(@RequestParam String folderId){
-        Store.deleteFolderContent(folderId, mediaFolderService, mediaFileService);
+    public void deleteFolders(@RequestParam String folderId) throws IOException {
+        Store.deleteFromServer(mediaFileService.createPath(folderId));
+        Store.deleteFolderContent(folderId, mediaFolderService);
     }
 }

@@ -28,7 +28,9 @@ public class MediaFolderServiceImpl implements MediaFolderService {
 
     @Override
     public void deleteFolders(String folderId) {
-
+        mediaFolderRepository.deleteAll(findByparentId(folderId));
+        mediaFolderRepository.deleteById(folderId);
+        mediaFileRepository.deleteAll(mediaFileRepository.findByParentId(folderId));
     }
 
     private MediaFolder addMediaFolder(String folderName, String parentId, String folderPath){
