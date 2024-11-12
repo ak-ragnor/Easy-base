@@ -51,4 +51,14 @@ public class MediaFileServiceImpl implements MediaFileService {
     public List<MediaFile> findByParentId(String parentId) {
         return mediaFileRepository.findByParentId(parentId);
     }
+
+    @Override
+    public MediaFile findById(String fileId) {
+        return mediaFileRepository.findById(fileId).orElse(null);
+    }
+
+    @Override
+    public void delete(String id) {
+        mediaFileRepository.deleteById(id);
+    }
 }

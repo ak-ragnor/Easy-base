@@ -11,4 +11,6 @@ public interface MediaFileService {
     public String findPath(String fileId);
     public String createPath(String parentId);
     public List<MediaFile> findByParentId(String parentId);
+    public MediaFile findById(String fileId);
+    public void delete(String id);
 }
