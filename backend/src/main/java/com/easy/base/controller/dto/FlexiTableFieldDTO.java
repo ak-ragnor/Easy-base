@@ -1,6 +1,5 @@
 package com.easy.base.controller.dto;
 
-import com.easy.base.model.FlexiTable;
 import com.easy.base.model.FlexiTableField;
 import com.easy.base.model.enums.FieldTypes;
 

@@ -187,7 +187,7 @@ public class FlexiTableServiceImpl implements FlexiTableService {
         flexiTable.setCreatedDate(new Date());
         flexiTable.setModifiedDate(new Date());
 
-        mongoCollectionService.createCollection(flexiTable.getFlexiName(), flexiTable.getFields());
+        mongoCollectionService.createCollection(flexiTable.getCollectionName(), flexiTable.getFields());
         return flexiTableRepository.save(flexiTable);
     }
 
