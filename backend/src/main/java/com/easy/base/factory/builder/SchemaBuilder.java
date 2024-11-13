@@ -10,21 +10,21 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Component
 public class SchemaBuilder {
-
     private final ValidationFactorySelector validationFactorySelector;
-    private final Document schema;
-    private final Document properties;
+    private final Map<String, Document> schemaProperties;
     private final List<String> requiredFields;
 
     @Autowired
     public SchemaBuilder(ValidationFactorySelector validationFactorySelector) {
         this.validationFactorySelector = validationFactorySelector;
-        this.schema = new Document();
-        this.properties = new Document();
-        this.requiredFields = new ArrayList<>(Arrays.asList("_id", "createdDate", "modifiedDate", "authorId"));
+        this.schemaProperties = new ConcurrentHashMap<>();
+        this.requiredFields = new ArrayList<>(List.of("_id", "createdDate", "modifiedDate", "authorId"));
         _addDefaultFields();
     }
 
@@ -34,27 +34,37 @@ public class SchemaBuilder {
     }
 
     public Document build() {
-        schema.append("properties", properties).append("required", requiredFields);
+        Document schema = new Document("properties", schemaProperties)
+                .append("required", requiredFields);
         return new Document("$jsonSchema", schema);
     }
 
     private void _addDefaultFields() {
-        properties.append("_id", new Document("bsonType", "objectId"))
-                .append("createdDate", new Document("bsonType", "date"))
-                .append("modifiedDate", new Document("bsonType", "date"))
-                .append("authorId", new Document("bsonType", "objectId"));
+        schemaProperties.put("_id", new Document("bsonType", "objectId"));
+        schemaProperties.put("createdDate", new Document("bsonType", "date"));
+        schemaProperties.put("modifiedDate", new Document("bsonType", "date"));
+        schemaProperties.put("authorId", new Document("bsonType", "objectId"));
     }
 
     private void _addDynamicFields(List<FlexiTableField> fields) {
-        fields.forEach(field -> {
-            ValidationFactory validationFactory = validationFactorySelector.getFactory(field);
-            Document fieldDocument = validationFactory.createValidation(field);
-            properties.append(field.getFieldName(), fieldDocument);
+        Map<Boolean, List<FlexiTableField>> partitionedFields = fields.stream()
+                .collect(Collectors.partitioningBy(FlexiTableField::isRequired));
 
-            if (field.isRequired()) {
-                requiredFields.add(field.getFieldName());
-            }
-        });
+        partitionedFields.get(true).forEach(this::_addRequiredField);
+        partitionedFields.get(false).forEach(this::_addOptionalField);
+    }
+
+    private void _addRequiredField(FlexiTableField field) {
+        ValidationFactory validationFactory = validationFactorySelector.getFactory(field);
+        Document fieldDocument = validationFactory.createValidation(field);
+        schemaProperties.put(field.getFieldName(), fieldDocument);
+        requiredFields.add(field.getFieldName());
+    }
+
+    private void _addOptionalField(FlexiTableField field) {
+        ValidationFactory validationFactory = validationFactorySelector.getFactory(field);
+        Document fieldDocument = validationFactory.createValidation(field);
+        schemaProperties.put(field.getFieldName(), fieldDocument);
     }
 }
 
