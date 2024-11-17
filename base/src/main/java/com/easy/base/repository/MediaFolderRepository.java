@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface MediaFolderRepository extends MongoRepository<MediaFolder,String> {
     public List<MediaFolder> findByParentId(String parentId);
+    public MediaFolder findByParentIdAndFolderName(String parentId, String name);
 }

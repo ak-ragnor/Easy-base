@@ -11,4 +11,5 @@ public interface MediaFolderService {
     public MediaFolder addFolder(String name, String parentId);
     public MediaFolder addFolder(String name);
     public List<MediaFolder> findByparentId(String patrentId);
+    public MediaFolder findByParentIdAndFolderName(String parentId, String folderName);
 }
