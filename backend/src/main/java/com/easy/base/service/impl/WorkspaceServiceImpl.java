@@ -6,7 +6,7 @@ import com.easy.base.exception.workspace.WorkspaceCreationException;
 import com.easy.base.exception.workspace.WorkspaceNotFoundException;
 import com.easy.base.exception.workspace.WorkspaceDeletionException;
 import com.easy.base.exception.workspace.WorkspaceUpdateException;
-import com.easy.base.factory.builder.DefaultCollectionsBuilder;
+import com.easy.base.flexi.builder.DefaultCollectionsBuilder;
 import com.easy.base.model.FlexiTable;
 import com.easy.base.model.Workspace;
 import com.easy.base.repository.WorkspaceRepository;

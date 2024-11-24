@@ -1,6 +1,6 @@
 package com.easy.base.service.impl;
 
-import com.easy.base.factory.builder.SchemaBuilder;
+import com.easy.base.flexi.builder.SchemaBuilder;
 import com.easy.base.model.FlexiTableField;
 import com.easy.base.service.MongoCollectionService;
 import com.mongodb.client.MongoCollection;

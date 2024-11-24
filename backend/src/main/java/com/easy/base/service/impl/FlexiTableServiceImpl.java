@@ -1,7 +1,7 @@
 package com.easy.base.service.impl;
 
-import com.easy.base.factory.ValidationFactory;
-import com.easy.base.factory.selector.ValidationFactorySelector;
+import com.easy.base.flexi.factory.ValidationFactory;
+import com.easy.base.flexi.selector.ValidationFactorySelector;
 import com.easy.base.model.FlexiFieldValidation;
 import com.easy.base.model.FlexiTableField;
 import com.easy.base.service.MongoCollectionService;
@@ -118,6 +118,8 @@ public class FlexiTableServiceImpl implements FlexiTableService {
      * @param data the data to be inserted.
      * @return the document containing the created record.
      */
+
+    //have to fix it should be based on flexi table name
     public Document createRecord(String workspaceId, String tableName, Document data) {
         FlexiTable table = _getTableOrThrow(workspaceId, tableName);
         String flexiName = table.getFlexiName();

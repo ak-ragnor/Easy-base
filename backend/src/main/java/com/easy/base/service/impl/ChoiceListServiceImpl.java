@@ -17,7 +17,6 @@ import java.util.List;
 
 @Slf4j
 @Service
-@Transactional
 public class ChoiceListServiceImpl implements ChoiceListService {
 
     private final ChoiceListRepository choiceListRepository;
