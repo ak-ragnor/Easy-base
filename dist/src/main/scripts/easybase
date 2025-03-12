@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# EasyBase command-line interface
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+LIB_DIR="$SCRIPT_DIR/lib"
+CONFIG_DIR="$SCRIPT_DIR/config"
+MAIN_JAR=$(find "$LIB_DIR" -name "easybase-core-*.jar" | head -1)
+
+if [ "$1" = "serve" ]; then
+    java -cp "$MAIN_JAR:$LIB_DIR/*" -Dlogging.config="$CONFIG_DIR/logback.xml" com.easybase.core.Application serve
+elif [ "$1" = "superuser" ] && [ "$2" = "create" ]; then
+    java -cp "$MAIN_JAR:$LIB_DIR/*" com.easybase.core.Application superuser create "$3" "$4"
+elif [ "$1" = "generate" ]; then
+    java -cp "$MAIN_JAR:$LIB_DIR/*" com.easybase.generator.GeneratorMain "$2"
+else
+    echo "Usage:"
+    echo "  $0 serve                     # Start the EasyBase server"
+    echo "  $0 superuser create EMAIL PASSWORD # Create a superuser account"
+    echo "  $0 generate entity.yml       # Generate code from YAML definition"
+fi
