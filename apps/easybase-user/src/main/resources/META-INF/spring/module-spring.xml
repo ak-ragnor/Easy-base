@@ -1,0 +1,91 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Component scanning for the User module -->
+    <context:component-scan base-package="com.easybase.user"/>
+
+    <!-- Entity definition for collection management -->
+    <bean id="userDefinition" class="com.easybase.core.collection.EntityDefinition">
+        <property name="name" value="User"/>
+        <property name="tableName" value="eb_user"/>
+        <property name="fields">
+            <list>
+                <bean class="com.easybase.core.collection.FieldDefinition">
+                    <property name="name" value="id"/>
+                    <property name="type" value="UUID"/>
+                    <property name="primaryKey" value="true"/>
+                    <property name="nullable" value="true"/>
+                </bean>
+                <bean class="com.easybase.core.collection.FieldDefinition">
+                    <property name="name" value="email"/>
+                    <property name="type" value="String"/>
+                    <property name="primaryKey" value="false"/>
+                    <property name="nullable" value="false"/>
+                    <property name="searchMapping">
+                        <map>
+                            <entry key="type" value="text"/>
+                            <entry key="analyzer" value="email"/>
+                        </map>
+                    </property>
+                </bean>
+                <bean class="com.easybase.core.collection.FieldDefinition">
+                    <property name="name" value="firstName"/>
+                    <property name="type" value="String"/>
+                    <property name="primaryKey" value="false"/>
+                    <property name="nullable" value="true"/>
+                    <property name="searchMapping">
+                        <map>
+                            <entry key="type" value="text"/>
+                        </map>
+                    </property>
+                </bean>
+                <bean class="com.easybase.core.collection.FieldDefinition">
+                    <property name="name" value="lastName"/>
+                    <property name="type" value="String"/>
+                    <property name="primaryKey" value="false"/>
+                    <property name="nullable" value="true"/>
+                    <property name="searchMapping">
+                        <map>
+                            <entry key="type" value="text"/>
+                        </map>
+                    </property>
+                </bean>
+                <bean class="com.easybase.core.collection.FieldDefinition">
+                    <property name="name" value="status"/>
+                    <property name="type" value="Enum"/>
+                    <property name="primaryKey" value="false"/>
+                    <property name="nullable" value="true"/>
+                    <property name="searchMapping">
+                        <map>
+                            <entry key="type" value="keyword"/>
+                        </map>
+                    </property>
+                </bean>
+                <bean class="com.easybase.core.collection.FieldDefinition">
+                    <property name="name" value="department"/>
+                    <property name="type" value="Relationship"/>
+                    <property name="primaryKey" value="false"/>
+                    <property name="nullable" value="true"/>
+                    <property name="searchMapping">
+                        <map>
+                            <entry key="type" value="object"/>
+                        </map>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Register the entity with the collection service -->
+    <bean class="com.easybase.core.collection.EntityRegistrar">
+        <property name="collectionService" ref="collectionService"/>
+        <property name="entityDefinition" ref="userDefinition"/>
+    </bean>
+</beans>

@@ -1,0 +1,83 @@
+module: easybase-user
+entity: User
+table: eb_user
+packageName: com.easybase.user
+generateController: true
+
+# Field definitions with integrated search configuration
+fields:
+  - name: id
+    type: UUID
+    primaryKey: true
+    generated: true
+    indexed: true
+    
+  - name: email
+    type: String
+    length: 255
+    nullable: false
+    validation:
+      - type: Email
+      - type: NotBlank
+    search:
+      type: text
+      analyzer: email
+      fields:
+        keyword: true
+    
+  - name: firstName
+    type: String
+    length: 100
+    search:
+      type: text
+      
+  - name: lastName
+    type: String
+    length: 100
+    search:
+      type: text
+      
+  - name: status
+    type: Enum
+    enumClass: UserStatus
+    values: [ACTIVE, INACTIVE, SUSPENDED]
+    default: ACTIVE
+    search:
+      type: keyword
+
+  # Relationship definition with search configuration
+  - name: department
+    type: Relationship
+    target: Department
+    targetPackage: com.easybase.department.model
+    relationType: ManyToOne
+    joinColumn: department_id
+    search:
+      type: object
+      properties:
+        id:
+          type: keyword
+        name:
+          type: keyword
+
+# Finder method definitions
+finders:
+  - name: findByEmailAndStatus
+    parameters:
+      - name: email
+        type: String
+      - name: status
+        type: UserStatus
+    returnType: List<User>
+    
+  - name: findByDepartmentId
+    parameters:
+      - name: departmentId
+        type: UUID
+    returnType: List<User>
+    
+  - name: countByDepartmentId
+    parameters:
+      - name: departmentId
+        type: UUID
+    returnType: Long

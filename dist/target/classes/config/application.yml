@@ -1,0 +1,18 @@
+# EasyBase Configuration
+
+server:
+  port: 8090
+
+storage:
+  type: embedded  # or postgresql
+  embedded:
+    path: ./data/hsqldb
+
+elasticsearch:
+  version: 8.17.0
+  embedded: true
+  host: localhost
+  port: 9200
+
+admin:
+  path: /_/
