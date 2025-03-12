@@ -1,4 +1,3 @@
-
 package ${entity.packageName};
 
 import org.springframework.boot.SpringApplication;
@@ -14,7 +13,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories
 public class ${entity.entity}Application {
 
-public static void main(String[] args) {
-SpringApplication.run(${entity.entity}Application.class, args);
-}
+    public static void main(String[] args) {
+        SpringApplication.run(${entity.entity}Application.class, args);
+    }
 }
