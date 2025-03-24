@@ -8,7 +8,7 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import com.easybase.common.exception.EntityNotFoundException;
-import com.easybase.core.storage.DatabaseService;
+import com.easybase.core.storage.DataSourceManager;
 import com.easybase.core.sync.SyncService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public class CollectionServiceImpl implements CollectionService {
     private static final Logger logger = LoggerFactory.getLogger(CollectionServiceImpl.class);
 
     @Autowired
-    private DatabaseService databaseService;
+    private DataSourceManager databaseService;
 
     @Autowired
     private ElasticsearchClient esClient;

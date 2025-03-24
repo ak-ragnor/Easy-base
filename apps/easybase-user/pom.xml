@@ -52,11 +52,6 @@
         <!-- Add dependencies for related modules -->
 
         <!-- Related module dependencies -->
-        <dependency>
-            <groupId>com.easybase</groupId>
-            <artifactId>easybase-department</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- Database Migration -->
         <dependency>
