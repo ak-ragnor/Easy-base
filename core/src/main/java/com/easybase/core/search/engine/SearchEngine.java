@@ -25,4 +25,6 @@ public interface SearchEngine {
      */
     <T> Page<T> search(String index, SearchCriteria criteria,
                        Function<Map<String, Object>, T> resultMapper) throws SearchException;
+
+    boolean verifyIndex(String index);
 }

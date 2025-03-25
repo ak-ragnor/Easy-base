@@ -1,5 +1,6 @@
-package com.easybase.core.search.api;
+package com.easybase.core.search.service;
 
+import com.easybase.core.search.api.Page;
 import com.easybase.core.search.exception.SearchException;
 import com.easybase.core.search.model.search.SearchCriteria;
 

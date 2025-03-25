@@ -1,14 +1,15 @@
 package com.easybase.core.search.util;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.easybase.core.search.api.Page;
 import com.easybase.core.search.api.Pagination;
-import com.easybase.core.search.engine.ElasticsearchEngine;
 import com.easybase.core.search.engine.SearchEngine;
 import com.easybase.core.search.exception.SearchException;
 import com.easybase.core.search.model.search.SearchCriteria;
 import com.easybase.core.search.model.search.Sort;
 import com.easybase.core.search.parser.SortParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,28 +17,24 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Utility class for search operations.
- * This provides a static facade for search functionality.
+ * Component for search operations.
+ * Provides centralized search functionality, leveraging DataSourceManager.
  */
+@Component
 public class SearchUtil {
-    private static SearchEngine searchEngine;
+    private static final Logger logger = LoggerFactory.getLogger(SearchUtil.class);
+
+    private final SearchEngine _searchEngine;
+    private final SortParser _sortParser;
 
     /**
-     * Initializes the SearchUtil with an Elasticsearch client.
+     * Creates a new SearchUtil with required dependencies.
      *
-     * @param client The Elasticsearch client
+     * @param searchEngine The search engine implementation
      */
-    public static void initialize(ElasticsearchClient client) {
-        searchEngine = new ElasticsearchEngine(client);
-    }
-
-    /**
-     * Sets the search engine to use.
-     *
-     * @param engine The search engine
-     */
-    public static void setSearchEngine(SearchEngine engine) {
-        searchEngine = engine;
+    public SearchUtil(SearchEngine searchEngine) {
+        this._searchEngine = searchEngine;
+        this._sortParser = new SortParser();
     }
 
     /**
@@ -54,7 +51,7 @@ public class SearchUtil {
      * @return A page of search results
      * @throws SearchException If the search operation fails
      */
-    public static <T> Page<T> search(
+    public <T> Page<T> search(
             String index,
             String search,
             String filter,
@@ -63,13 +60,10 @@ public class SearchUtil {
             int size,
             Function<Map<String, Object>, T> resultMapper) throws SearchException {
 
-        checkSearchEngine();
-
         // Parse sort expression
         List<Sort> sorts = Collections.emptyList();
         if (sort != null && !sort.trim().isEmpty()) {
-            SortParser sortParser = new SortParser();
-            sorts = sortParser.parse(sort);
+            sorts = _sortParser.parse(sort);
         }
 
         // Build search criteria
@@ -81,7 +75,7 @@ public class SearchUtil {
                 .build();
 
         // Execute search
-        return searchEngine.search(index, criteria, resultMapper);
+        return _searchEngine.search(index, criteria, resultMapper);
     }
 
     /**
@@ -94,23 +88,23 @@ public class SearchUtil {
      * @return A page of search results
      * @throws SearchException If the search operation fails
      */
-    public static <T> Page<T> search(
+    public <T> Page<T> search(
             String index,
             SearchCriteria criteria,
             Function<Map<String, Object>, T> resultMapper) throws SearchException {
 
-        checkSearchEngine();
-        return searchEngine.search(index, criteria, resultMapper);
+        return _searchEngine.search(index, criteria, resultMapper);
     }
 
     /**
-     * Checks that the search engine has been initialized.
+     * Verifies the existence of an index before search operations.
+     * Uses DataSourceManager's caching capabilities.
      *
-     * @throws SearchException If the search engine has not been initialized
+     * @param index The index name to verify
+     * @return true if the index exists
      */
-    private static void checkSearchEngine() throws SearchException {
-        if (searchEngine == null) {
-            throw new SearchException("SearchUtil has not been initialized with a search engine");
-        }
+    public boolean verifyIndex(String index) {
+
+        return _searchEngine.verifyIndex(index);
     }
 }
