@@ -1,43 +1,114 @@
 package com.easybase.generator.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Represents a field within an entity definition.
- * Fields define the structure of the entity and can be simple property types
- * or complex relationship types.
+ * Represents a field definition within an entity.
  */
 public class FieldDefinition {
     private String name;
     private String type;
-    private boolean nullable = true;
     private boolean primaryKey = false;
-    private boolean generated = false;
-    private boolean indexed = false;
+    private boolean nullable = true;
+    private boolean unique = false;
     private Integer length;
+    private Object defaultValue;
     private String description;
-    private String defaultValue;
-    private List<Map<String, Object>> validation = new ArrayList<>();
-    private SearchConfig search;
+    private List<ValidationRule> validations = new ArrayList<>();
+    private SearchMapping searchMapping;
+    private boolean generated = false;
 
-    // Relationship specific properties
-    private String target;
-    private String targetPackage;
-    private String targetModule;
-    private String relationType;
-    private String joinColumn;
-
-    // Enum specific properties
+    // For enum types
     private String enumClass;
-    private List<String> values = new ArrayList<>();
+    private List<String> enumValues = new ArrayList<>();
 
-    // Constructors
-    public FieldDefinition() {
+    // Builder pattern
+    public static class Builder {
+        private FieldDefinition field = new FieldDefinition();
+
+        public Builder withName(String name) {
+            field.name = name;
+            return this;
+        }
+
+        public Builder withType(String type) {
+            field.type = type;
+            return this;
+        }
+
+        public Builder withPrimaryKey(boolean primaryKey) {
+            field.primaryKey = primaryKey;
+            return this;
+        }
+
+        public Builder withNullable(boolean nullable) {
+            field.nullable = nullable;
+            return this;
+        }
+
+        public Builder withUnique(boolean unique) {
+            field.unique = unique;
+            return this;
+        }
+
+        public Builder withLength(Integer length) {
+            field.length = length;
+            return this;
+        }
+
+        public Builder withDefaultValue(Object defaultValue) {
+            field.defaultValue = defaultValue;
+            return this;
+        }
+
+        public Builder withDescription(String description) {
+            field.description = description;
+            return this;
+        }
+
+        public Builder withValidation(ValidationRule validation) {
+            field.validations.add(validation);
+            return this;
+        }
+
+        public Builder withValidations(List<ValidationRule> validations) {
+            field.validations.addAll(validations);
+            return this;
+        }
+
+        public Builder withSearchMapping(SearchMapping searchMapping) {
+            field.searchMapping = searchMapping;
+            return this;
+        }
+
+        public Builder withGenerated(boolean generated) {
+            field.generated = generated;
+            return this;
+        }
+
+        public Builder withEnumClass(String enumClass) {
+            field.enumClass = enumClass;
+            return this;
+        }
+
+        public Builder withEnumValues(List<String> enumValues) {
+            field.enumValues.addAll(enumValues);
+            return this;
+        }
+
+        public FieldDefinition build() {
+            return field;
+        }
     }
 
-    // Getters and Setters
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    // Getters and setters
+
     public String getName() {
         return name;
     }
@@ -54,14 +125,6 @@ public class FieldDefinition {
         this.type = type;
     }
 
-    public boolean isNullable() {
-        return nullable;
-    }
-
-    public void setNullable(boolean nullable) {
-        this.nullable = nullable;
-    }
-
     public boolean isPrimaryKey() {
         return primaryKey;
     }
@@ -70,20 +133,20 @@ public class FieldDefinition {
         this.primaryKey = primaryKey;
     }
 
-    public boolean isGenerated() {
-        return generated;
+    public boolean isNullable() {
+        return nullable;
     }
 
-    public void setGenerated(boolean generated) {
-        this.generated = generated;
+    public void setNullable(boolean nullable) {
+        this.nullable = nullable;
     }
 
-    public boolean isIndexed() {
-        return indexed;
+    public boolean isUnique() {
+        return unique;
     }
 
-    public void setIndexed(boolean indexed) {
-        this.indexed = indexed;
+    public void setUnique(boolean unique) {
+        this.unique = unique;
     }
 
     public Integer getLength() {
@@ -94,6 +157,14 @@ public class FieldDefinition {
         this.length = length;
     }
 
+    public Object getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(Object defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -102,68 +173,28 @@ public class FieldDefinition {
         this.description = description;
     }
 
-    public String getDefaultValue() {
-        return defaultValue;
+    public List<ValidationRule> getValidations() {
+        return validations;
     }
 
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
+    public void setValidations(List<ValidationRule> validations) {
+        this.validations = validations;
     }
 
-    public List<Map<String, Object>> getValidation() {
-        return validation;
+    public SearchMapping getSearchMapping() {
+        return searchMapping;
     }
 
-    public void setValidation(List<Map<String, Object>> validation) {
-        this.validation = validation;
+    public void setSearchMapping(SearchMapping searchMapping) {
+        this.searchMapping = searchMapping;
     }
 
-    public SearchConfig getSearch() {
-        return search;
+    public boolean isGenerated() {
+        return generated;
     }
 
-    public void setSearch(SearchConfig search) {
-        this.search = search;
-    }
-
-    public String getTarget() {
-        return target;
-    }
-
-    public void setTarget(String target) {
-        this.target = target;
-    }
-
-    public String getTargetPackage() {
-        return targetPackage;
-    }
-
-    public void setTargetPackage(String targetPackage) {
-        this.targetPackage = targetPackage;
-    }
-
-    public String getTargetModule() {
-        return targetModule;
-    }
-
-    public void setTargetModule(String targetModule) {
-        this.targetModule = targetModule;
-    }
-
-    public String getRelationType() {
-        return relationType;
-    }
-
-    public void setRelationType(String relationType) {
-        this.relationType = relationType;
-    }
-
-    public String getJoinColumn() {
-        return joinColumn;
-    }
-
-    public void setJoinColumn(String joinColumn) {
-        this.joinColumn = joinColumn;
+    public void setGenerated(boolean generated) {
+        this.generated = generated;
     }
 
     public String getEnumClass() {
@@ -174,27 +205,18 @@ public class FieldDefinition {
         this.enumClass = enumClass;
     }
 
-    public List<String> getValues() {
-        return values;
+    public List<String> getEnumValues() {
+        return enumValues;
     }
 
-    public void setValues(List<String> values) {
-        this.values = values;
+    public void setEnumValues(List<String> enumValues) {
+        this.enumValues = enumValues;
     }
 
-    /**
-     * Determines if this field represents a relationship.
-     *
-     * @return True if this is a relationship field
-     */
-    public boolean isRelationship() {
-        return "Relationship".equals(type);
-    }
+    // Utility methods
 
     /**
-     * Determines if this field represents an enumeration.
-     *
-     * @return True if this is an enum field
+     * Checks if this field is an enum type.
      */
     public boolean isEnum() {
         return "Enum".equals(type);
@@ -202,124 +224,208 @@ public class FieldDefinition {
 
     /**
      * Gets the Java type for this field.
-     * Maps custom types (like "Relationship") to appropriate Java types.
-     *
-     * @return The Java type as a string
      */
     public String getJavaType() {
-        if (isRelationship()) {
-            return target;
-        } else if (isEnum()) {
+        if (isEnum()) {
             return enumClass;
         }
-        return type;
+
+        switch (type) {
+            case "String":
+                return "String";
+            case "Integer":
+            case "Int":
+                return "Integer";
+            case "Long":
+                return "Long";
+            case "Double":
+                return "Double";
+            case "Float":
+                return "Float";
+            case "Boolean":
+                return "Boolean";
+            case "Date":
+                return "java.time.LocalDate";
+            case "DateTime":
+                return "java.time.LocalDateTime";
+            case "Instant":
+                return "java.time.Instant";
+            case "BigDecimal":
+                return "java.math.BigDecimal";
+            case "UUID":
+                return "java.util.UUID";
+            default:
+                return type;
+        }
     }
 
     /**
-     * Gets a list of all imports needed for this field.
-     *
-     * @return A list of fully qualified class names to import
+     * Gets the database column definition for this field.
+     */
+    public String getColumnDefinition() {
+        StringBuilder sb = new StringBuilder();
+
+        // Column type
+        if (isEnum()) {
+            sb.append("VARCHAR");
+            if (length != null) {
+                sb.append("(").append(length).append(")");
+            } else {
+                sb.append("(50)"); // Default length for enum
+            }
+        } else {
+            switch (type) {
+                case "String":
+                    sb.append("VARCHAR");
+                    if (length != null) {
+                        sb.append("(").append(length).append(")");
+                    } else {
+                        sb.append("(255)");
+                    }
+                    break;
+                case "Integer":
+                case "Int":
+                    sb.append("INTEGER");
+                    break;
+                case "Long":
+                    sb.append("BIGINT");
+                    break;
+                case "Double":
+                    sb.append("DOUBLE PRECISION");
+                    break;
+                case "Float":
+                    sb.append("FLOAT");
+                    break;
+                case "Boolean":
+                    sb.append("BOOLEAN");
+                    break;
+                case "Date":
+                    sb.append("DATE");
+                    break;
+                case "DateTime":
+                case "Instant":
+                    sb.append("TIMESTAMP");
+                    break;
+                case "BigDecimal":
+                    sb.append("DECIMAL(19, 2)");
+                    break;
+                case "UUID":
+                    sb.append("VARCHAR(36)");
+                    break;
+                default:
+                    sb.append("VARCHAR(255)");
+            }
+        }
+
+        // Nullable constraint
+        if (!nullable) {
+            sb.append(" NOT NULL");
+        }
+
+        // Unique constraint
+        if (unique) {
+            sb.append(" UNIQUE");
+        }
+
+        // Default value
+        if (defaultValue != null) {
+            sb.append(" DEFAULT ");
+            if (defaultValue instanceof String) {
+                sb.append("'").append(defaultValue).append("'");
+            } else if (defaultValue instanceof Boolean) {
+                sb.append((Boolean) defaultValue ? "TRUE" : "FALSE");
+            } else {
+                sb.append(defaultValue);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Gets JPA column annotations for this field.
+     */
+    public List<String> getJpaAnnotations() {
+        List<String> annotations = new ArrayList<>();
+
+        // Primary key annotation
+        if (primaryKey) {
+            annotations.add("@Id");
+            if (generated) {
+                annotations.add("@GeneratedValue(strategy = GenerationType.IDENTITY)");
+            }
+        }
+
+        // Column annotation
+        StringBuilder columnAnnotation = new StringBuilder("@Column(name = \"");
+        columnAnnotation.append(name).append("\"");
+
+        if (!nullable) {
+            columnAnnotation.append(", nullable = false");
+        }
+
+        if (unique) {
+            columnAnnotation.append(", unique = true");
+        }
+
+        if (length != null && "String".equals(type)) {
+            columnAnnotation.append(", length = ").append(length);
+        }
+
+        columnAnnotation.append(")");
+        annotations.add(columnAnnotation.toString());
+
+        // Enum annotation
+        if (isEnum()) {
+            annotations.add("@Enumerated(EnumType.STRING)");
+        }
+
+        return annotations;
+    }
+
+    /**
+     * Gets all validation annotations for this field.
+     */
+    public List<String> getValidationAnnotations() {
+        List<String> annotations = new ArrayList<>();
+
+        for (ValidationRule validation : validations) {
+            annotations.add(validation.getAnnotation());
+        }
+
+        return annotations;
+    }
+
+    /**
+     * Gets all imports required for this field.
      */
     public List<String> getRequiredImports() {
         List<String> imports = new ArrayList<>();
 
-        // Add imports based on field type
-        if ("Date".equals(type) || "DateTime".equals(type)) {
-            imports.add("java.time.Instant");
-        } else if ("BigDecimal".equals(type)) {
-            imports.add("java.math.BigDecimal");
+        // Add imports based on type
+        switch (type) {
+            case "Date":
+                imports.add("java.time.LocalDate");
+                break;
+            case "DateTime":
+                imports.add("java.time.LocalDateTime");
+                break;
+            case "Instant":
+                imports.add("java.time.Instant");
+                break;
+            case "BigDecimal":
+                imports.add("java.math.BigDecimal");
+                break;
+            case "UUID":
+                imports.add("java.util.UUID");
+                break;
         }
 
-        // Add validation-related imports
-        for (Map<String, Object> validationRule : validation) {
-            String validationType = (String) validationRule.get("type");
-            if ("Email".equals(validationType)) {
-                imports.add("jakarta.validation.constraints.Email");
-            } else if ("NotBlank".equals(validationType)) {
-                imports.add("jakarta.validation.constraints.NotBlank");
-            } else if ("NotNull".equals(validationType)) {
-                imports.add("jakarta.validation.constraints.NotNull");
-            } else if ("Size".equals(validationType)) {
-                imports.add("jakarta.validation.constraints.Size");
-            } else if ("Pattern".equals(validationType)) {
-                imports.add("jakarta.validation.constraints.Pattern");
-            }
+        // Add imports for validations
+        for (ValidationRule validation : validations) {
+            imports.add(validation.getImport());
         }
 
         return imports;
     }
-
-    /**
-     * Gets the JPA column definition for this field.
-     *
-     * @return A string representing the SQL column type
-     */
-    public String getColumnDefinition() {
-        StringBuilder column = new StringBuilder();
-
-        // Handle different field types
-        if ("String".equals(type)) {
-            column.append("VARCHAR");
-            if (length != null) {
-                column.append("(").append(length).append(")");
-            } else {
-                column.append("(255)");
-            }
-        } else if ("Integer".equals(type) || "int".equals(type)) {
-            column.append("INTEGER");
-        } else if ("Long".equals(type) || "long".equals(type)) {
-            column.append("BIGINT");
-        } else if ("Double".equals(type) || "double".equals(type)) {
-            column.append("DOUBLE PRECISION");
-        } else if ("Float".equals(type) || "float".equals(type)) {
-            column.append("FLOAT");
-        } else if ("Boolean".equals(type) || "boolean".equals(type)) {
-            column.append("BOOLEAN");
-        } else if ("Date".equals(type)) {
-            column.append("DATE");
-        } else if ("DateTime".equals(type) || "Instant".equals(type)) {
-            column.append("TIMESTAMP");
-        } else if ("BigDecimal".equals(type)) {
-            column.append("DECIMAL(19, 2)");
-        } else if ("UUID".equals(type)) {
-            column.append("VARCHAR(36)");
-        } else if (isEnum()) {
-            column.append("VARCHAR(50)");
-        }
-
-        // Add NOT NULL constraint if needed
-        if (!nullable) {
-            column.append(" NOT NULL");
-        }
-
-        return column.toString();
-    }
-
-    /**
-     * Determines if this relationship field references an entity in a different module.
-     *
-     * @param currentPackage The current entity's package
-     * @return True if the target entity is in a different module
-     */
-    public boolean isCrossModuleRelationship(String currentPackage) {
-        if (!isRelationship()) {
-            return false;
-        }
-
-        // For now, we'll just assume all relationships are cross-module
-        // In a more advanced implementation, we could check entity registry or
-        // define relationship targets with their full package
-        return true;
-    }
-
-    /**
-     * Gets the fully qualified name of the target class for relationships.
-     */
-    public String getFullyQualifiedTarget() {
-        if (!isRelationship() || targetPackage == null || targetPackage.isEmpty()) {
-            return target;
-        }
-        return targetPackage + "." + target;
-    }
-
 }

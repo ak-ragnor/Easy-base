@@ -4,20 +4,59 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represents the search configuration for a field.
- * This defines how the field is indexed in Elasticsearch.
+ * Represents an Elasticsearch mapping for a field.
  */
-public class SearchConfig {
+public class SearchMapping {
     private String type;
     private String analyzer;
     private Map<String, Object> fields = new HashMap<>();
     private Map<String, Object> properties = new HashMap<>();
 
-    // Constructors
-    public SearchConfig() {
+    // Builder pattern
+    public static class Builder {
+        private SearchMapping mapping = new SearchMapping();
+
+        public Builder withType(String type) {
+            mapping.type = type;
+            return this;
+        }
+
+        public Builder withAnalyzer(String analyzer) {
+            mapping.analyzer = analyzer;
+            return this;
+        }
+
+        public Builder withField(String name, Object value) {
+            mapping.fields.put(name, value);
+            return this;
+        }
+
+        public Builder withFields(Map<String, Object> fields) {
+            mapping.fields.putAll(fields);
+            return this;
+        }
+
+        public Builder withProperty(String name, Object value) {
+            mapping.properties.put(name, value);
+            return this;
+        }
+
+        public Builder withProperties(Map<String, Object> properties) {
+            mapping.properties.putAll(properties);
+            return this;
+        }
+
+        public SearchMapping build() {
+            return mapping;
+        }
     }
 
-    // Getters and Setters
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    // Getters and setters
+
     public String getType() {
         return type;
     }
@@ -51,11 +90,9 @@ public class SearchConfig {
     }
 
     /**
-     * Generates the Elasticsearch mapping for this search configuration.
-     *
-     * @return A map representing the Elasticsearch mapping
+     * Gets the Elasticsearch mapping as a map.
      */
-    public Map<String, Object> generateMapping() {
+    public Map<String, Object> toMap() {
         Map<String, Object> mapping = new HashMap<>();
         mapping.put("type", type);
 

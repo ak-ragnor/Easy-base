@@ -1,43 +1,129 @@
 package com.easybase.generator.model;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
- * Represents the complete definition of an entity as parsed from YAML.
- * This class serves as the primary model for code generation, containing
- * all information needed to generate the entity's code components.
+ * Represents an entity definition from a YAML configuration.
+ * Central model object for the code generation process.
  */
 public class EntityDefinition {
-    private String module;
-    private String entity;
+    private String name;
     private String table;
     private String packageName;
-    private boolean generateController = true;
     private List<FieldDefinition> fields = new ArrayList<>();
+    private List<RelationshipDefinition> relationships = new ArrayList<>();
     private List<FinderDefinition> finders = new ArrayList<>();
+    private List<DtoLevel> dtoLevels = new ArrayList<>();
+    private List<ListenerDefinition> listeners = new ArrayList<>();
+    private Map<String, Object> options = new HashMap<>();
+    private AuditConfig auditConfig = new AuditConfig();
 
-    // Constructor
-    public EntityDefinition() {
+    // Builder pattern for constructing entity definitions
+    public static class Builder {
+        private EntityDefinition entity = new EntityDefinition();
+
+        public Builder withName(String name) {
+            entity.name = name;
+            return this;
+        }
+
+        public Builder withTable(String table) {
+            entity.table = table;
+            return this;
+        }
+
+        public Builder withPackage(String packageName) {
+            entity.packageName = packageName;
+            return this;
+        }
+
+        public Builder withField(FieldDefinition field) {
+            entity.fields.add(field);
+            return this;
+        }
+
+        public Builder withFields(List<FieldDefinition> fields) {
+            entity.fields.addAll(fields);
+            return this;
+        }
+
+        public Builder withRelationship(RelationshipDefinition relationship) {
+            entity.relationships.add(relationship);
+            return this;
+        }
+
+        public Builder withRelationships(List<RelationshipDefinition> relationships) {
+            entity.relationships.addAll(relationships);
+            return this;
+        }
+
+        public Builder withFinder(FinderDefinition finder) {
+            entity.finders.add(finder);
+            return this;
+        }
+
+        public Builder withFinders(List<FinderDefinition> finders) {
+            entity.finders.addAll(finders);
+            return this;
+        }
+
+        public Builder withDtoLevel(DtoLevel dtoLevel) {
+            entity.dtoLevels.add(dtoLevel);
+            return this;
+        }
+
+        public Builder withDtoLevels(List<DtoLevel> dtoLevels) {
+            entity.dtoLevels.addAll(dtoLevels);
+            return this;
+        }
+
+        public Builder withListener(ListenerDefinition listener) {
+            entity.listeners.add(listener);
+            return this;
+        }
+
+        public Builder withListeners(List<ListenerDefinition> listeners) {
+            entity.listeners.addAll(listeners);
+            return this;
+        }
+
+        public Builder withOption(String key, Object value) {
+            entity.options.put(key, value);
+            return this;
+        }
+
+        public Builder withOptions(Map<String, Object> options) {
+            entity.options.putAll(options);
+            return this;
+        }
+
+        public Builder withAuditConfig(AuditConfig auditConfig) {
+            entity.auditConfig = auditConfig;
+            return this;
+        }
+
+        public EntityDefinition build() {
+            return entity;
+        }
     }
 
-    // Getters and Setters
-    public String getModule() {
-        return module;
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public void setModule(String module) {
-        this.module = module;
+    // Getters and setters
+
+    public String getName() {
+        return name;
     }
 
-    public String getEntity() {
-        return entity;
-    }
-
-    public void setEntity(String entity) {
-        this.entity = entity;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getTable() {
@@ -52,14 +138,6 @@ public class EntityDefinition {
         return packageName;
     }
 
-    public boolean isGenerateController() {
-        return generateController;
-    }
-
-    public void setGenerateController(boolean generateController) {
-        this.generateController = generateController;
-    }
-
     public void setPackageName(String packageName) {
         this.packageName = packageName;
     }
@@ -72,6 +150,14 @@ public class EntityDefinition {
         this.fields = fields;
     }
 
+    public List<RelationshipDefinition> getRelationships() {
+        return relationships;
+    }
+
+    public void setRelationships(List<RelationshipDefinition> relationships) {
+        this.relationships = relationships;
+    }
+
     public List<FinderDefinition> getFinders() {
         return finders;
     }
@@ -80,139 +166,140 @@ public class EntityDefinition {
         this.finders = finders;
     }
 
+    public List<DtoLevel> getDtoLevels() {
+        return dtoLevels;
+    }
+
+    public void setDtoLevels(List<DtoLevel> dtoLevels) {
+        this.dtoLevels = dtoLevels;
+    }
+
+    public List<ListenerDefinition> getListeners() {
+        return listeners;
+    }
+
+    public void setListeners(List<ListenerDefinition> listeners) {
+        this.listeners = listeners;
+    }
+
+    public Map<String, Object> getOptions() {
+        return options;
+    }
+
+    public void setOptions(Map<String, Object> options) {
+        this.options = options;
+    }
+
+    public AuditConfig getAuditConfig() {
+        return auditConfig;
+    }
+
+    public void setAuditConfig(AuditConfig auditConfig) {
+        this.auditConfig = auditConfig;
+    }
+
+    // Utility methods
+
     /**
-     * Gets a list of all imports needed for this entity.
+     * Gets the primary key field of this entity.
+     */
+    public Optional<FieldDefinition> getPrimaryKey() {
+        return fields.stream()
+                .filter(FieldDefinition::isPrimaryKey)
+                .findFirst();
+    }
+
+    /**
+     * Gets all searchable fields.
+     */
+    public List<FieldDefinition> getSearchableFields() {
+        return fields.stream()
+                .filter(f -> f.getSearchMapping() != null)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Checks if soft delete is enabled.
+     */
+    public boolean isSoftDeleteEnabled() {
+        Object softDelete = options.get("softDelete");
+        return softDelete != null && (Boolean) softDelete;
+    }
+
+    /**
+     * Gets the soft delete field name.
+     */
+    public String getSoftDeleteField() {
+        return (String) options.getOrDefault("softDeleteField", "deleted");
+    }
+
+    /**
+     * Gets the default package path for a specific component type.
      *
-     * @return A list of fully qualified class names to import
+     * @param componentType The component type (e.g., "model", "service", "repository")
+     * @return The package path
+     */
+    public String getComponentPackage(String componentType) {
+        return packageName + "." + componentType;
+    }
+
+    /**
+     * Gets the base package path for a specific component type.
+     *
+     * @param componentType The component type (e.g., "model", "service", "repository")
+     * @return The base package path
+     */
+    public String getBaseComponentPackage(String componentType) {
+        return getComponentPackage(componentType) + ".base";
+    }
+
+    /**
+     * Gets the full table name, including prefix if specified.
+     */
+    public String getFullTableName() {
+        return table;
+    }
+
+    /**
+     * Gets all import statements needed for this entity definition.
      */
     public List<String> getRequiredImports() {
         List<String> imports = new ArrayList<>();
 
-        // Add standard imports
-        imports.add("java.util.UUID");
-        imports.add("java.time.Instant");
-
         // Add imports based on field types
-        for (FieldDefinition field : fields) {
-            List<String> fieldImports = field.getRequiredImports();
-            for (String fieldImport : fieldImports) {
-                if (!imports.contains(fieldImport)) {
-                    imports.add(fieldImport);
-                }
-            }
+        fields.forEach(field -> imports.addAll(field.getRequiredImports()));
 
-            // Add imports for relationship targets with package specified
-            if (field.isRelationship() && field.getTargetPackage() != null && !field.getTargetPackage().isEmpty()) {
-                // Import the target entity
-                String targetImport = field.getTargetPackage() + "." + field.getTarget();
-                if (!imports.contains(targetImport)) {
-                    imports.add(targetImport);
-                }
-            }
-        }
+        // Add imports for relationships
+        relationships.forEach(rel -> imports.addAll(rel.getRequiredImports()));
 
-        return imports;
+        return imports.stream().distinct().collect(Collectors.toList());
     }
 
     /**
-     * Gets the primary key field for this entity.
-     *
-     * @return The field definition representing the primary key
+     * Audit configuration class.
      */
-    public FieldDefinition getPrimaryKeyField() {
-        for (FieldDefinition field : fields) {
-            if (field.isPrimaryKey()) {
-                return field;
-            }
-        }
-        // Default to ID if no primary key specified
-        FieldDefinition defaultId = new FieldDefinition();
-        defaultId.setName("id");
-        defaultId.setType("UUID");
-        defaultId.setPrimaryKey(true);
-        defaultId.setGenerated(true);
-        return defaultId;
-    }
+    public static class AuditConfig {
+        private boolean enabled = false;
+        private List<String> fields = new ArrayList<>();
 
-    /**
-     * Checks if the entity has audit fields (createdDate, lastModifiedDate).
-     *
-     * @return True if audit fields exist
-     */
-    public boolean hasAuditFields() {
-        for (FieldDefinition field : fields) {
-            if (field.getName().equals("createdDate") ||
-                    field.getName().equals("lastModifiedDate")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Gets all fields that need to be indexed based on finder methods.
-     *
-     * @return A set of field names that should be indexed
-     */
-    public Set<String> getFieldsUsedInFinders() {
-        Set<String> indexedFields = new HashSet<>();
-
-        for (FinderDefinition finder : finders) {
-            // Extract field names from the finder method name
-            String methodName = finder.getName();
-            if (methodName.startsWith("findBy") || methodName.startsWith("countBy")) {
-                String[] parts = methodName.replaceFirst("^(findBy|countBy)", "").split("And|Or");
-                for (String part : parts) {
-                    // Convert to field name (camelCase)
-                    String fieldName = part;
-                    if (!fieldName.isEmpty()) {
-                        fieldName = Character.toLowerCase(fieldName.charAt(0)) + fieldName.substring(1);
-                    }
-
-                    // Add field that matches this name (ignoring suffixes like 'Contains', 'GreaterThan', etc.)
-                    for (FieldDefinition field : fields) {
-                        if (fieldName.startsWith(field.getName())) {
-                            indexedFields.add(field.getName());
-                        }
-                    }
-                }
-            }
+        public boolean isEnabled() {
+            return enabled;
         }
 
-        return indexedFields;
-    }
-
-    /**
-     * Determines if this entity has any relationship fields.
-     *
-     * @return True if this entity has at least one relationship field
-     */
-    public boolean hasRelationships() {
-        for (FieldDefinition field : fields) {
-            if (field.isRelationship()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Gets a list of all related modules that this entity depends on.
-     *
-     * @return A list of module names
-     */
-    public List<String> getRelatedModules() {
-        List<String> modules = new ArrayList<>();
-
-        for (FieldDefinition field : fields) {
-            if (field.isRelationship() && field.getTargetModule() != null) {
-                if (!modules.contains(field.getTargetModule())) {
-                    modules.add(field.getTargetModule());
-                }
-            }
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
 
-        return modules;
-    }
+        public List<String> getFields() {
+            return fields;
+        }
 
+        public void setFields(List<String> fields) {
+            this.fields = fields;
+        }
+
+        public boolean hasField(String fieldName) {
+            return fields.contains(fieldName);
+        }
+    }
 }

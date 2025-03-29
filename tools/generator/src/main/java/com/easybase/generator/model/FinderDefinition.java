@@ -4,112 +4,65 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a finder method defined for an entity.
- * Finder methods are query methods that are generated in the repository.
+ * Represents a finder method in a repository.
  */
 public class FinderDefinition {
     private String name;
-    private List<ParameterDefinition> parameters = new ArrayList<>();
     private String returnType;
+    private List<Parameter> parameters = new ArrayList<>();
     private String query;
 
-    // Constructors
-    public FinderDefinition() {
-    }
+    // Builder pattern
+    public static class Builder {
+        private FinderDefinition finder = new FinderDefinition();
 
-    // Getters and Setters
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<ParameterDefinition> getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(List<ParameterDefinition> parameters) {
-        this.parameters = parameters;
-    }
-
-    public String getReturnType() {
-        return returnType;
-    }
-
-    public void setReturnType(String returnType) {
-        this.returnType = returnType;
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
-    }
-
-    /**
-     * Generates the method signature for this finder method.
-     *
-     * @return The method signature as a string
-     */
-    public String getMethodSignature() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(returnType).append(" ").append(name).append("(");
-
-        for (int i = 0; i < parameters.size(); i++) {
-            ParameterDefinition param = parameters.get(i);
-            sb.append(param.getType()).append(" ").append(param.getName());
-            if (i < parameters.size() - 1) {
-                sb.append(", ");
-            }
+        public Builder withName(String name) {
+            finder.name = name;
+            return this;
         }
 
-        sb.append(")");
-        return sb.toString();
-    }
-
-    /**
-     * Gets the list of imports required for this finder method.
-     *
-     * @param entityName The name of the entity
-     * @return List of imports
-     */
-    public List<String> getRequiredImports(String entityName) {
-        List<String> imports = new ArrayList<>();
-
-        // Add import for return type
-        if (returnType.startsWith("List<")) {
-            imports.add("java.util.List");
-        } else if (returnType.startsWith("Optional<")) {
-            imports.add("java.util.Optional");
-        } else if (returnType.startsWith("Page<")) {
-            imports.add("org.springframework.data.domain.Page");
-            imports.add("org.springframework.data.domain.Pageable");
+        public Builder withReturnType(String returnType) {
+            finder.returnType = returnType;
+            return this;
         }
 
-        // Add imports for parameters
-        for (ParameterDefinition param : parameters) {
-            if ("UUID".equals(param.getType())) {
-                imports.add("java.util.UUID");
-            } else if ("Pageable".equals(param.getType())) {
-                imports.add("org.springframework.data.domain.Pageable");
-            }
+        public Builder withParameter(Parameter parameter) {
+            finder.parameters.add(parameter);
+            return this;
         }
 
-        return imports;
+        public Builder withParameters(List<Parameter> parameters) {
+            finder.parameters.addAll(parameters);
+            return this;
+        }
+
+        public Builder withQuery(String query) {
+            finder.query = query;
+            return this;
+        }
+
+        public FinderDefinition build() {
+            return finder;
+        }
     }
 
-    /**
-     * Nested class to represent a parameter in a finder method.
-     */
-    public static class ParameterDefinition {
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    // Parameter class
+    public static class Parameter {
         private String name;
         private String type;
 
-        // Getters and Setters
+        public Parameter() {
+        }
+
+        public Parameter(String name, String type) {
+            this.name = name;
+            this.type = type;
+        }
+
         public String getName() {
             return name;
         }
@@ -125,5 +78,105 @@ public class FinderDefinition {
         public void setType(String type) {
             this.type = type;
         }
+    }
+
+    // Getters and setters
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(String returnType) {
+        this.returnType = returnType;
+    }
+
+    public List<Parameter> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(List<Parameter> parameters) {
+        this.parameters = parameters;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
+
+    // Utility methods
+
+    /**
+     * Gets the method signature for this finder method.
+     */
+    public String getMethodSignature() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(returnType).append(" ").append(name).append("(");
+
+        for (int i = 0; i < parameters.size(); i++) {
+            Parameter param = parameters.get(i);
+            sb.append(param.getType()).append(" ").append(param.getName());
+
+            if (i < parameters.size() - 1) {
+                sb.append(", ");
+            }
+        }
+
+        sb.append(")");
+        return sb.toString();
+    }
+
+    /**
+     * Gets the parameter list for method calls.
+     */
+    public String getParameterCallList() {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < parameters.size(); i++) {
+            sb.append(parameters.get(i).getName());
+
+            if (i < parameters.size() - 1) {
+                sb.append(", ");
+            }
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Gets all imports required for this finder method.
+     */
+    public List<String> getRequiredImports() {
+        List<String> imports = new ArrayList<>();
+
+        // Handle return type imports
+        if (returnType.startsWith("List<")) {
+            imports.add("java.util.List");
+        } else if (returnType.startsWith("Optional<")) {
+            imports.add("java.util.Optional");
+        } else if (returnType.startsWith("Page<")) {
+            imports.add("org.springframework.data.domain.Page");
+        }
+
+        // Handle parameter type imports
+        for (Parameter param : parameters) {
+            if (param.getType().equals("Pageable")) {
+                imports.add("org.springframework.data.domain.Pageable");
+            } else if (param.getType().equals("UUID")) {
+                imports.add("java.util.UUID");
+            }
+        }
+
+        return imports;
     }
 }
