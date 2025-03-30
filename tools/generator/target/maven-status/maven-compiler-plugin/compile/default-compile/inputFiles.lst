@@ -1,17 +1,32 @@
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/validators/FieldValidator.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/parser/YamlParser.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/model/EntityDefinition.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/model/FieldDefinition.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/mojo/BuildMojo.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/engine/TemplateProcessor.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/validators/ValidationResult.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/model/SearchConfig.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/mojo/BuildAllMojo.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/model/FinderDefinition.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/mojo/CleanMojo.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/validators/EntityValidator.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/engine/Generator.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/engine/FileWriter.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/parser/YamlConverter.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/GeneratorMain.java
-/home/me/Desktop/easy base/workspace/Easy-base/tools/generator/src/main/java/com/easybase/generator/mojo/GenerateMojo.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/parser/RelationshipParser.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/model/FieldDefinition.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/model/DtoLevel.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/parser/EntityParser.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/engine/TestGenerator.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/template/TemplateContext.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/maven/GenerateModuleMojo.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/engine/ServiceGenerator.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/engine/ApiGenerator.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/model/SearchMapping.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/model/FinderDefinition.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/io/FileWriter.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/model/EntityDefinition.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/engine/BaseGenerator.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/engine/EntityGenerator.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/template/TemplateProcessor.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/io/FileManager.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/engine/ModelGenerator.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/parser/YamlParser.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/engine/SchemaGenerator.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/util/CodeAnalyzer.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/config/GenerationOptions.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/maven/HelpMojo.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/maven/GenerateEntityMojo.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/engine/RepositoryGenerator.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/io/ProjectScanner.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/io/CustomCodePreserver.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/model/ValidationRule.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/parser/FieldParser.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/model/RelationshipDefinition.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/CodeGenerator.java
+/home/me/Desktop/easyBase/Easy-base/tools/generator/src/main/java/com/easybase/generator/model/ListenerDefinition.java

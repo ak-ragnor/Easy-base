@@ -11,143 +11,158 @@
   <goalPrefix>easybase</goalPrefix>
   <mojos>
     <mojo>
-      <goal>all</goal>
-      <description>Goal to build all services. Usage: mvn easybase:all</description>
+      <goal>generate-entity</goal>
+      <description>Maven plugin for generating a single entity from Maven parameters. This mojo implements the &quot;generate-entity&quot; goal.</description>
       <requiresDirectInvocation>false</requiresDirectInvocation>
       <requiresProject>true</requiresProject>
       <requiresReports>false</requiresReports>
       <aggregator>false</aggregator>
       <requiresOnline>false</requiresOnline>
       <inheritedByDefault>true</inheritedByDefault>
-      <implementation>com.easybase.generator.mojo.BuildAllMojo</implementation>
+      <phase>generate-sources</phase>
+      <implementation>com.easybase.generator.maven.GenerateEntityMojo</implementation>
       <language>java</language>
       <instantiationStrategy>per-lookup</instantiationStrategy>
       <executionStrategy>once-per-session</executionStrategy>
       <threadSafe>false</threadSafe>
       <parameters>
         <parameter>
-          <name>rootDirectory</name>
-          <type>java.io.File</type>
-          <required>false</required>
-          <editable>true</editable>
-          <description>The root project directory.</description>
-        </parameter>
-      </parameters>
-      <configuration>
-        <rootDirectory implementation="java.io.File" default-value="${project.basedir}/../.."/>
-      </configuration>
-    </mojo>
-    <mojo>
-      <goal>build</goal>
-      <description>Goal to build a specific service. Usage: mvn easybase:build -Dservice=user</description>
-      <requiresDirectInvocation>false</requiresDirectInvocation>
-      <requiresProject>true</requiresProject>
-      <requiresReports>false</requiresReports>
-      <aggregator>false</aggregator>
-      <requiresOnline>false</requiresOnline>
-      <inheritedByDefault>true</inheritedByDefault>
-      <implementation>com.easybase.generator.mojo.BuildMojo</implementation>
-      <language>java</language>
-      <instantiationStrategy>per-lookup</instantiationStrategy>
-      <executionStrategy>once-per-session</executionStrategy>
-      <threadSafe>false</threadSafe>
-      <parameters>
-        <parameter>
-          <name>appsDirectory</name>
-          <type>java.io.File</type>
-          <required>false</required>
-          <editable>true</editable>
-          <description>The directory containing app modules.</description>
-        </parameter>
-        <parameter>
-          <name>service</name>
+          <name>entityName</name>
           <type>java.lang.String</type>
           <required>true</required>
           <editable>true</editable>
-          <description>The service name to build.</description>
+          <description>The entity name.</description>
         </parameter>
-      </parameters>
-      <configuration>
-        <appsDirectory implementation="java.io.File" default-value="${project.basedir}/../../apps"/>
-        <service implementation="java.lang.String">${service}</service>
-      </configuration>
-    </mojo>
-    <mojo>
-      <goal>clean</goal>
-      <description>Goal to clean a specific service. Usage: mvn easybase:clean -Dservice=user</description>
-      <requiresDirectInvocation>false</requiresDirectInvocation>
-      <requiresProject>true</requiresProject>
-      <requiresReports>false</requiresReports>
-      <aggregator>false</aggregator>
-      <requiresOnline>false</requiresOnline>
-      <inheritedByDefault>true</inheritedByDefault>
-      <implementation>com.easybase.generator.mojo.CleanMojo</implementation>
-      <language>java</language>
-      <instantiationStrategy>per-lookup</instantiationStrategy>
-      <executionStrategy>once-per-session</executionStrategy>
-      <threadSafe>false</threadSafe>
-      <parameters>
         <parameter>
-          <name>appsDirectory</name>
-          <type>java.io.File</type>
+          <name>generateTests</name>
+          <type>boolean</type>
           <required>false</required>
           <editable>true</editable>
-          <description>The directory containing app modules.</description>
+          <description>Whether to generate test classes.</description>
         </parameter>
-        <parameter>
-          <name>service</name>
-          <type>java.lang.String</type>
-          <required>true</required>
-          <editable>true</editable>
-          <description>The service name to clean.</description>
-        </parameter>
-      </parameters>
-      <configuration>
-        <appsDirectory implementation="java.io.File" default-value="${project.basedir}/../../apps"/>
-        <service implementation="java.lang.String">${service}</service>
-      </configuration>
-    </mojo>
-    <mojo>
-      <goal>generate</goal>
-      <description>Goal to generate a service from a YAML definition file. Usage: mvn easybase:generate -Dservice=user</description>
-      <requiresDirectInvocation>false</requiresDirectInvocation>
-      <requiresProject>true</requiresProject>
-      <requiresReports>false</requiresReports>
-      <aggregator>false</aggregator>
-      <requiresOnline>false</requiresOnline>
-      <inheritedByDefault>true</inheritedByDefault>
-      <implementation>com.easybase.generator.mojo.GenerateMojo</implementation>
-      <language>java</language>
-      <instantiationStrategy>per-lookup</instantiationStrategy>
-      <executionStrategy>once-per-session</executionStrategy>
-      <threadSafe>false</threadSafe>
-      <parameters>
         <parameter>
           <name>outputDirectory</name>
-          <type>java.io.File</type>
+          <type>java.lang.String</type>
           <required>false</required>
           <editable>true</editable>
           <description>The output directory for generated code.</description>
         </parameter>
         <parameter>
-          <name>service</name>
+          <name>packageName</name>
           <type>java.lang.String</type>
-          <required>true</required>
-          <editable>true</editable>
-          <description>The service name to generate.</description>
-        </parameter>
-        <parameter>
-          <name>yamlDirectory</name>
-          <type>java.io.File</type>
           <required>false</required>
           <editable>true</editable>
-          <description>The directory containing YAML files.</description>
+          <description>The package name.</description>
+        </parameter>
+        <parameter>
+          <name>tableName</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The database table name.</description>
         </parameter>
       </parameters>
       <configuration>
-        <outputDirectory implementation="java.io.File" default-value="${project.basedir}/../../apps"/>
-        <service implementation="java.lang.String">${service}</service>
-        <yamlDirectory implementation="java.io.File" default-value="${project.basedir}/src/main/resources/sample"/>
+        <entityName implementation="java.lang.String">${entity}</entityName>
+        <generateTests implementation="boolean" default-value="true">${generateTests}</generateTests>
+        <outputDirectory implementation="java.lang.String" default-value="${project.basedir}">${outputDirectory}</outputDirectory>
+        <packageName implementation="java.lang.String" default-value="com.easybase">${package}</packageName>
+        <tableName implementation="java.lang.String">${table}</tableName>
+      </configuration>
+    </mojo>
+    <mojo>
+      <goal>generate-module</goal>
+      <description>Maven plugin for generating code from YAML definition files. This mojo implements the &quot;generate-module&quot; goal.</description>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>true</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <phase>generate-sources</phase>
+      <implementation>com.easybase.generator.maven.GenerateModuleMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <threadSafe>false</threadSafe>
+      <parameters>
+        <parameter>
+          <name>entity</name>
+          <type>java.lang.String</type>
+          <required>true</required>
+          <editable>true</editable>
+          <description>The entity name (used to identify the module).</description>
+        </parameter>
+        <parameter>
+          <name>generateTests</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Whether to generate test classes.</description>
+        </parameter>
+        <parameter>
+          <name>outputDirectory</name>
+          <type>java.io.File</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The output directory for generated code. Default is the project&apos;s base directory.</description>
+        </parameter>
+        <parameter>
+          <name>overwriteCustomCode</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Whether to overwrite custom code.</description>
+        </parameter>
+        <parameter>
+          <name>verbose</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Whether to enable verbose logging.</description>
+        </parameter>
+        <parameter>
+          <name>yamlFile</name>
+          <type>java.io.File</type>
+          <required>true</required>
+          <editable>true</editable>
+          <description>The path to the YAML definition file.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <entity implementation="java.lang.String">${entity}</entity>
+        <generateTests implementation="boolean" default-value="true">${generateTests}</generateTests>
+        <outputDirectory implementation="java.io.File" default-value="${project.basedir}">${outputDirectory}</outputDirectory>
+        <overwriteCustomCode implementation="boolean" default-value="false">${overwriteCustomCode}</overwriteCustomCode>
+        <verbose implementation="boolean" default-value="true">${verbose}</verbose>
+        <yamlFile implementation="java.io.File">${yamlFile}</yamlFile>
+      </configuration>
+    </mojo>
+    <mojo>
+      <goal>help</goal>
+      <description>Display help information on easybase-generator.</description>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>false</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <implementation>com.easybase.generator.maven.HelpMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <threadSafe>false</threadSafe>
+      <parameters>
+        <parameter>
+          <name>detail</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Display help information.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <detail implementation="boolean" default-value="false">${detail}</detail>
       </configuration>
     </mojo>
   </mojos>
