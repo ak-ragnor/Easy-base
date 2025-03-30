@@ -1,23 +1,24 @@
 package com.easybase.generator;
 
 import com.easybase.generator.config.GenerationOptions;
-import com.easybase.generator.engine.EntityGenerator;
-import com.easybase.generator.io.FileManager;
 import com.easybase.generator.model.EntityDefinition;
 import com.easybase.generator.parser.YamlParser;
-import com.easybase.generator.template.TemplateProcessor;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
  * Main entry point for the code generator.
+ * This is a temporary debugging implementation that creates a simple file.
  */
 public class CodeGenerator {
 
-    private final YamlParser yamlParser;
-    private final EntityGenerator entityGenerator;
+    private final GenerationOptions options;
 
     /**
      * Constructs a new CodeGenerator with the given options.
@@ -25,12 +26,9 @@ public class CodeGenerator {
      * @param options The generation options
      */
     public CodeGenerator(GenerationOptions options) {
-        this.yamlParser = new YamlParser();
-
-        TemplateProcessor templateProcessor = new TemplateProcessor();
-        FileManager fileManager = new FileManager(options.getOutputDirectory());
-
-        this.entityGenerator = new EntityGenerator(templateProcessor, fileManager, options);
+        this.options = options;
+        // Print debug output
+        System.out.println("CodeGenerator initialized with options: " + options);
     }
 
     /**
@@ -40,52 +38,56 @@ public class CodeGenerator {
      * @throws IOException If an I/O error occurs
      */
     public void generate(File yamlFile) throws IOException {
-        // Parse the YAML file
-        List<EntityDefinition> entities = yamlParser.parse(yamlFile);
+        System.out.println("Starting code generation from YAML file: " + yamlFile.getAbsolutePath());
 
-        // Generate code for all entities
-        entityGenerator.generateAll(entities);
-    }
+        // Create a simple test file to verify write access
+        String outputPath = options.getOutputDirectory();
+        System.out.println("Output directory: " + outputPath);
 
-    /**
-     * Main method for command-line usage.
-     *
-     * @param args Command-line arguments
-     */
-    public static void main(String[] args) {
-        if (args.length < 1) {
-            System.err.println("Usage: java -jar code-generator.jar <yaml-file> [output-directory]");
-            System.exit(1);
-        }
-
-        String yamlFilePath = args[0];
-        File yamlFile = new File(yamlFilePath);
-
-        if (!yamlFile.exists()) {
-            System.err.println("YAML file not found: " + yamlFilePath);
-            System.exit(1);
-        }
-
-        // Create options
-        GenerationOptions.Builder optionsBuilder = GenerationOptions.builder();
-
-        // Set output directory if provided
-        if (args.length > 1) {
-            optionsBuilder.outputDirectory(args[1]);
-        }
-
-        GenerationOptions options = optionsBuilder.build();
-
+        // Create test file
+        Path testFilePath = Paths.get(outputPath, "generation-test.txt");
         try {
-            // Create and run the generator
-            CodeGenerator generator = new CodeGenerator(options);
-            generator.generate(yamlFile);
-
-            System.out.println("Code generation completed successfully.");
+            Files.writeString(testFilePath, "Generation test file. Created from CodeGenerator.generate method.");
+            System.out.println("Created test file at: " + testFilePath);
         } catch (IOException e) {
-            System.err.println("Error generating code: " + e.getMessage());
+            System.err.println("Failed to create test file: " + e.getMessage());
             e.printStackTrace();
-            System.exit(1);
+            throw e;
+        }
+
+        // Parse the YAML file
+        try {
+            System.out.println("Parsing YAML file...");
+            YamlParser parser = new YamlParser();
+            List<EntityDefinition> entities = parser.parse(yamlFile);
+            System.out.println("Parsed " + entities.size() + " entities from YAML file");
+
+            // Create output directory for each entity
+            for (EntityDefinition entity : entities) {
+                String entityName = entity.getName();
+                System.out.println("Processing entity: " + entityName);
+
+                // Create entity directory
+                Path entityDir = Paths.get(outputPath, "easybase-" + entityName.toLowerCase());
+                Files.createDirectories(entityDir);
+                System.out.println("Created entity directory: " + entityDir);
+
+                // Create a simple info file
+                Path infoFilePath = entityDir.resolve("entity-info.txt");
+                String infoContent =
+                        "Entity Name: " + entityName + "\n" +
+                                "Table Name: " + entity.getTable() + "\n" +
+                                "Package: " + entity.getPackageName() + "\n" +
+                                "Fields: " + entity.getFields().size() + "\n";
+
+                Files.writeString(infoFilePath, infoContent);
+                System.out.println("Created entity info file at: " + infoFilePath);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error parsing YAML file: " + e.getMessage());
+            e.printStackTrace();
+            throw new IOException("Error parsing YAML file", e);
         }
     }
 }
