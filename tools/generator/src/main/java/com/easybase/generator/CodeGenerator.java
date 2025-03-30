@@ -1,11 +1,13 @@
 package com.easybase.generator;
 
 import com.easybase.generator.config.GenerationOptions;
+import com.easybase.generator.engine.EntityGenerator;
+import com.easybase.generator.io.FileManager;
 import com.easybase.generator.model.EntityDefinition;
 import com.easybase.generator.parser.YamlParser;
+import com.easybase.generator.template.TemplateProcessor;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,7 +16,6 @@ import java.util.List;
 
 /**
  * Main entry point for the code generator.
- * This is a temporary debugging implementation that creates a simple file.
  */
 public class CodeGenerator {
 
@@ -62,26 +63,31 @@ public class CodeGenerator {
             List<EntityDefinition> entities = parser.parse(yamlFile);
             System.out.println("Parsed " + entities.size() + " entities from YAML file");
 
-            // Create output directory for each entity
+            // Setup the necessary components for code generation
+            FileManager fileManager = new FileManager(outputPath);
+            TemplateProcessor templateProcessor = new TemplateProcessor();
+            EntityGenerator entityGenerator = new EntityGenerator(templateProcessor, fileManager, options);
+
+            // Generate code for each entity
             for (EntityDefinition entity : entities) {
                 String entityName = entity.getName();
                 System.out.println("Processing entity: " + entityName);
 
-                // Create entity directory
+                // Generate all the files for this entity
+                entityGenerator.generate(entity);
+
+                // Create a simple info file to track what was processed
                 Path entityDir = Paths.get(outputPath, "easybase-" + entityName.toLowerCase());
                 Files.createDirectories(entityDir);
-                System.out.println("Created entity directory: " + entityDir);
-
-                // Create a simple info file
                 Path infoFilePath = entityDir.resolve("entity-info.txt");
                 String infoContent =
                         "Entity Name: " + entityName + "\n" +
                                 "Table Name: " + entity.getTable() + "\n" +
                                 "Package: " + entity.getPackageName() + "\n" +
-                                "Fields: " + entity.getFields().size() + "\n";
+                                "Fields: " + entity.getFields().size() + "\n" +
+                                "Generation completed at: " + java.time.LocalDateTime.now() + "\n";
 
                 Files.writeString(infoFilePath, infoContent);
-                System.out.println("Created entity info file at: " + infoFilePath);
             }
 
         } catch (Exception e) {
