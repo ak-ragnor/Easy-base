@@ -12,9 +12,11 @@
         <module name="admin" />
         <module name="dist" />
         <module name="generator" />
-        <module name="easybase-user" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="easybase-user" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

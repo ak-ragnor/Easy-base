@@ -254,6 +254,26 @@ public class EntityDefinition {
     }
 
     /**
+     * Alias for getComponentPackage to support FreeMarker template calls.
+     *
+     * @param componentType The component type (e.g., "model", "service", "repository")
+     * @return The package path
+     */
+    public String componentPackage(String componentType) {
+        return getComponentPackage(componentType);
+    }
+
+    /**
+     * Alias for getBaseComponentPackage to support FreeMarker template calls.
+     *
+     * @param componentType The component type (e.g., "model", "service", "repository")
+     * @return The base package path
+     */
+    public String baseComponentPackage(String componentType) {
+        return getBaseComponentPackage(componentType);
+    }
+
+    /**
      * Gets the full table name, including prefix if specified.
      */
     public String getFullTableName() {

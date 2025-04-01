@@ -1,0 +1,87 @@
+module: easybase-product
+package: com.example.product
+
+entities:
+  - name: Product
+    table: eb_product
+    packageName: com.example.product
+    fields:
+      - name: id
+        type: UUID
+        primaryKey: true
+        generated: true
+
+      - name: name
+        type: String
+        length: 255
+        nullable: false
+        validation:
+          - type: NotBlank
+          - type: Size
+            max: 255
+        search:
+          type: text
+          fields:
+            keyword: true
+
+      - name: description
+        type: String
+        length: 1000
+        search:
+          type: text
+
+      - name: price
+        type: Double
+        nullable: false
+        validation:
+          - type: NotNull
+          - type: Min
+            value: 0
+        search:
+          type: double
+
+      - name: sku
+        type: String
+        length: 50
+        nullable: false
+        unique: true
+        validation:
+          - type: NotBlank
+        search:
+          type: keyword
+
+      - name: status
+        type: Enum
+        enumClass: ProductStatus
+        values: [ACTIVE, INACTIVE, DISCONTINUED]
+        default: ACTIVE
+        search:
+          type: keyword
+
+    finders:
+      - name: findBySku
+        parameters:
+          - name: sku
+            type: String
+        returnType: Optional<Product>
+
+      - name: findByNameContaining
+        parameters:
+          - name: name
+            type: String
+        returnType: List<Product>
+
+      - name: findByPriceRange
+        parameters:
+          - name: minPrice
+            type: Double
+          - name: maxPrice
+            type: Double
+        returnType: List<Product>
+
+    options:
+      softDelete: true
+
+    audit:
+      enabled: true
+      fields: [createdDate, modifiedDate, createdBy, modifiedBy, version]
