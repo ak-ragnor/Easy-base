@@ -164,6 +164,10 @@ public class CodeGenerator {
             return;
         }
 
+        if (Files.size(pomPath) == 0) {
+            System.out.println("Parent POM file is empty");
+            return;
+        }
         String pomContent = Files.readString(pomPath);
 
         // Check if modules section exists
