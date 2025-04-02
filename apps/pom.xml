@@ -18,7 +18,7 @@
     
     <!-- Note: Dynamically generated modules will be added here -->
     <modules>
-        <module>easybase-user</module>
+        <module>easybase-product</module>
     </modules>
 
 
