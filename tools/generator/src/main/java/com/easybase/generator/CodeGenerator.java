@@ -182,7 +182,7 @@ public class CodeGenerator {
         }
 
         // Get existing modules content
-        String modulesContent = pomContent.substring(modulesStart + 9, modulesEnd).trim();
+        String modulesContent = pomContent.substring(modulesStart + "<modules>".length(), modulesEnd).trim();
 
         // Create new modules content
         StringBuilder newModulesContent = new StringBuilder(modulesContent);
