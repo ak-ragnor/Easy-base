@@ -20,6 +20,8 @@ public interface ${entity.name}BaseJpaRepository extends JpaRepository<${entity.
 </#if>
 
 <#list entity.finders as finder>
-    ${finder.methodSignature};
+<#-- Get method signature string correctly -->
+    <#assign methodSig = finder.getMethodSignature()>
+    ${methodSig};
 </#list>
 }
