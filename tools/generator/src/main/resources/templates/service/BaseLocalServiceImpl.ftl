@@ -152,7 +152,10 @@ public Optional<${entity.name}DTO> findById(<#if primaryKey?has_content>${primar
             <#list entity.finders as finder>
                 @Override
                 @Transactional(readOnly = true)
-                public ${finder.methodSignature.replace(entity.name, entity.name + "DTO")} {
+                <#assign methodSig = finder.getMethodSignature()>
+                <#assign entityName = entity.name>
+                <#assign replacedSignature = methodSig?replace(entityName, entityName + "DTO")>
+                public ${replacedSignature} {
                 // CUSTOM CODE START: ${finder.name}
                 // Implement the finder method
                 throw new UnsupportedOperationException("${finder.name} not implemented yet");
