@@ -153,6 +153,10 @@ public class CodeGenerator {
      * @throws IOException If an I/O error occurs
      */
     private void _updateParentPom(String outputPath, List<EntityDefinition> entities) throws IOException {
+        if (entities == null) {
+            System.out.println("Entities list is null");
+            return;
+        }
         Path pomPath = Paths.get(outputPath, "pom.xml");
 
         if (!Files.exists(pomPath)) {
