@@ -167,8 +167,14 @@ public class CodeGenerator {
         String pomContent = Files.readString(pomPath);
 
         // Check if modules section exists
-        int modulesStart = pomContent.indexOf("<modules>");
-        int modulesEnd = pomContent.indexOf("</modules>");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(pomPath.toFile());
+        NodeList moduleNodes = doc.getElementsByTagName("modules");
+        if (moduleNodes.getLength() == 0) {
+            System.out.println("Could not find <modules> section in parent POM");
+            return;
+        }
 
         if (modulesStart == -1 || modulesEnd == -1) {
             System.out.println("Could not find <modules> section in parent POM");
