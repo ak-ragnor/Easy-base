@@ -1,4 +1,3 @@
-// File: tools/generator/src/main/java/com/easybase/generator/CodeGenerator.java
 package com.easybase.generator;
 
 import com.easybase.generator.config.GenerationOptions;
@@ -9,11 +8,23 @@ import com.easybase.generator.parser.YamlParser;
 import com.easybase.generator.template.TemplateContext;
 import com.easybase.generator.template.TemplateProcessor;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -112,9 +123,9 @@ public class CodeGenerator {
             _updateParentPom(outputPath, entities);
 
         } catch (Exception e) {
-            System.err.println("Error parsing YAML file: " + e.getMessage());
+            System.err.println("Error during code generation: " + e.getMessage());
             e.printStackTrace();
-            throw new IOException("Error parsing YAML file", e);
+            throw new IOException("Error during code generation", e);
         }
     }
 
@@ -150,53 +161,77 @@ public class CodeGenerator {
      *
      * @param outputPath The output directory
      * @param entities The list of entity definitions
-     * @throws IOException If an I/O error occurs
+     * @throws Exception If an error occurs
      */
-    private void _updateParentPom(String outputPath, List<EntityDefinition> entities) throws IOException {
-        Path pomPath = Paths.get(outputPath, "pom.xml");
+    private void _updateParentPom(String outputPath, List<EntityDefinition> entities) throws Exception {
+        if (entities == null || entities.isEmpty()) {
+            System.out.println("No entities to add to parent POM");
+            return;
+        }
 
+        Path pomPath = Paths.get(outputPath, "pom.xml");
         if (!Files.exists(pomPath)) {
             System.out.println("Parent POM file not found at: " + pomPath);
             return;
         }
 
-        String pomContent = Files.readString(pomPath);
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(pomPath.toFile());
 
-        // Check if modules section exists
-        int modulesStart = pomContent.indexOf("<modules>");
-        int modulesEnd = pomContent.indexOf("</modules>");
+            // Find or create modules section
+            NodeList modulesList = doc.getElementsByTagName("modules");
+            Element modulesElement;
 
-        if (modulesStart == -1 || modulesEnd == -1) {
-            System.out.println("Could not find <modules> section in parent POM");
-            return;
-        }
-
-        // Get existing modules content
-        String modulesContent = pomContent.substring(modulesStart + 9, modulesEnd).trim();
-
-        // Create new modules content
-        StringBuilder newModulesContent = new StringBuilder(modulesContent);
-
-        for (EntityDefinition entity : entities) {
-            String moduleName = "easybase-" + entity.getName().toLowerCase();
-
-            // Check if module already exists
-            if (!modulesContent.contains("<module>" + moduleName + "</module>")) {
-                if (!modulesContent.isEmpty()) {
-                    newModulesContent.append("\n        ");
-                }
-                newModulesContent.append("<module>").append(moduleName).append("</module>");
+            if (modulesList.getLength() == 0) {
+                // Create modules section
+                modulesElement = doc.createElement("modules");
+                Element root = doc.getDocumentElement();
+                root.appendChild(modulesElement);
+                System.out.println("Created <modules> section in parent POM");
+            } else {
+                modulesElement = (Element) modulesList.item(0);
             }
+
+            // Get existing modules
+            NodeList existingModules = modulesElement.getElementsByTagName("module");
+            List<String> existingModuleNames = new ArrayList<>();
+
+            for (int i = 0; i < existingModules.getLength(); i++) {
+                Node moduleNode = existingModules.item(i);
+                existingModuleNames.add(moduleNode.getTextContent());
+            }
+
+            // Add new modules
+            boolean modified = false;
+            for (EntityDefinition entity : entities) {
+                String moduleName = "easybase-" + entity.getName().toLowerCase();
+
+                if (!existingModuleNames.contains(moduleName)) {
+                    Element moduleElement = doc.createElement("module");
+                    moduleElement.setTextContent(moduleName);
+                    modulesElement.appendChild(moduleElement);
+                    modified = true;
+                    System.out.println("Added module " + moduleName + " to parent POM");
+                }
+            }
+
+            // Save changes
+            if (modified) {
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(doc);
+                StreamResult result = new StreamResult(pomPath.toFile());
+                transformer.transform(source, result);
+                System.out.println("Updated parent POM at: " + pomPath);
+            } else {
+                System.out.println("No changes needed for parent POM");
+            }
+        } catch (Exception e) {
+            System.err.println("Error updating parent POM: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-
-        // Replace modules content
-        String newPomContent = pomContent.substring(0, modulesStart + 9) +
-                "\n        " + newModulesContent + "\n    " +
-                pomContent.substring(modulesEnd);
-
-        // Write updated POM
-        Files.writeString(pomPath, newPomContent);
-
-        System.out.println("Updated parent POM at: " + pomPath);
     }
 }

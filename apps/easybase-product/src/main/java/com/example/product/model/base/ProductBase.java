@@ -15,20 +15,20 @@ import java.util.Objects;
 @MappedSuperclass
 public class ProductBase {
         @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
+            @GeneratedValue(strategy = GenerationType.AUTO)
         @Column(name = "id")
-    private java.util.UUID id;
-        @Column(name = "name", nullable = false, length = 255)
-    private String name;
-        @Column(name = "description", length = 1000)
-    private String description;
-        @Column(name = "price", nullable = false)
-    private Double price;
-        @Column(name = "sku", nullable = false, unique = true, length = 50)
-    private String sku;
-        @Column(name = "status")
-        @Enumerated(EnumType.STRING)
-    private ProductStatus status;
+        private java.util.UUID id;
+            @Column(name = "name", nullable = false, length = 255)
+        private String name;
+            @Column(name = "description", length = 1000)
+        private String description;
+            @Column(name = "price", nullable = false)
+        private Double price;
+            @Column(name = "sku", nullable = false, unique = true, length = 50)
+        private String sku;
+            @Column(name = "status")
+            @Enumerated(EnumType.STRING)
+        private ProductStatus status;
 
     // Audit fields
     @Column(name = "created_date")
@@ -49,7 +49,7 @@ public class ProductBase {
     @Column(name = "deleted")
     private boolean deleted = false;
 
-    // Getters and setters
+// Getters and setters
     public java.util.UUID getId() {
     return id;
     }
@@ -163,7 +163,7 @@ return "Product{" +
     "sku=" + sku +
     ", " +
     "status=" + status +
-
+    
 '}';
 }
 }

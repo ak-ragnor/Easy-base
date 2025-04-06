@@ -23,6 +23,5 @@ CREATE TABLE eb_product (
 -- Create indexes
         CREATE UNIQUE INDEX idx_eb_product_sku ON eb_product(sku);
 
-        CREATE INDEX idx_eb_product_sku ON eb_product(sku);
-        CREATE INDEX idx_eb_product_name ON eb_product(name);
-        CREATE INDEX idx_eb_product_minPrice_maxPrice ON eb_product(minPrice, maxPrice);
+                CREATE INDEX idx_eb_product_name ON eb_product(name);
+

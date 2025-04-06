@@ -13,10 +13,19 @@ import java.util.Objects;
 @MappedSuperclass
 public class ${entity.name}Base {
 <#list entity.fields as field>
-    <#list field.jpaAnnotations as annotation>
-        ${annotation}
-    </#list>
-    private ${field.javaType} ${field.name}<#if field.defaultValue??> = ${field.defaultValue}</#if>;
+    <#if field.primaryKey && field.type == "UUID">
+        @Id
+        <#if field.generated>
+            @GeneratedValue(strategy = GenerationType.AUTO)
+        </#if>
+        @Column(name = "${field.name}")
+        private ${field.javaType} ${field.name}<#if field.defaultValue??> = ${field.defaultValue}</#if>;
+    <#else>
+        <#list field.jpaAnnotations as annotation>
+            ${annotation}
+        </#list>
+        private ${field.javaType} ${field.name}<#if field.defaultValue??> = ${field.defaultValue}</#if>;
+    </#if>
 </#list>
 
 <#if entity.auditConfig.enabled>

@@ -60,7 +60,19 @@ public class FieldParser {
 
         // Parse numeric and string properties
         if (fieldMap.containsKey("length")) {
-            builder.withLength((Integer) fieldMap.get("length"));
+            Object lengthValue = fieldMap.get("length");
+            if (lengthValue instanceof Integer) {
+                builder.withLength((Integer) lengthValue);
+            } else if (lengthValue instanceof String) {
+                // Handle case where length might be a string with commas
+                try {
+                    String lengthStr = ((String) lengthValue).replaceAll(",", "");
+                    builder.withLength(Integer.parseInt(lengthStr));
+                } catch (NumberFormatException e) {
+                    // Log warning and continue with default
+                    System.err.println("Warning: Invalid length value for field " + fieldMap.get("name") + ": " + lengthValue);
+                }
+            }
         }
 
         if (fieldMap.containsKey("defaultValue")) {

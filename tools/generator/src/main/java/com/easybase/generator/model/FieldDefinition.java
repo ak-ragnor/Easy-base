@@ -1,7 +1,6 @@
 package com.easybase.generator.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -265,6 +264,12 @@ public class FieldDefinition {
     public String getColumnDefinition() {
         StringBuilder sb = new StringBuilder();
 
+        // Special handling for UUID primary keys
+        if (type.equals("UUID") && primaryKey) {
+            sb.append("VARCHAR(36)");
+            return sb.toString();
+        }
+
         // Column type
         if (isEnum()) {
             sb.append("VARCHAR");
@@ -347,6 +352,16 @@ public class FieldDefinition {
      */
     public List<String> getJpaAnnotations() {
         List<String> annotations = new ArrayList<>();
+
+        // Special handling for UUID primary keys
+        if (primaryKey && "UUID".equals(type)) {
+            annotations.add("@Id");
+            if (generated) {
+                annotations.add("@GeneratedValue(strategy = GenerationType.AUTO)");
+            }
+            annotations.add("@Column(name = \"" + name + "\")");
+            return annotations;
+        }
 
         // Primary key annotation
         if (primaryKey) {
