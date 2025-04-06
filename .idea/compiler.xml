@@ -15,6 +15,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="easybase-product" target="17" />
       <module name="easybase-user" target="17" />
     </bytecodeTargetLevel>
   </component>

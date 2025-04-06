@@ -29,11 +29,15 @@ EntityDefinition definition = new EntityDefinition("${entity.name}", "${entity.f
     <#if field.nullable??>
         ${field.name}Field.setNullable(${field.nullable?string});
     </#if>
-    <#if field.length??>
-        ${field.name}Field.setLength(${field.length});
+    <#if field.length?? && field.length gt 0>
+        ${field.name}Field.setLength(${field.length?c});
     </#if>
     <#if field.defaultValue??>
-        ${field.name}Field.setDefaultValue("${field.defaultValue}");
+        <#if field.defaultValue?is_string>
+            ${field.name}Field.setDefaultValue("${field.defaultValue}");
+        <#else>
+            ${field.name}Field.setDefaultValue(${field.defaultValue?string});
+        </#if>
     </#if>
     <#if field.searchMapping??>
         Map<String, Object> ${field.name}SearchMapping = new HashMap<>();
@@ -44,7 +48,13 @@ EntityDefinition definition = new EntityDefinition("${entity.name}", "${entity.f
         <#if field.searchMapping.fields?size gt 0>
             Map<String, Object> ${field.name}Fields = new HashMap<>();
             <#list field.searchMapping.fields?keys as fieldKey>
-                ${field.name}Fields.put("${fieldKey}", ${field.searchMapping.fields[fieldKey]?string});
+                <#if field.searchMapping.fields[fieldKey]?is_boolean>
+                    ${field.name}Fields.put("${fieldKey}", ${field.searchMapping.fields[fieldKey]?string});
+                <#elseif field.searchMapping.fields[fieldKey]?is_string>
+                    ${field.name}Fields.put("${fieldKey}", "${field.searchMapping.fields[fieldKey]}");
+                <#else>
+                    ${field.name}Fields.put("${fieldKey}", ${field.searchMapping.fields[fieldKey]?c});
+                </#if>
             </#list>
             ${field.name}SearchMapping.put("fields", ${field.name}Fields);
         </#if>

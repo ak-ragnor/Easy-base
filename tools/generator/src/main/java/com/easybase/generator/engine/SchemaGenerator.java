@@ -3,8 +3,6 @@ package com.easybase.generator.engine;
 import com.easybase.generator.config.GenerationOptions;
 import com.easybase.generator.io.FileManager;
 import com.easybase.generator.model.EntityDefinition;
-import com.easybase.generator.model.FieldDefinition;
-import com.easybase.generator.model.RelationshipDefinition;
 import com.easybase.generator.template.TemplateContext;
 import com.easybase.generator.template.TemplateProcessor;
 
@@ -61,7 +59,8 @@ public class SchemaGenerator extends BaseGenerator {
      * @throws IOException If an I/O error occurs
      */
     private void generateSchemaConfiguration(EntityDefinition entity) throws IOException {
-        String configName = entity.getName() + "SchemaConfig.java";
+        // Fix the filename to avoid duplicate .java extensions
+        String configName = entity.getName() + "SchemaConfig";
         String configPath = getJavaFilePath(getComponentPackagePath(entity, "infrastructure/config"), configName);
 
         // Only generate if the file doesn't exist
