@@ -1,5 +1,0 @@
-Entity Name: Product
-Table Name: eb_product
-Package: com.example.product
-Fields: 6
-Generation completed at: 2025-04-06T14:14:56.524179356

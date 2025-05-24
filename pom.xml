@@ -1,43 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.easybase</groupId>
-    <artifactId>easybase-parent</artifactId>
+    <groupId>com.easyBase</groupId>
+    <artifactId>easy-base-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-
-    <name>EasyBase</name>
-    <description>A zero-configuration backend development framework with dual storage system</description>
-
-    <modules>
-        <module>core</module>
-        <module>common</module>
-        <module>admin</module>
-        <module>starter</module>
-        <module>tools</module>
-        <module>tools/generator</module>
-        <module>apps</module>
-        <module>dist</module>
-    </modules>
+    <name>Easy Base Parent</name>
+    <description>Easy Base Spring Application with React Frontend</description>
 
     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>17</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-        
-        <!-- Dependency versions -->
-        <spring.version>6.0.11</spring.version>
-        <spring.boot.version>3.2.3</spring.boot.version>
-        <elasticsearch.version>8.17.0</elasticsearch.version>
-        <hsqldb.version>2.7.2</hsqldb.version>
-        <postgresql.version>42.6.0</postgresql.version>
-        <junit.version>5.10.0</junit.version>
-        <mockito.version>5.4.0</mockito.version>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <spring.version>6.2.7</spring.version>
+        <spring.security.version>6.5.0</spring.security.version>
+        <spring.data.version>2024.1.6</spring.data.version>
+
+        <hibernate.version>6.6.3.Final</hibernate.version>
+        <hsqldb.version>2.7.4</hsqldb.version>
+        <postgresql.version>42.7.5</postgresql.version>
+        <hikari.version>6.2.1</hikari.version>
+
+        <jakarta.persistence.version>3.2.0</jakarta.persistence.version>
+
+        <elasticsearch.version>8.14.1</elasticsearch.version>
+        <jackson.version>2.19.0</jackson.version>
+
+        <servlet.api.version>6.1.0</servlet.api.version>
+        <jsp.api.version>4.0.0</jsp.api.version>
+        <jstl.api.version>3.0.0</jstl.api.version>
+        <jstl.impl.version>3.0.1</jstl.impl.version>
+
+        <jakarta.validation.version>3.1.1</jakarta.validation.version>
+        <hibernate.validator.version>8.0.2.Final</hibernate.validator.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+
+        <slf4j.version>2.0.17</slf4j.version>
+        <logback.version>1.5.18</logback.version>
+        <log4j2.version>2.24.3</log4j2.version>
+
+        <junit.version>5.12.2</junit.version>
+        <mockito.version>5.17.0</mockito.version>
+        <junit.jupiter.version>5.12.2</junit.jupiter.version>
+        <testcontainers.version>1.19.8</testcontainers.version>
+
+        <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
+        <maven.war.plugin.version>3.4.0</maven.war.plugin.version>
+        <maven.surefire.plugin.version>3.5.3</maven.surefire.plugin.version>
+        <maven.failsafe.plugin.version>3.5.3</maven.failsafe.plugin.version>
+
+        <caffeine.version>3.2.0</caffeine.version>
+
+        <commons.lang3.version>3.17.0</commons.lang3.version>
+        <commons.collections4.version>4.4</commons.collections4.version>
+        <commons.io.version>2.19.0</commons.io.version>
+        <guava.version>33.2.1-jre</guava.version>
+
+        <jjwt.version>0.12.6</jjwt.version>
+        <bcprov.version>1.80</bcprov.version>
+
+        <springdoc.version>2.5.0</springdoc.version>
+        <swagger.version>2.2.30</swagger.version>
     </properties>
+
+    <modules>
+        <module>common</module>
+        <module>config</module>
+        <module>domain</module>
+        <module>service</module>
+        <module>security</module>
+        <module>integration</module>
+        <module>monitoring</module>
+        <module>web</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
@@ -49,46 +90,102 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            
-            <!-- Spring Boot BOM (only for apps module) -->
+
+            <!-- Spring Security BOM -->
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-bom</artifactId>
+                <version>${spring.security.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            
-            <!-- Internal module dependencies -->
+
+            <!-- Spring Data BOM -->
             <dependency>
-                <groupId>com.easybase</groupId>
-                <artifactId>core</artifactId>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-bom</artifactId>
+                <version>${spring.data.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Jackson BOM -->
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- JUnit BOM -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Testcontainers BOM -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Internal Modules -->
+            <dependency>
+                <groupId>com.easyBase</groupId>
+                <artifactId>easy-base-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.easybase</groupId>
-                <artifactId>common</artifactId>
+                <groupId>com.easyBase</groupId>
+                <artifactId>easy-base-config</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.easybase</groupId>
-                <artifactId>admin</artifactId>
+                <groupId>com.easyBase</groupId>
+                <artifactId>easy-base-domain</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.easybase</groupId>
-                <artifactId>starter</artifactId>
+                <groupId>com.easyBase</groupId>
+                <artifactId>easy-base-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            
-            <!-- Elasticsearch -->
             <dependency>
-                <groupId>co.elastic.clients</groupId>
-                <artifactId>elasticsearch-java</artifactId>
-                <version>${elasticsearch.version}</version>
+                <groupId>com.easyBase</groupId>
+                <artifactId>easy-base-security</artifactId>
+                <version>${project.version}</version>
             </dependency>
-            
-            <!-- Database drivers -->
+            <dependency>
+                <groupId>com.easyBase</groupId>
+                <artifactId>easy-base-integration</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.easyBase</groupId>
+                <artifactId>easy-base-monitoring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- JPA and Persistence -->
+            <dependency>
+                <groupId>jakarta.persistence</groupId>
+                <artifactId>jakarta.persistence-api</artifactId>
+                <version>${jakarta.persistence.version}</version>
+            </dependency>
+
+            <!-- Database -->
+            <dependency>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.hsqldb</groupId>
                 <artifactId>hsqldb</artifactId>
@@ -99,18 +196,190 @@
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
             </dependency>
-            
-            <!-- Testing -->
             <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikari.version}</version>
             </dependency>
+
+            <!-- Elasticsearch -->
+            <dependency>
+                <groupId>co.elastic.clients</groupId>
+                <artifactId>elasticsearch-java</artifactId>
+                <version>${elasticsearch.version}</version>
+            </dependency>
+
+            <!-- Jackson -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <!-- Web & Servlet -->
+            <dependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>${servlet.api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.servlet.jsp</groupId>
+                <artifactId>jakarta.servlet.jsp-api</artifactId>
+                <version>${jsp.api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.servlet.jsp.jstl</groupId>
+                <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+                <version>${jstl.api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.web</groupId>
+                <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+                <version>${jstl.impl.version}</version>
+            </dependency>
+
+            <!-- Validation -->
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>${jakarta.validation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate.validator.version}</version>
+            </dependency>
+
+            <!-- Mapping -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${mapstruct.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Logging -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <!-- Utilities -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons.collections4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <!-- Cache -->
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
+
+            <!-- Security -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bcprov.version}</version>
+            </dependency>
+
+            <!-- API Documentation -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-core-jakarta</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-models-jakarta</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+
+            <!-- Testing -->
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
                 <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.jupiter.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -122,23 +391,95 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
+                    <version>${maven.compiler.plugin.version}</version>
                     <configuration>
-                        <source>${java.version}</source>
-                        <target>${java.version}</target>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>${maven.war.plugin.version}</version>
+                    <configuration>
+                        <failOnMissingWebXml>false</failOnMissingWebXml>
+                    </configuration>
+                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>${maven.surefire.plugin.version}</version>
+                    <configuration>
+                        <includes>
+                            <include>**/*Test.java</include>
+                            <include>**/*Tests.java</include>
+                        </includes>
+                        <excludes>
+                            <exclude>**/*IntegrationTest.java</exclude>
+                            <exclude>**/*IT.java</exclude>
+                        </excludes>
+                    </configuration>
                 </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven.failsafe.plugin.version}</version>
+                    <configuration>
+                        <includes>
+                            <include>**/*IntegrationTest.java</include>
+                            <include>**/*IT.java</include>
+                        </includes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+                <db.profile>dev</db.profile>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>test</id>
+            <properties>
+                <spring.profiles.active>test</spring.profiles.active>
+                <db.profile>test</db.profile>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+                <db.profile>prod</db.profile>
+            </properties>
+        </profile>
+    </profiles>
 </project>

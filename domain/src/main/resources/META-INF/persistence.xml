@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+             http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="2.0">
+
+    <persistence-unit name="easyBasePU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <!-- Scan for entities -->
+        <class>com.easyBase.domain.entity.user.User</class>
+        <class>com.easyBase.domain.entity.user.Role</class>
+        <class>com.easyBase.domain.entity.user.Permission</class>
+        <class>com.easyBase.domain.entity.product.Product</class>
+        <class>com.easyBase.domain.entity.product.Category</class>
+        <class>com.easyBase.domain.entity.order.Order</class>
+        <class>com.easyBase.domain.entity.order.OrderItem</class>
+        <class>com.easyBase.domain.entity.audit.AuditLog</class>
+
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+
+        <properties>
+            <property name="hibernate.archive.autodetection" value="class"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="false"/>
+        </properties>
+    </persistence-unit>
+</persistence>

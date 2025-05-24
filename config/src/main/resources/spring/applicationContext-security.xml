@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!-- Enable method security -->
+    <security:global-method-security pre-post-annotations="enabled"
+                                     secured-annotations="enabled"/>
+
+    <!-- HTTP Security Configuration -->
+    <security:http auto-config="false"
+                   use-expressions="true"
+                   entry-point-ref="jwtAuthenticationEntryPoint">
+
+        <!-- Public endpoints -->
+        <security:intercept-url pattern="/api/public/**" access="permitAll"/>
+        <security:intercept-url pattern="/api/auth/**" access="permitAll"/>
+        <security:intercept-url pattern="/api/health/**" access="permitAll"/>
+
+        <!-- Admin endpoints -->
+        <security:intercept-url pattern="/api/admin/**" access="hasRole('ADMIN')"/>
+
+        <!-- Authenticated endpoints -->
+        <security:intercept-url pattern="/api/**" access="isAuthenticated()"/>
+
+        <!-- Static resources -->
+        <security:intercept-url pattern="/static/**" access="permitAll"/>
+        <security:intercept-url pattern="/css/**" access="permitAll"/>
+        <security:intercept-url pattern="/js/**" access="permitAll"/>
+        <security:intercept-url pattern="/images/**" access="permitAll"/>
+
+        <!-- Default deny -->
+        <security:intercept-url pattern="/**" access="isAuthenticated()"/>
+
+        <!-- Custom filters -->
+        <security:custom-filter ref="jwtAuthenticationFilter" before="BASIC_AUTH_FILTER"/>
+
+        <!-- CORS -->
+        <security:cors configuration-source-ref="corsConfigurationSource"/>
+
+        <!-- CSRF disabled for REST API -->
+        <security:csrf disabled="true"/>
+
+        <!-- Session management -->
+        <security:session-management session-creation-policy="STATELESS"/>
+
+    </security:http>
+
+    <!-- Authentication Manager -->
+    <security:authentication-manager>
+        <security:authentication-provider ref="jwtAuthenticationProvider"/>
+        <security:authentication-provider ref="databaseAuthenticationProvider"/>
+    </security:authentication-manager>
+
+    <!-- CORS Configuration -->
+    <bean id="corsConfigurationSource" class="org.springframework.web.cors.CorsConfigurationSource">
+        <property name="corsConfigurations">
+            <map>
+                <entry key="/**">
+                    <bean class="org.springframework.web.cors.CorsConfiguration">
+                        <property name="allowedOrigins" value="${security.cors.allowed-origins:*}"/>
+                        <property name="allowedMethods" value="GET,POST,PUT,DELETE,OPTIONS"/>
+                        <property name="allowedHeaders" value="*"/>
+                        <property name="allowCredentials" value="true"/>
+                        <property name="maxAge" value="3600"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <!-- Password Encoder -->
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+        <constructor-arg value="12"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="easy-base" default="all" basedir=".">
+
+    <!-- Property definitions -->
+    <property file="build.properties"/>
+    <property name="app.name" value="easy-base"/>
+    <property name="app.version" value="1.0.0-SNAPSHOT"/>
+
+    <!-- Directory structure -->
+    <property name="basedir" value="."/>
+    <property name="build.dir" value="${basedir}/target"/>
+    <property name="dist.dir" value="${build.dir}/dist"/>
+    <property name="war.dir" value="${build.dir}/war"/>
+    <property name="tomcat.bundle.dir" value="${build.dir}/tomcat-bundle"/>
+    <property name="docs.dir" value="${build.dir}/docs"/>
+
+    <!-- Module directories -->
+    <property name="common.dir" value="${basedir}/common"/>
+    <property name="config.dir" value="${basedir}/config"/>
+    <property name="domain.dir" value="${basedir}/domain"/>
+    <property name="service.dir" value="${basedir}/service"/>
+    <property name="security.dir" value="${basedir}/security"/>
+    <property name="integration.dir" value="${basedir}/integration"/>
+    <property name="monitoring.dir" value="${basedir}/monitoring"/>
+    <property name="web.dir" value="${basedir}/web"/>
+    <property name="frontend.dir" value="${basedir}/frontend"/>
+
+    <!-- Tomcat configuration -->
+    <property name="tomcat.version" value="9.0.85"/>
+    <property name="tomcat.url" value="https://archive.apache.org/dist/tomcat/tomcat-9/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.tar.gz"/>
+    <property name="tomcat.dir" value="${tomcat.bundle.dir}/apache-tomcat-${tomcat.version}"/>
+
+    <!-- Maven executable -->
+    <condition property="mvn.cmd" value="mvn.cmd" else="mvn">
+        <os family="windows"/>
+    </condition>
+
+    <!-- NPM executable -->
+    <condition property="npm.cmd" value="npm.cmd" else="npm">
+        <os family="windows"/>
+    </condition>
+
+    <!-- Build profiles -->
+    <property name="maven.profile" value="dev"/>
+    <property name="spring.profile" value="dev"/>
+
+    <!-- Main targets -->
+    <target name="all" depends="clean,init,compile,frontend-build,package,documentation"
+            description="Complete build process"/>
+
+    <target name="quick" depends="clean,init,compile,frontend-build,package"
+            description="Quick build without tests"/>
+
+    <target name="dev-quick" depends="clean,init,compile,package"
+            description="Development build without frontend"/>
+
+    <!-- Initialization -->
+    <target name="init" description="Initialize build environment">
+        <echo message="Initializing build environment for ${app.name} v${app.version}"/>
+        <echo message="Build profile: ${maven.profile}"/>
+        <echo message="Spring profile: ${spring.profile}"/>
+
+        <!-- Create build directories -->
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${war.dir}"/>
+        <mkdir dir="${tomcat.bundle.dir}"/>
+        <mkdir dir="${docs.dir}"/>
+
+        <!-- Timestamp for builds -->
+        <tstamp>
+            <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss"/>
+            <format property="build.date" pattern="yyyy-MM-dd"/>
+        </tstamp>
+
+        <echo message="Build started at: ${build.timestamp}"/>
+    </target>
+
+    <!-- Clean build artifacts -->
+    <target name="clean" description="Clean all build artifacts">
+        <echo message="Cleaning build artifacts"/>
+
+        <!-- Clean main build directory -->
+        <delete dir="${build.dir}" failonerror="false"/>
+
+        <!-- Clean Maven modules -->
+        <antcall target="maven-clean"/>
+
+        <!-- Clean frontend -->
+        <antcall target="frontend-clean"/>
+
+        <!-- Clean logs -->
+        <delete dir="logs" failonerror="false"/>
+
+        <echo message="Clean completed"/>
+    </target>
+
+    <!-- Maven clean for all modules -->
+    <target name="maven-clean" description="Clean all Maven modules">
+        <echo message="Cleaning Maven modules"/>
+        <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="false">
+            <arg value="clean"/>
+            <arg value="-P${maven.profile}"/>
+        </exec>
+    </target>
+
+    <!-- Frontend clean -->
+    <target name="frontend-clean" description="Clean frontend build">
+        <echo message="Cleaning frontend build"/>
+        <delete dir="${frontend.dir}/dist" failonerror="false"/>
+        <delete dir="${frontend.dir}/build" failonerror="false"/>
+        <delete dir="${frontend.dir}/node_modules/.cache" failonerror="false"/>
+    </target>
+
+    <!-- Compile all modules -->
+    <target name="compile" depends="init" description="Compile all Java modules">
+        <echo message="Compiling Java modules"/>
+
+        <!-- First, clean Maven cache for spring-data issues -->
+        <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="false">
+            <arg value="dependency:purge-local-repository"/>
+            <arg value="-DmanualInclude=org.springframework.data:spring-data-bom"/>
+        </exec>
+
+        <!-- Compile in dependency order -->
+        <antcall target="compile-module">
+            <param name="module.dir" value="${common.dir}"/>
+            <param name="module.name" value="common"/>
+        </antcall>
+
+        <antcall target="compile-module">
+            <param name="module.dir" value="${config.dir}"/>
+            <param name="module.name" value="config"/>
+        </antcall>
+
+        <antcall target="compile-module">
+            <param name="module.dir" value="${domain.dir}"/>
+            <param name="module.name" value="domain"/>
+        </antcall>
+
+        <antcall target="compile-module">
+            <param name="module.dir" value="${security.dir}"/>
+            <param name="module.name" value="security"/>
+        </antcall>
+
+        <antcall target="compile-module">
+            <param name="module.dir" value="${service.dir}"/>
+            <param name="module.name" value="service"/>
+        </antcall>
+
+        <antcall target="compile-module">
+            <param name="module.dir" value="${integration.dir}"/>
+            <param name="module.name" value="integration"/>
+        </antcall>
+
+        <antcall target="compile-module">
+            <param name="module.dir" value="${monitoring.dir}"/>
+            <param name="module.name" value="monitoring"/>
+        </antcall>
+
+        <antcall target="compile-module">
+            <param name="module.dir" value="${web.dir}"/>
+            <param name="module.name" value="web"/>
+        </antcall>
+
+        <echo message="Java compilation completed"/>
+    </target>
+
+    <!-- Compile individual module -->
+    <target name="compile-module" description="Compile individual module">
+        <echo message="Compiling module: ${module.name}"/>
+        <exec executable="${mvn.cmd}" dir="${module.dir}" failonerror="true">
+            <arg value="clean"/>
+            <arg value="compile"/>
+            <arg value="-P${maven.profile}"/>
+            <arg value="-Dmaven.test.skip=true"/>
+        </exec>
+    </target>
+
+    <!-- Frontend build -->
+    <target name="frontend-build" depends="init" description="Build React frontend">
+        <echo message="Building React frontend"/>
+
+        <!-- Check if node_modules exists -->
+        <available file="${frontend.dir}/node_modules" type="dir" property="node_modules.exists"/>
+
+        <!-- Install dependencies if needed -->
+        <antcall target="frontend-install"/>
+
+        <!-- Build frontend -->
+        <echo message="Building React application"/>
+        <exec executable="${npm.cmd}" dir="${frontend.dir}" failonerror="true">
+            <arg value="run"/>
+            <arg value="build"/>
+        </exec>
+
+        <!-- Copy frontend build to web static directory -->
+        <echo message="Copying frontend build to web module"/>
+        <mkdir dir="${web.dir}/src/main/webapp/static"/>
+        <copy todir="${web.dir}/src/main/webapp/static" failonerror="false">
+            <fileset dir="${frontend.dir}/build" erroronmissingdir="false"/>
+        </copy>
+
+        <echo message="Frontend build completed"/>
+    </target>
+
+    <!-- Frontend dependency installation -->
+    <target name="frontend-install" unless="node_modules.exists" description="Install frontend dependencies">
+        <echo message="Installing frontend dependencies"/>
+        <exec executable="${npm.cmd}" dir="${frontend.dir}" failonerror="true">
+            <arg value="install"/>
+        </exec>
+    </target>
+
+    <!-- Package application -->
+    <target name="package" depends="compile" description="Package application as WAR">
+        <echo message="Packaging application"/>
+
+        <!-- Create WAR using Maven -->
+        <exec executable="${mvn.cmd}" dir="${web.dir}" failonerror="true">
+            <arg value="package"/>
+            <arg value="-P${maven.profile}"/>
+            <arg value="-Dmaven.test.skip=true"/>
+        </exec>
+
+        <!-- Copy WAR to build directory -->
+        <copy file="${web.dir}/target/easy-base.war"
+              tofile="${dist.dir}/${app.name}.war"/>
+
+        <echo message="WAR packaging completed: ${dist.dir}/${app.name}.war"/>
+    </target>
+
+    <!-- Generate documentation -->
+    <target name="documentation" description="Generate documentation">
+        <echo message="Generating documentation"/>
+
+        <!-- Generate JavaDoc -->
+        <antcall target="generate-javadoc"/>
+    </target>
+
+    <!-- Generate JavaDoc -->
+    <target name="generate-javadoc" description="Generate JavaDoc">
+        <echo message="Generating JavaDoc"/>
+        <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="false">
+            <arg value="javadoc:aggregate"/>
+            <arg value="-P${maven.profile}"/>
+        </exec>
+    </target>
+
+    <!-- Development server with Jetty -->
+    <target name="dev-server" description="Start development server with Jetty">
+        <echo message="Starting development server with Jetty"/>
+
+        <!-- Build first -->
+        <antcall target="dev-quick"/>
+
+        <!-- Start Jetty server -->
+        <exec executable="${mvn.cmd}" dir="${web.dir}" spawn="true">
+            <arg value="jetty:run"/>
+            <arg value="-Dspring.profiles.active=dev"/>
+            <arg value="-Djetty.port=8080"/>
+        </exec>
+
+        <echo message="Development server starting..."/>
+        <echo message="Application will be available at: http://localhost:8080/easy-base"/>
+        <echo message="API Health: http://localhost:8080/easy-base/api/health"/>
+    </target>
+
+    <!-- Test basic Maven build -->
+    <target name="test-maven" description="Test Maven build without dependencies">
+        <echo message="Testing basic Maven compilation"/>
+        <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="false">
+            <arg value="clean"/>
+            <arg value="compile"/>
+            <arg value="-P${maven.profile}"/>
+            <arg value="-Dmaven.test.skip=true"/>
+            <arg value="-X"/>
+        </exec>
+    </target>
+
+    <!-- Help target -->
+    <target name="help" description="Display build targets">
+        <echo message="Available build targets:"/>
+        <echo message="  all              - Complete build process"/>
+        <echo message="  quick            - Quick build with frontend"/>
+        <echo message="  dev-quick        - Development build (no frontend)"/>
+        <echo message="  clean            - Clean all build artifacts"/>
+        <echo message="  compile          - Compile all Java modules"/>
+        <echo message="  frontend-build   - Build React frontend"/>
+        <echo message="  package          - Package application as WAR"/>
+        <echo message="  documentation    - Generate documentation"/>
+        <echo message="  dev-server       - Start Jetty development server"/>
+        <echo message="  test-maven       - Test Maven build"/>
+        <echo message="  help             - Display this help"/>
+    </target>
+
+</project>

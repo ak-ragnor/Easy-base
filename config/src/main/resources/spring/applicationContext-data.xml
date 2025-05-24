@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/data/jpa
+           http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- JPA Repository scanning -->
+    <jpa:repositories base-package="com.easyBase.domain.repository.jpa"
+                      entity-manager-factory-ref="entityManagerFactory"
+                      transaction-manager-ref="transactionManager"/>
+
+    <!-- Development Profile DataSource (HSQLDB) -->
+    <beans profile="dev,test">
+        <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+            <property name="driverClassName" value="${db.driver}"/>
+            <property name="url" value="${db.url}"/>
+            <property name="username" value="${db.username}"/>
+            <property name="password" value="${db.password}"/>
+        </bean>
+    </beans>
+
+    <!-- Production Profile DataSource (JNDI) -->
+    <beans profile="prod">
+        <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+            <property name="jndiName" value="${db.jndi.name}"/>
+            <property name="resourceRef" value="true"/>
+        </bean>
+    </beans>
+
+    <!-- JPA Entity Manager Factory -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="com.easyBase.domain.entity"/>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="showSql" value="${jpa.hibernate.show_sql:false}"/>
+                <property name="databasePlatform" value="${jpa.hibernate.dialect}"/>
+            </bean>
+        </property>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.hbm2ddl.auto">${jpa.hibernate.ddl-auto}</prop>
+                <prop key="hibernate.format_sql">${jpa.hibernate.format_sql:false}</prop>
+                <prop key="hibernate.use_sql_comments">true</prop>
+                <prop key="hibernate.show_sql">${jpa.hibernate.show_sql:false}</prop>
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.jcache.JCacheRegionFactory</prop>
+                <prop key="hibernate.javax.cache.provider">org.ehcache.jsr107.EhcacheCachingProvider</prop>
+                <prop key="hibernate.javax.cache.uri">classpath:cache/ehcache.xml</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- Transaction Manager -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <!-- Cache Manager -->
+    <bean id="cacheManager" class="org.springframework.cache.jcache.JCacheCacheManager">
+        <property name="cacheManager">
+            <bean class="org.springframework.cache.jcache.JCacheManagerFactoryBean">
+                <property name="cacheManagerUri" value="classpath:cache/ehcache.xml"/>
+            </bean>
+        </property>
+    </bean>
+
+</beans>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/task
+           http://www.springframework.org/schema/task/spring-task.xsd
+           http://www.springframework.org/schema/jms
+           http://www.springframework.org/schema/jms/spring-jms.xsd">
+
+    <!-- Enable async processing -->
+    <task:annotation-driven/>
+
+    <!-- Enable scheduling -->
+    <task:scheduler id="taskScheduler" pool-size="10"/>
+
+    <!-- Thread pool for async operations -->
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="5"/>
+        <property name="maxPoolSize" value="25"/>
+        <property name="queueCapacity" value="100"/>
+        <property name="threadNamePrefix" value="EasyBase-Async-"/>
+        <property name="rejectedExecutionHandler">
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
+        </property>
+    </bean>
+
+    <!-- RestTemplate for external API calls -->
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+        <property name="requestFactory">
+            <bean class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory">
+                <property name="connectTimeout" value="5000"/>
+                <property name="readTimeout" value="30000"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- Elasticsearch configuration (if enabled) -->
+    <beans profile="!test">
+        <bean id="elasticsearchClient" class="co.elastic.clients.elasticsearch.ElasticsearchClient"
+              factory-bean="elasticsearchClientFactory" factory-method="createClient"/>
+
+        <bean id="elasticsearchClientFactory" class="com.easyBase.config.elasticsearch.ElasticsearchClientFactory">
+            <property name="enabled" value="${elasticsearch.enabled:false}"/>
+            <property name="host" value="${elasticsearch.host:localhost}"/>
+            <property name="port" value="${elasticsearch.port:9200}"/>
+        </bean>
+    </beans>
+
+</beans>
