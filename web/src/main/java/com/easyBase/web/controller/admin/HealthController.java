@@ -21,6 +21,11 @@ public class HealthController {
         status.put("application", "Easy Base");
         status.put("version", "1.0.0-SNAPSHOT");
         status.put("profile", System.getProperty("spring.profiles.active", "dev"));
+
+        // Add some basic health checks
+        status.put("database", "UP"); // You can add actual DB health check later
+        status.put("memory", getMemoryInfo());
+
         return ResponseEntity.ok(status);
     }
 
@@ -32,6 +37,24 @@ public class HealthController {
         info.put("version", "1.0.0-SNAPSHOT");
         info.put("java.version", System.getProperty("java.version"));
         info.put("spring.profiles.active", System.getProperty("spring.profiles.active", "dev"));
+        info.put("build.timestamp", LocalDateTime.now());
         return ResponseEntity.ok(info);
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<String> status() {
+        return ResponseEntity.ok("Application is running");
+    }
+
+    private Map<String, Object> getMemoryInfo() {
+        Map<String, Object> memory = new HashMap<>();
+        Runtime runtime = Runtime.getRuntime();
+
+        memory.put("total", runtime.totalMemory());
+        memory.put("free", runtime.freeMemory());
+        memory.put("used", runtime.totalMemory() - runtime.freeMemory());
+        memory.put("max", runtime.maxMemory());
+
+        return memory;
     }
 }

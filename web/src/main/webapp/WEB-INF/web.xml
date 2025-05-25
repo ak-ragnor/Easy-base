@@ -1,121 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-         http://java.sun.com/xml/ns/javaee/web-app_3_1.xsd"
-         version="3.0"
-         metadata-complete="false">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security.xsd">
 
-    <display-name>Easy Base Application</display-name>
-    <description>Easy Base Spring Application with React Frontend</description>
+    <!-- Development Profile: Simplified Security -->
+    <beans profile="dev">
 
-    <!-- Context Parameters -->
-    <context-param>
-        <param-name>contextClass</param-name>
-        <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-    </context-param>
+        <!-- Very permissive security for development -->
+        <security:http auto-config="true" use-expressions="true">
+            <!-- Allow all health and info endpoints -->
+            <security:intercept-url pattern="/api/health/**" access="permitAll"/>
+            <security:intercept-url pattern="/api/info/**" access="permitAll"/>
 
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:spring/applicationContext.xml</param-value>
-    </context-param>
+            <!-- Allow all static resources -->
+            <security:intercept-url pattern="/static/**" access="permitAll"/>
+            <security:intercept-url pattern="/css/**" access="permitAll"/>
+            <security:intercept-url pattern="/js/**" access="permitAll"/>
+            <security:intercept-url pattern="/images/**" access="permitAll"/>
+            <security:intercept-url pattern="/" access="permitAll"/>
+            <security:intercept-url pattern="/index.html" access="permitAll"/>
 
-    <!-- Spring Context Loader Listener -->
-    <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
+            <!-- Allow all API endpoints for development -->
+            <security:intercept-url pattern="/api/**" access="permitAll"/>
 
-    <!-- Request Context Listener -->
-    <listener>
-        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-    </listener>
+            <!-- Default allow all for dev -->
+            <security:intercept-url pattern="/**" access="permitAll"/>
 
-    <!-- Character Encoding Filter -->
-    <filter>
-        <filter-name>CharacterEncodingFilter</filter-name>
-        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-        <init-param>
-            <param-name>encoding</param-name>
-            <param-value>UTF-8</param-value>
-        </init-param>
-        <init-param>
-            <param-name>forceEncoding</param-name>
-            <param-value>true</param-value>
-        </init-param>
-    </filter>
-    <filter-mapping>
-        <filter-name>CharacterEncodingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+            <!-- Disable CSRF for REST APIs -->
+            <security:csrf disabled="true"/>
 
-    <!-- Spring Security Filter Chain -->
-    <filter>
-        <filter-name>springSecurityFilterChain</filter-name>
-        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>springSecurityFilterChain</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+            <!-- Enable CORS -->
+            <security:cors/>
 
-    <!-- CORS Filter -->
-    <filter>
-        <filter-name>CorsFilter</filter-name>
-        <filter-class>com.easyBase.web.filter.CorsFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>CorsFilter</filter-name>
-        <url-pattern>/api/*</url-pattern>
-    </filter-mapping>
+            <!-- Configure headers -->
+            <security:headers>
+                <security:frame-options policy="SAMEORIGIN"/>
+                <security:content-type-options/>
+            </security:headers>
+        </security:http>
 
-    <!-- Spring MVC Dispatcher Servlet -->
-    <servlet>
-        <servlet-name>dispatcher</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <init-param>
-            <param-name>contextConfigLocation</param-name>
-            <param-value>/WEB-INF/spring/servlet-context.xml</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-        <multipart-config>
-            <max-file-size>10485760</max-file-size>
-            <max-request-size>20971520</max-request-size>
-            <file-size-threshold>0</file-size-threshold>
-        </multipart-config>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>dispatcher</servlet-name>
-        <url-pattern>/api/*</url-pattern>
-    </servlet-mapping>
+        <!-- Simple authentication manager (not used due to permitAll) -->
+        <security:authentication-manager>
+            <security:authentication-provider>
+                <security:user-service>
+                    <security:user name="${dev.username}" password="${dev.password}" authorities="ROLE_USER"/>
+                </security:user-service>
+            </security:authentication-provider>
+        </security:authentication-manager>
 
-    <!-- Default Servlet for Static Content -->
-    <servlet-mapping>
-        <servlet-name>default</servlet-name>
-        <url-pattern>/static/*</url-pattern>
-    </servlet-mapping>
+    </beans>
 
-    <!-- Welcome Files -->
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
+    <!-- Production Profile: Secured -->
+    <beans profile="prod,test">
 
-    <!-- Session Configuration -->
-    <session-config>
-        <session-timeout>30</session-timeout>
-        <cookie-config>
-            <http-only>true</http-only>
-            <secure>false</secure>
-        </cookie-config>
-    </session-config>
+        <security:global-method-security pre-post-annotations="enabled"/>
 
-    <!-- Error Pages -->
-    <error-page>
-        <error-code>404</error-code>
-        <location>/error/404.html</location>
-    </error-page>
-    <error-page>
-        <error-code>500</error-code>
-        <location>/error/500.html</location>
-    </error-page>
+        <security:http auto-config="false" use-expressions="true">
+            <!-- Public endpoints -->
+            <security:intercept-url pattern="/api/public/**" access="permitAll"/>
+            <security:intercept-url pattern="/api/auth/**" access="permitAll"/>
+            <security:intercept-url pattern="/api/health" access="permitAll"/>
+            <security:intercept-url pattern="/api/info" access="permitAll"/>
 
-</web-app>
+            <!-- Admin endpoints -->
+            <security:intercept-url pattern="/api/admin/**" access="hasRole('ADMIN')"/>
+
+            <!-- Protected API endpoints -->
+            <security:intercept-url pattern="/api/**" access="isAuthenticated()"/>
+
+            <!-- Static resources -->
+            <security:intercept-url pattern="/static/**" access="permitAll"/>
+            <security:intercept-url pattern="/" access="permitAll"/>
+
+            <!-- Everything else requires authentication -->
+            <security:intercept-url pattern="/**" access="isAuthenticated()"/>
+
+            <security:csrf disabled="true"/>
+            <security:cors/>
+
+            <security:headers>
+                <security:frame-options policy="DENY"/>
+                <security:content-type-options/>
+                <security:xss-protection/>
+            </security:headers>
+
+            <security:http-basic/>
+        </security:http>
+
+        <security:authentication-manager>
+            <security:authentication-provider>
+                <security:user-service>
+                    <security:user name="admin" password="{bcrypt}$2a$12$XXXXXX" authorities="ROLE_ADMIN"/>
+                    <security:user name="user" password="{bcrypt}$2a$12$YYYYYY" authorities="ROLE_USER"/>
+                </security:user-service>
+            </security:authentication-provider>
+        </security:authentication-manager>
+
+    </beans>
+
+</beans>
