@@ -48,7 +48,7 @@
         <security:authentication-manager>
             <security:authentication-provider>
                 <security:user-service>
-                    <security:user name="dev" password="{noop}dev" authorities="ROLE_USER"/>
+                    <security:user name="${dev.username}" password="${dev.password}" authorities="ROLE_USER"/>
                 </security:user-service>
             </security:authentication-provider>
         </security:authentication-manager>
