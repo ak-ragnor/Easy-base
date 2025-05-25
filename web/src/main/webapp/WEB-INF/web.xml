@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
          http://java.sun.com/xml/ns/javaee/web-app_3_1.xsd"
-         version="3.1"
+         version="3.0"
          metadata-complete="false">
 
     <display-name>Easy Base Application</display-name>
@@ -18,11 +18,6 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath:spring/applicationContext.xml</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>spring.profiles.active</param-name>
-        <param-value>${spring.profiles.active}</param-value>
     </context-param>
 
     <!-- Spring Context Loader Listener -->
