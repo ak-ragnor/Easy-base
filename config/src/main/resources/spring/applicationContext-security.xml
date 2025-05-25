@@ -15,12 +15,13 @@
     <!-- HTTP Security Configuration -->
     <security:http auto-config="false"
                    use-expressions="true"
-                   entry-point-ref="jwtAuthenticationEntryPoint">
+                   create-session="stateless">
 
         <!-- Public endpoints -->
         <security:intercept-url pattern="/api/public/**" access="permitAll"/>
         <security:intercept-url pattern="/api/auth/**" access="permitAll"/>
         <security:intercept-url pattern="/api/health/**" access="permitAll"/>
+        <security:intercept-url pattern="/api/info/**" access="permitAll"/>
 
         <!-- Admin endpoints -->
         <security:intercept-url pattern="/api/admin/**" access="hasRole('ADMIN')"/>
@@ -33,37 +34,52 @@
         <security:intercept-url pattern="/css/**" access="permitAll"/>
         <security:intercept-url pattern="/js/**" access="permitAll"/>
         <security:intercept-url pattern="/images/**" access="permitAll"/>
+        <security:intercept-url pattern="/" access="permitAll"/>
+        <security:intercept-url pattern="/index.html" access="permitAll"/>
 
-        <!-- Default deny -->
-        <security:intercept-url pattern="/**" access="isAuthenticated()"/>
-
-        <!-- Custom filters -->
-        <security:custom-filter ref="jwtAuthenticationFilter" before="BASIC_AUTH_FILTER"/>
+        <!-- Default deny for protected resources -->
+        <security:intercept-url pattern="/protected/**" access="isAuthenticated()"/>
 
         <!-- CORS -->
-        <security:cors configuration-source-ref="corsConfigurationSource"/>
+        <security:cors/>
 
         <!-- CSRF disabled for REST API -->
         <security:csrf disabled="true"/>
 
-        <!-- Session management -->
-        <security:session-management session-creation-policy="STATELESS"/>
+        <!-- Headers -->
+        <security:headers>
+            <security:frame-options policy="DENY"/>
+            <security:content-type-options/>
+            <security:xss-protection/>
+        </security:headers>
+
+        <!-- Custom authentication entry point for development -->
+        <security:http-basic entry-point-ref="customAuthenticationEntryPoint"/>
 
     </security:http>
 
-    <!-- Authentication Manager -->
+    <!-- Simple Authentication Manager for Development -->
     <security:authentication-manager>
-        <security:authentication-provider ref="jwtAuthenticationProvider"/>
-        <security:authentication-provider ref="databaseAuthenticationProvider"/>
+        <security:authentication-provider>
+            <security:user-service>
+                <security:user name="admin" password="{noop}admin" authorities="ROLE_ADMIN"/>
+                <security:user name="user" password="{noop}user" authorities="ROLE_USER"/>
+            </security:user-service>
+        </security:authentication-provider>
     </security:authentication-manager>
 
+    <!-- Custom Authentication Entry Point -->
+    <bean id="customAuthenticationEntryPoint"
+          class="com.easyBase.security.CustomAuthenticationEntryPoint"/>
+
     <!-- CORS Configuration -->
-    <bean id="corsConfigurationSource" class="org.springframework.web.cors.CorsConfigurationSource">
-        <property name="corsConfigurations">
+    <bean id="corsConfigurationSource"
+          class="org.springframework.web.cors.CorsConfigurationSource">
+        <constructor-arg>
             <map>
                 <entry key="/**">
                     <bean class="org.springframework.web.cors.CorsConfiguration">
-                        <property name="allowedOrigins" value="${security.cors.allowed-origins:*}"/>
+                        <property name="allowedOriginPatterns" value="*"/>
                         <property name="allowedMethods" value="GET,POST,PUT,DELETE,OPTIONS"/>
                         <property name="allowedHeaders" value="*"/>
                         <property name="allowCredentials" value="true"/>
@@ -71,7 +87,7 @@
                     </bean>
                 </entry>
             </map>
-        </property>
+        </constructor-arg>
     </bean>
 
     <!-- Password Encoder -->
