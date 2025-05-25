@@ -45,10 +45,10 @@
     <property name="spring.profile" value="dev"/>
 
     <!-- Main targets -->
-    <target name="all" depends="clean,init,compile,frontend-build,package,documentation"
+    <target name="all" depends="clean,init,compile-backend,frontend-build,compile-web,package,documentation"
             description="Complete build process"/>
 
-    <target name="quick" depends="clean,init,compile,frontend-build,package"
+    <target name="quick" depends="clean,init,compile-backend,frontend-build,compile-web,package"
             description="Quick build without tests"/>
 
     <target name="dev-quick" depends="clean,init,compile,package"
@@ -113,8 +113,12 @@
     </target>
 
     <!-- Compile all modules -->
-    <target name="compile" depends="init" description="Compile all Java modules">
-        <echo message="Compiling Java modules"/>
+    <target name="compile" depends="compile-backend,frontend-build,compile-web"
+            description="Compile all modules in correct order"/>
+
+    <!-- Compile backend modules -->
+    <target name="compile-backend" depends="init" description="Compile Java modules except web">
+        <echo message="Compiling backend Java modules"/>
 
         <!-- First, clean Maven cache for spring-data issues -->
         <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="false">
@@ -122,7 +126,6 @@
             <arg value="-DmanualInclude=org.springframework.data:spring-data-bom"/>
         </exec>
 
-        <!-- Compile in dependency order -->
         <antcall target="compile-module">
             <param name="module.dir" value="${common.dir}"/>
             <param name="module.name" value="common"/>
@@ -158,12 +161,7 @@
             <param name="module.name" value="monitoring"/>
         </antcall>
 
-        <antcall target="compile-module">
-            <param name="module.dir" value="${web.dir}"/>
-            <param name="module.name" value="web"/>
-        </antcall>
-
-        <echo message="Java compilation completed"/>
+        <echo message="Backend compilation completed"/>
     </target>
 
     <!-- Compile individual module -->
@@ -171,10 +169,21 @@
         <echo message="Compiling module: ${module.name}"/>
         <exec executable="${mvn.cmd}" dir="${module.dir}" failonerror="true">
             <arg value="clean"/>
-            <arg value="compile"/>
+            <arg value="install"/>
             <arg value="-P${maven.profile}"/>
             <arg value="-Dmaven.test.skip=true"/>
         </exec>
+    </target>
+
+    <target name="compile-web" depends="frontend-build" description="Compile web module">
+        <echo message="Compiling web module"/>
+
+        <antcall target="compile-module">
+            <param name="module.dir" value="${web.dir}"/>
+            <param name="module.name" value="web"/>
+        </antcall>
+
+        <echo message="Web compilation completed"/>
     </target>
 
     <!-- Frontend build -->
