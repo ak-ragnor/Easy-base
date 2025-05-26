@@ -2,61 +2,31 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:aop="http://www.springframework.org/schema/aop"
-       xmlns:cache="http://www.springframework.org/schema/cache"
        xsi:schemaLocation="
            http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context.xsd
-           http://www.springframework.org/schema/tx
-           http://www.springframework.org/schema/tx/spring-tx.xsd
-           http://www.springframework.org/schema/aop
-           http://www.springframework.org/schema/aop/spring-aop.xsd
-           http://www.springframework.org/schema/cache
-           http://www.springframework.org/schema/cache/spring-cache.xsd">
+           http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!-- Component scanning for all modules -->
+    <!-- Component scanning for everything EXCEPT controllers -->
     <context:component-scan base-package="com.easyBase">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
         <context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.RestController"/>
     </context:component-scan>
 
-    <!-- Property placeholder configuration -->
-    <context:property-placeholder
-            location="classpath:database/database-${spring.profiles.active:dev}.properties,
-                  classpath:environment/${spring.profiles.active:dev}.properties"
-            ignore-unresolvable="true"/>
-
-    <!-- Enable annotation-driven configuration -->
+    <!-- Enable annotation config -->
     <context:annotation-config/>
 
-    <!-- Enable AOP -->
-    <aop:aspectj-autoproxy/>
+    <!-- Property placeholder - ignore missing files -->
+    <context:property-placeholder
+            location="classpath*:database/database-${spring.profiles.active:dev}.properties,
+                      classpath*:environment/${spring.profiles.active:development}.properties"
+            ignore-unresolvable="true"
+            ignore-resource-not-found="true"/>
 
-    <!-- Enable transaction management -->
-    <tx:annotation-driven transaction-manager="transactionManager"/>
-
-    <!-- Enable caching -->
-    <cache:annotation-driven cache-manager="cacheManager"/>
-
-    <!-- Import module-specific contexts -->
-    <import resource="applicationContext-data.xml"/>
-    <import resource="applicationContext-security.xml"/>
-    <import resource="applicationContext-integration.xml"/>
-
-    <!-- Profile-specific configurations -->
-    <beans profile="dev">
-        <context:property-placeholder location="classpath:database/database-dev.properties"/>
-    </beans>
-
-    <beans profile="test">
-        <context:property-placeholder location="classpath:database/database-test.properties"/>
-    </beans>
-
-    <beans profile="prod">
-        <context:property-placeholder location="classpath:database/database-prod.properties"/>
-    </beans>
+    <!-- Don't import other contexts for now - keep it minimal -->
+    <!-- <import resource="applicationContext-data.xml"/> -->
+    <!-- <import resource="applicationContext-security.xml"/> -->
+    <!-- <import resource="applicationContext-integration.xml"/> -->
 
 </beans>

@@ -11,46 +11,32 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!-- Component scanning for controllers -->
-    <context:component-scan base-package="com.easyBase.web.controller"
-                            use-default-filters="false">
-        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
-        <context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.RestController"/>
-    </context:component-scan>
-
-    <!-- Enable MVC annotations -->
+    <!-- Enable Spring MVC annotations -->
     <mvc:annotation-driven>
         <mvc:message-converters>
             <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
                 <property name="objectMapper">
-                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
-                        <property name="propertyNamingStrategy">
-                            <bean class="com.fasterxml.jackson.databind.PropertyNamingStrategies$SnakeCaseStrategy"/>
-                        </property>
-                    </bean>
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper"/>
                 </property>
             </bean>
         </mvc:message-converters>
-        <mvc:argument-resolvers>
-            <bean class="org.springframework.data.web.PageableHandlerMethodArgumentResolver"/>
-        </mvc:argument-resolvers>
     </mvc:annotation-driven>
 
-    <!-- Static resource handling -->
-    <mvc:resources mapping="/static/**" location="/static/" cache-period="31556926"/>
-    <mvc:resources mapping="/css/**" location="/static/css/" cache-period="31556926"/>
-    <mvc:resources mapping="/js/**" location="/static/js/" cache-period="31556926"/>
-    <mvc:resources mapping="/images/**" location="/static/images/" cache-period="31556926"/>
+    <!-- Component scanning for controllers ONLY -->
+    <context:component-scan base-package="com.easyBase.web.controller" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.RestController"/>
+    </context:component-scan>
 
-    <!-- Default servlet handler for serving static content -->
-    <mvc:default-servlet-handler/>
-
-    <!-- View resolver for JSP (if needed) -->
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="prefix" value="/WEB-INF/jsp/"/>
-        <property name="suffix" value=".jsp"/>
-        <property name="order" value="2"/>
-    </bean>
+    <!-- CORS Configuration for development -->
+    <mvc:cors>
+        <mvc:mapping path="/**"
+                     allowed-origins="*"
+                     allowed-methods="GET,POST,PUT,DELETE,OPTIONS"
+                     allowed-headers="*"
+                     allow-credentials="false"
+                     max-age="3600"/>
+    </mvc:cors>
 
     <!-- Exception handling -->
     <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
@@ -62,10 +48,12 @@
         </property>
     </bean>
 
-    <!-- Interceptors -->
+    <!-- Interceptors for debugging -->
     <mvc:interceptors>
-        <bean class="com.easyBase.web.interceptor.LoggingInterceptor"/>
-        <bean class="com.easyBase.web.interceptor.PerformanceInterceptor"/>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.easyBase.web.interceptor.LoggingInterceptor"/>
+        </mvc:interceptor>
     </mvc:interceptors>
 
 </beans>

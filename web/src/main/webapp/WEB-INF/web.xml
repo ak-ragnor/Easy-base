@@ -1,106 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:security="http://www.springframework.org/schema/security"
-       xsi:schemaLocation="
-           http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans.xsd
-           http://www.springframework.org/schema/security
-           http://www.springframework.org/schema/security/spring-security.xsd">
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+         http://java.sun.com/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.0">
 
-    <!-- Development Profile: Simplified Security -->
-    <beans profile="dev">
+    <display-name>Easy Base Application</display-name>
 
-        <!-- Very permissive security for development -->
-        <security:http auto-config="true" use-expressions="true">
-            <!-- Allow all health and info endpoints -->
-            <security:intercept-url pattern="/api/health/**" access="permitAll"/>
-            <security:intercept-url pattern="/api/info/**" access="permitAll"/>
+    <!-- Spring Active Profile -->
+    <context-param>
+        <param-name>spring.profiles.active</param-name>
+        <param-value>dev</param-value>
+    </context-param>
 
-            <!-- Allow all static resources -->
-            <security:intercept-url pattern="/static/**" access="permitAll"/>
-            <security:intercept-url pattern="/css/**" access="permitAll"/>
-            <security:intercept-url pattern="/js/**" access="permitAll"/>
-            <security:intercept-url pattern="/images/**" access="permitAll"/>
-            <security:intercept-url pattern="/" access="permitAll"/>
-            <security:intercept-url pattern="/index.html" access="permitAll"/>
+    <!-- Spring Root Application Context -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring/applicationContext.xml</param-value>
+    </context-param>
 
-            <!-- Allow all API endpoints for development -->
-            <security:intercept-url pattern="/api/**" access="permitAll"/>
+    <!-- Spring Context Loader Listener -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
 
-            <!-- Default allow all for dev -->
-            <security:intercept-url pattern="/**" access="permitAll"/>
+    <!-- Character Encoding Filter -->
+    <filter>
+        <filter-name>characterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
-            <!-- Disable CSRF for REST APIs -->
-            <security:csrf disabled="true"/>
+    <!-- Spring MVC Dispatcher Servlet -->
+    <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>/WEB-INF/spring/servlet-context.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
-            <!-- Enable CORS -->
-            <security:cors/>
+    <!-- Map API requests to Spring -->
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
 
-            <!-- Configure headers -->
-            <security:headers>
-                <security:frame-options policy="SAMEORIGIN"/>
-                <security:content-type-options/>
-            </security:headers>
-        </security:http>
+    <!-- Default servlet for static content -->
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/static/*</url-pattern>
+    </servlet-mapping>
 
-        <!-- Simple authentication manager (not used due to permitAll) -->
-        <security:authentication-manager>
-            <security:authentication-provider>
-                <security:user-service>
-                    <security:user name="${dev.username}" password="${dev.password}" authorities="ROLE_USER"/>
-                </security:user-service>
-            </security:authentication-provider>
-        </security:authentication-manager>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.html</url-pattern>
+    </servlet-mapping>
 
-    </beans>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.css</url-pattern>
+    </servlet-mapping>
 
-    <!-- Production Profile: Secured -->
-    <beans profile="prod,test">
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.js</url-pattern>
+    </servlet-mapping>
 
-        <security:global-method-security pre-post-annotations="enabled"/>
+    <!-- Session Configuration -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
 
-        <security:http auto-config="false" use-expressions="true">
-            <!-- Public endpoints -->
-            <security:intercept-url pattern="/api/public/**" access="permitAll"/>
-            <security:intercept-url pattern="/api/auth/**" access="permitAll"/>
-            <security:intercept-url pattern="/api/health" access="permitAll"/>
-            <security:intercept-url pattern="/api/info" access="permitAll"/>
+    <!-- Welcome Files -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
 
-            <!-- Admin endpoints -->
-            <security:intercept-url pattern="/api/admin/**" access="hasRole('ADMIN')"/>
+    <!-- Error Pages -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/index.html</location>
+    </error-page>
 
-            <!-- Protected API endpoints -->
-            <security:intercept-url pattern="/api/**" access="isAuthenticated()"/>
-
-            <!-- Static resources -->
-            <security:intercept-url pattern="/static/**" access="permitAll"/>
-            <security:intercept-url pattern="/" access="permitAll"/>
-
-            <!-- Everything else requires authentication -->
-            <security:intercept-url pattern="/**" access="isAuthenticated()"/>
-
-            <security:csrf disabled="true"/>
-            <security:cors/>
-
-            <security:headers>
-                <security:frame-options policy="DENY"/>
-                <security:content-type-options/>
-                <security:xss-protection/>
-            </security:headers>
-
-            <security:http-basic/>
-        </security:http>
-
-        <security:authentication-manager>
-            <security:authentication-provider>
-                <security:user-service>
-                    <security:user name="admin" password="{bcrypt}$2a$12$XXXXXX" authorities="ROLE_ADMIN"/>
-                    <security:user name="user" password="{bcrypt}$2a$12$YYYYYY" authorities="ROLE_USER"/>
-                </security:user-service>
-            </security:authentication-provider>
-        </security:authentication-manager>
-
-    </beans>
-
-</beans>
+</web-app>
