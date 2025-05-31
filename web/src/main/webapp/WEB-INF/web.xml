@@ -5,7 +5,7 @@
          http://java.sun.com/xml/ns/javaee/web-app_3_1.xsd"
          version="3.0">
 
-    <display-name>Easy Base Application</display-name>
+    <display-name>Easy Base Enterprise Application</display-name>
 
     <!-- Spring Active Profile -->
     <context-param>
@@ -42,9 +42,19 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <!-- Spring MVC Dispatcher Servlet -->
+    <!-- CORS Filter for Development -->
+    <filter>
+        <filter-name>corsFilter</filter-name>
+        <filter-class>com.easyBase.web.filter.CorsFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>corsFilter</filter-name>
+        <url-pattern>/api/*</url-pattern>
+    </filter-mapping>
+
+    <!-- Spring MVC Dispatcher Servlet for API -->
     <servlet>
-        <servlet-name>dispatcher</servlet-name>
+        <servlet-name>apiServlet</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
@@ -53,36 +63,84 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <!-- Map API requests to Spring -->
+    <!-- React SPA Servlet -->
+    <servlet>
+        <servlet-name>reactServlet</servlet-name>
+        <servlet-class>com.easyBase.web.servlet.ReactSpaServlet</servlet-class>
+        <init-param>
+            <param-name>indexPath</param-name>
+            <param-value>/index.html</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <!-- API Requests to Spring MVC -->
     <servlet-mapping>
-        <servlet-name>dispatcher</servlet-name>
+        <servlet-name>apiServlet</servlet-name>
         <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
 
-    <!-- Default servlet for static content -->
+    <!-- React Routes - Handle SPA routing -->
+    <servlet-mapping>
+        <servlet-name>reactServlet</servlet-name>
+        <url-pattern>/dashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>reactServlet</servlet-name>
+        <url-pattern>/dashboard/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>reactServlet</servlet-name>
+        <url-pattern>/users</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>reactServlet</servlet-name>
+        <url-pattern>/users/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Static Assets - Direct serving -->
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>/static/*</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>default</servlet-name>
-        <url-pattern>*.html</url-pattern>
+        <url-pattern>*.js</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>*.css</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>default</servlet-name>
-        <url-pattern>*.js</url-pattern>
+        <url-pattern>*.ico</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.png</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.jpg</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.svg</url-pattern>
+    </servlet-mapping>
+
+    <!-- Root and Index - Serve React App -->
+    <servlet-mapping>
+        <servlet-name>reactServlet</servlet-name>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
     <!-- Session Configuration -->
     <session-config>
         <session-timeout>30</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+            <secure>false</secure> <!-- Set to true in production with HTTPS -->
+        </cookie-config>
     </session-config>
 
     <!-- Welcome Files -->
@@ -90,10 +148,32 @@
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
 
-    <!-- Error Pages -->
+    <!-- Error Pages - All errors go to React for SPA handling -->
     <error-page>
         <error-code>404</error-code>
         <location>/index.html</location>
     </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/index.html</location>
+    </error-page>
+
+    <!-- MIME Type Mappings for Modern Assets -->
+    <mime-mapping>
+        <extension>js</extension>
+        <mime-type>application/javascript</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>css</extension>
+        <mime-type>text/css</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>json</extension>
+        <mime-type>application/json</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>woff2</extension>
+        <mime-type>font/woff2</mime-type>
+    </mime-mapping>
 
 </web-app>

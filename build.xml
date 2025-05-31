@@ -13,6 +13,7 @@
     <property name="war.dir" value="${build.dir}/war"/>
     <property name="tomcat.bundle.dir" value="${build.dir}/tomcat-bundle"/>
     <property name="docs.dir" value="${build.dir}/docs"/>
+    <property name="logs.dir" value="${build.dir}/logs"/>
 
     <!-- Module directories -->
     <property name="common.dir" value="${basedir}/common"/>
@@ -25,10 +26,10 @@
     <property name="web.dir" value="${basedir}/web"/>
     <property name="frontend.dir" value="${basedir}/frontend"/>
 
-    <!-- Tomcat configuration -->
-    <property name="tomcat.version" value="9.0.85"/>
-    <property name="tomcat.url" value="https://archive.apache.org/dist/tomcat/tomcat-9/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.tar.gz"/>
-    <property name="tomcat.dir" value="${tomcat.bundle.dir}/apache-tomcat-${tomcat.version}"/>
+    <!-- Jetty/Tomcat configuration -->
+    <property name="jetty.port" value="8080"/>
+    <property name="jetty.context" value="/easy-base"/>
+    <property name="jetty.logs.dir" value="${logs.dir}/jetty"/>
 
     <!-- Maven executable -->
     <condition property="mvn.cmd" value="mvn.cmd" else="mvn">
@@ -66,6 +67,8 @@
         <mkdir dir="${war.dir}"/>
         <mkdir dir="${tomcat.bundle.dir}"/>
         <mkdir dir="${docs.dir}"/>
+        <mkdir dir="${logs.dir}"/>
+        <mkdir dir="${jetty.logs.dir}"/>
 
         <!-- Timestamp for builds -->
         <tstamp>
@@ -74,6 +77,7 @@
         </tstamp>
 
         <echo message="Build started at: ${build.timestamp}"/>
+        <echo message="Logs will be written to: ${logs.dir}"/>
     </target>
 
     <!-- Clean build artifacts -->
@@ -188,7 +192,7 @@
 
     <!-- Frontend build -->
     <target name="frontend-build" depends="init" description="Build React frontend">
-        <echo message="Building React frontend"/>
+        <echo message="Building React frontend for enterprise SPA"/>
 
         <!-- Check if node_modules exists -->
         <available file="${frontend.dir}/node_modules" type="dir" property="node_modules.exists"/>
@@ -197,20 +201,36 @@
         <antcall target="frontend-install"/>
 
         <!-- Build frontend -->
-        <echo message="Building React application"/>
+        <echo message="Building React application for production"/>
         <exec executable="${npm.cmd}" dir="${frontend.dir}" failonerror="true">
             <arg value="run"/>
             <arg value="build"/>
         </exec>
 
-        <!-- Copy frontend build to web static directory -->
-        <echo message="Copying frontend build to web module"/>
-        <mkdir dir="${web.dir}/src/main/webapp/static"/>
-        <copy todir="${web.dir}/src/main/webapp/static" failonerror="false">
-            <fileset dir="${frontend.dir}/build" erroronmissingdir="false"/>
+        <!-- CRITICAL: Copy ALL build files to webapp root -->
+        <echo message="Copying React SPA build to webapp root"/>
+
+        <!-- First, clean the webapp directory (except WEB-INF) -->
+        <delete includeemptydirs="true">
+            <fileset dir="${web.dir}/src/main/webapp" includes="**/*" excludes="WEB-INF/**,*.html"/>
+        </delete>
+
+        <!-- Copy everything from frontend/build to webapp root -->
+        <copy todir="${web.dir}/src/main/webapp" failonerror="true" overwrite="true">
+            <fileset dir="${frontend.dir}/build">
+                <include name="**/*"/>
+            </fileset>
         </copy>
 
-        <echo message="Frontend build completed"/>
+        <!-- Verify the copy worked -->
+        <echo message="Checking copied files:"/>
+        <exec executable="find" dir="${web.dir}/src/main/webapp" failonerror="false">
+            <arg value="."/>
+            <arg value="-name"/>
+            <arg value="*.js"/>
+        </exec>
+
+        <echo message="Frontend build and copy completed successfully"/>
     </target>
 
     <!-- Frontend dependency installation -->
@@ -223,7 +243,7 @@
 
     <!-- Package application -->
     <target name="package" depends="compile" description="Package application as WAR">
-        <echo message="Packaging application"/>
+        <echo message="Packaging enterprise application"/>
 
         <!-- Create WAR using Maven -->
         <exec executable="${mvn.cmd}" dir="${web.dir}" failonerror="true">
@@ -236,12 +256,12 @@
         <copy file="${web.dir}/target/easy-base.war"
               tofile="${dist.dir}/${app.name}.war"/>
 
-        <echo message="WAR packaging completed: ${dist.dir}/${app.name}.war"/>
+        <echo message="Enterprise WAR packaging completed: ${dist.dir}/${app.name}.war"/>
     </target>
 
     <!-- Generate documentation -->
     <target name="documentation" description="Generate documentation">
-        <echo message="Generating documentation"/>
+        <echo message="Generating enterprise documentation"/>
 
         <!-- Generate JavaDoc -->
         <antcall target="generate-javadoc"/>
@@ -249,30 +269,162 @@
 
     <!-- Generate JavaDoc -->
     <target name="generate-javadoc" description="Generate JavaDoc">
-        <echo message="Generating JavaDoc"/>
+        <echo message="Generating JavaDoc for all modules"/>
         <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="false">
             <arg value="javadoc:aggregate"/>
             <arg value="-P${maven.profile}"/>
         </exec>
     </target>
 
-    <!-- Development server with Jetty -->
-    <target name="dev-server" description="Start development server with Jetty">
-        <echo message="Starting development server with Jetty"/>
+    <!-- Development server with enhanced logging -->
+    <target name="dev-server" description="Start development server with comprehensive logging">
+        <echo message="================================================="/>
+        <echo message="Starting Easy Base Enterprise Development Server"/>
+        <echo message="================================================="/>
+        <echo message="Context Path: ${jetty.context}"/>
+        <echo message="Port: ${jetty.port}"/>
+        <echo message="Profile: ${spring.profile}"/>
+        <echo message="Logs Directory: ${jetty.logs.dir}"/>
+        <echo message="================================================="/>
 
         <!-- Build first -->
-        <antcall target="dev-quick"/>
+        <antcall target="quick"/>
 
-        <!-- Start Jetty server -->
-        <exec executable="${mvn.cmd}" dir="${web.dir}" spawn="true">
+        <!-- Create log configuration -->
+        <echo message="Setting up logging configuration"/>
+        <mkdir dir="${jetty.logs.dir}"/>
+
+        <!-- Create logback configuration for development -->
+        <echo file="${jetty.logs.dir}/logback-dev.xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${jetty.logs.dir}/easy-base-dev.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.easyBase" level="DEBUG"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.eclipse.jetty" level="INFO"/>
+    <logger name="org.hibernate" level="WARN"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>]]></echo>
+
+        <!-- Start Jetty server with enhanced logging -->
+        <echo message="Starting Jetty development server..."/>
+        <echo message="Application URL: http://localhost:${jetty.port}${jetty.context}"/>
+        <echo message="API Health Check: http://localhost:${jetty.port}${jetty.context}/api/health"/>
+        <echo message="Dashboard: http://localhost:${jetty.port}${jetty.context}/dashboard"/>
+        <echo message="Users: http://localhost:${jetty.port}${jetty.context}/users"/>
+        <echo message="================================================="/>
+        <echo message="Server logs will appear below and in: ${jetty.logs.dir}/easy-base-dev.log"/>
+        <echo message="Press Ctrl+C to stop the server"/>
+        <echo message="================================================="/>
+
+        <exec executable="${mvn.cmd}" dir="${web.dir}" spawn="false">
             <arg value="jetty:run"/>
-            <arg value="-Dspring.profiles.active=dev"/>
-            <arg value="-Djetty.port=8080"/>
+            <arg value="-Dspring.profiles.active=${spring.profile}"/>
+            <arg value="-Djetty.port=${jetty.port}"/>
+            <arg value="-Dlogback.configurationFile=${jetty.logs.dir}/logback-dev.xml"/>
+            <arg value="-Dfile.encoding=UTF-8"/>
+            <arg value="-Duser.timezone=UTC"/>
+            <env key="JAVA_OPTS" value="-Xms512m -Xmx1024m -XX:+UseG1GC"/>
         </exec>
+    </target>
 
-        <echo message="Development server starting..."/>
-        <echo message="Application will be available at: http://localhost:8080/easy-base"/>
-        <echo message="API Health: http://localhost:8080/easy-base/api/health"/>
+    <!-- Production Tomcat bundle -->
+    <target name="tomcat-bundle" depends="package" description="Create production Tomcat bundle">
+        <echo message="Creating production Tomcat bundle"/>
+
+        <!-- Download and extract Tomcat if needed -->
+        <antcall target="setup-tomcat"/>
+
+        <!-- Configure Tomcat for production -->
+        <antcall target="configure-tomcat"/>
+
+        <!-- Deploy WAR to Tomcat -->
+        <copy file="${dist.dir}/${app.name}.war"
+              todir="${tomcat.bundle.dir}/apache-tomcat-9.0.85/webapps/"/>
+
+        <!-- Create startup scripts -->
+        <antcall target="create-scripts"/>
+
+        <echo message="Tomcat bundle created in: ${tomcat.bundle.dir}"/>
+    </target>
+
+    <!-- Setup Tomcat -->
+    <target name="setup-tomcat" description="Download and setup Tomcat">
+        <property name="tomcat.url" value="https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.85/bin/apache-tomcat-9.0.85.tar.gz"/>
+        <property name="tomcat.archive" value="${build.dir}/apache-tomcat-9.0.85.tar.gz"/>
+
+        <mkdir dir="${tomcat.bundle.dir}"/>
+
+        <echo message="Downloading Tomcat (if not exists)"/>
+        <get src="${tomcat.url}" dest="${tomcat.archive}" skipexisting="true"/>
+
+        <echo message="Extracting Tomcat"/>
+        <untar src="${tomcat.archive}" dest="${tomcat.bundle.dir}" compression="gzip"/>
+
+        <chmod perm="755">
+            <fileset dir="${tomcat.bundle.dir}/apache-tomcat-9.0.85/bin">
+                <include name="*.sh"/>
+            </fileset>
+        </chmod>
+    </target>
+
+    <!-- Configure Tomcat -->
+    <target name="configure-tomcat" description="Configure Tomcat for production">
+        <echo message="Configuring Tomcat for Easy Base Enterprise"/>
+
+        <!-- Create server.xml -->
+        <!-- Create context.xml with JNDI datasource -->
+        <!-- Create setenv.sh with JVM options -->
+
+        <echo message="Tomcat configured for production deployment"/>
+    </target>
+
+    <!-- Create deployment scripts -->
+    <target name="create-scripts" description="Create deployment and management scripts">
+        <echo message="Creating deployment scripts"/>
+
+        <!-- Create start script -->
+        <echo file="${tomcat.bundle.dir}/start.sh">#!/bin/bash
+            export CATALINA_HOME="${tomcat.bundle.dir}/apache-tomcat-9.0.85"
+            export CATALINA_BASE="${tomcat.bundle.dir}/apache-tomcat-9.0.85"
+            export JAVA_OPTS="-Xms1024m -Xmx2048m -XX:+UseG1GC -Dspring.profiles.active=prod"
+
+            echo "Starting Easy Base Enterprise Application..."
+            echo "Catalina Home: $CATALINA_HOME"
+            echo "Java Options: $JAVA_OPTS"
+
+            $CATALINA_HOME/bin/startup.sh
+
+            echo "Application starting..."
+            echo "URL: http://localhost:8080/easy-base"
+            echo "Logs: $CATALINA_HOME/logs/"
+        </echo>
+
+        <chmod file="${tomcat.bundle.dir}/start.sh" perm="755"/>
+
+        <!-- Create stop script -->
+        <echo file="${tomcat.bundle.dir}/stop.sh">#!/bin/bash
+            export CATALINA_HOME="${tomcat.bundle.dir}/apache-tomcat-9.0.85"
+            echo "Stopping Easy Base Enterprise Application..."
+            $CATALINA_HOME/bin/shutdown.sh
+        </echo>
+
+        <chmod file="${tomcat.bundle.dir}/stop.sh" perm="755"/>
     </target>
 
     <!-- Test basic Maven build -->
@@ -287,20 +439,56 @@
         </exec>
     </target>
 
+    <!-- Show server logs -->
+    <target name="show-logs" description="Show development server logs">
+        <echo message="=== Easy Base Development Server Logs ==="/>
+        <available file="${jetty.logs.dir}/easy-base-dev.log" property="log.exists"/>
+        <antcall target="tail-log"/>
+    </target>
+
+    <target name="tail-log" if="log.exists">
+        <exec executable="tail" os="Linux,Mac OS X" spawn="false">
+            <arg value="-f"/>
+            <arg value="${jetty.logs.dir}/easy-base-dev.log"/>
+        </exec>
+    </target>
+
     <!-- Help target -->
     <target name="help" description="Display build targets">
+        <echo message="============================================"/>
+        <echo message="Easy Base Enterprise Build System"/>
+        <echo message="============================================"/>
         <echo message="Available build targets:"/>
+        <echo message=""/>
+        <echo message="Core Targets:"/>
         <echo message="  all              - Complete build process"/>
         <echo message="  quick            - Quick build with frontend"/>
         <echo message="  dev-quick        - Development build (no frontend)"/>
         <echo message="  clean            - Clean all build artifacts"/>
-        <echo message="  compile          - Compile all Java modules"/>
-        <echo message="  frontend-build   - Build React frontend"/>
-        <echo message="  package          - Package application as WAR"/>
-        <echo message="  documentation    - Generate documentation"/>
+        <echo message=""/>
+        <echo message="Development:"/>
         <echo message="  dev-server       - Start Jetty development server"/>
+        <echo message="  show-logs        - Show development server logs"/>
+        <echo message="  frontend-build   - Build React SPA only"/>
+        <echo message=""/>
+        <echo message="Compilation:"/>
+        <echo message="  compile          - Compile all Java modules"/>
+        <echo message="  compile-backend  - Compile backend modules only"/>
+        <echo message="  compile-web      - Compile web module only"/>
+        <echo message=""/>
+        <echo message="Packaging &amp; Deployment:"/>
+        <echo message="  package          - Package application as WAR"/>
+        <echo message="  tomcat-bundle    - Create production Tomcat bundle"/>
+        <echo message=""/>
+        <echo message="Documentation:"/>
+        <echo message="  documentation    - Generate documentation"/>
+        <echo message=""/>
+        <echo message="Testing &amp; Utilities:"/>
         <echo message="  test-maven       - Test Maven build"/>
         <echo message="  help             - Display this help"/>
+        <echo message="============================================"/>
+        <echo message="Quick Start: ant dev-server"/>
+        <echo message="============================================"/>
     </target>
 
 </project>

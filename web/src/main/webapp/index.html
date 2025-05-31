@@ -1,10 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easy Base Application</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Easy Base Enterprise Application - Modern React Frontend with Spring Backend" />
+    <meta name="theme-color" content="#1976d2" />
+
+    <!-- Preconnect to improve performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Material-UI Roboto Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+
+    <title>Easy Base Enterprise</title>
+
+    <!-- Critical CSS - inline for performance -->
     <style>
+        /* Critical CSS for initial page load */
         * {
             margin: 0;
             padding: 0;
@@ -12,156 +26,228 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen',
+            'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+            sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        #root {
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Loading spinner styles */
+        .loading-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+            background-color: #f5f5f5;
+            z-index: 9999;
         }
 
-        .container {
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #e0e0e0;
+            border-top: 3px solid #1976d2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 16px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hide loading when React takes over */
+        .app-loaded .loading-container {
+            display: none;
+        }
+
+        /* Error boundary styles */
+        .error-boundary {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
             text-align: center;
-            padding: 3rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .error-boundary h1 {
+            color: #d32f2f;
+            margin-bottom: 16px;
+        }
+
+        .error-boundary p {
+            color: #666;
+            margin-bottom: 24px;
             max-width: 600px;
-            width: 90%;
         }
 
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #fff, #f0f8ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .status-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .status-card {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 1rem;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .status-card h3 {
-            margin-bottom: 0.5rem;
-            color: #a8edea;
-        }
-
-        .links {
-            margin-top: 2rem;
-        }
-
-        .link-button {
-            display: inline-block;
-            padding: 12px 24px;
-            margin: 0.5rem;
-            background: rgba(255, 255, 255, 0.2);
+        .error-boundary button {
+            background-color: #1976d2;
             color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
             font-weight: 500;
+            text-transform: uppercase;
         }
 
-        .link-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        .error-boundary button:hover {
+            background-color: #1565c0;
         }
 
-        .emoji {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .footer {
-            margin-top: 2rem;
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-
-        @media (max-width: 600px) {
-            .status-grid {
-                grid-template-columns: 1fr;
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            .loading-spinner {
+                animation: none;
             }
-            h1 {
-                font-size: 2rem;
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            body {
+                background-color: #ffffff;
+                color: #000000;
             }
         }
     </style>
+  <script type="module" crossorigin src="/easy-base/static/js/index-wHL8Q-f6.js"></script>
 </head>
 <body>
-<div class="container">
-    <div class="emoji">🚀</div>
-    <h1>Easy Base</h1>
-    <p class="subtitle">Spring Framework + React Frontend Application</p>
-
-    <div class="status-grid">
-        <div class="status-card">
-            <h3>🌐 Web Server</h3>
-            <p>✅ Tomcat Running</p>
+<!-- Main React Application Root -->
+<div id="root">
+    <!-- Loading indicator shown while React app loads -->
+    <div class="loading-container" id="loading-indicator">
+        <div style="text-align: center;">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading Easy Base Enterprise...</div>
         </div>
-        <div class="status-card">
-            <h3>🍃 Spring Framework</h3>
-            <p>✅ Context Loaded</p>
-        </div>
-        <div class="status-card">
-            <h3>🗄️ Database</h3>
-            <p>✅ HSQLDB Ready</p>
-        </div>
-        <div class="status-card">
-            <h3>⚛️ Frontend</h3>
-            <p>✅ React Deployed</p>
-        </div>
-    </div>
-
-    <div class="links">
-        <a href="/easy-base/api/health" class="link-button">🔍 API Health</a>
-        <a href="/easy-base/api/info" class="link-button">ℹ️ App Info</a>
-        <a href="/easy-base/static/" class="link-button">⚛️ React App</a>
-    </div>
-
-    <div class="footer">
-        <p>Easy Base Application v1.0.0</p>
-        <p>Built with Spring Framework & React</p>
     </div>
 </div>
 
+<!-- Fallback for browsers without JavaScript -->
+<noscript>
+    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h1>JavaScript Required</h1>
+        <p>Easy Base Enterprise requires JavaScript to run properly.</p>
+        <p>Please enable JavaScript in your browser and refresh the page.</p>
+    </div>
+</noscript>
+
+<!-- Global configuration script -->
 <script>
-    // Check API health on page load
-    fetch('/easy-base/api/health')
-        .then(response => response.json())
-        .then(data => {
-            console.log('API Health Check:', data);
-            if (data.status === 'UP') {
-                document.querySelector('.status-card h3').innerHTML = '🟢 API Status: ' + data.status;
-            }
-        })
-        .catch(error => {
-            console.error('API Health Check failed:', error);
-            document.querySelector('.status-card h3').innerHTML = '🔴 API Status: DOWN';
+    // Global app configuration
+    window.APP_CONFIG = {
+        API_BASE_URL: '/easy-base/api',
+        APP_VERSION: '1.0.0',
+        BUILD_TIME: new Date().toISOString(),
+        ENVIRONMENT: 'development',
+        CONTEXT_PATH: '/easy-base',
+        FEATURES: {
+            USER_MANAGEMENT: true,
+            DASHBOARD: true,
+            NOTIFICATIONS: true,
+            DARK_MODE: true
+        }
+    };
+
+    // Performance monitoring
+    window.PERFORMANCE = {
+        startTime: performance.now(),
+        marks: {},
+        measure: function(name) {
+            this.marks[name] = performance.now();
+            console.log(`Performance Mark: ${name} at ${this.marks[name]}ms`);
+        }
+    };
+
+    // Error tracking
+    window.addEventListener('error', function(event) {
+        console.error('Global Error:', {
+            message: event.message,
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno,
+            error: event.error
         });
+    });
+
+    window.addEventListener('unhandledrejection', function(event) {
+        console.error('Unhandled Promise Rejection:', event.reason);
+    });
+
+    // Hide loading indicator when React app loads
+    window.hideLoadingIndicator = function() {
+        var loadingIndicator = document.getElementById('loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+            document.body.classList.add('app-loaded');
+            window.PERFORMANCE.measure('app-loaded');
+        }
+    };
+
+    // Set a timeout to hide loading indicator if React doesn't load
+    setTimeout(function() {
+        var loadingIndicator = document.getElementById('loading-indicator');
+        if (loadingIndicator && loadingIndicator.style.display !== 'none') {
+            console.warn('React app did not load within expected time');
+            loadingIndicator.innerHTML = `
+                    <div style="text-align: center;">
+                        <h2 style="color: #d32f2f; margin-bottom: 16px;">Loading Error</h2>
+                        <p style="color: #666; margin-bottom: 24px;">The application is taking longer than expected to load.</p>
+                        <button onclick="window.location.reload()" style="
+                            background-color: #1976d2;
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            font-weight: 500;
+                            text-transform: uppercase;
+                        ">Reload Page</button>
+                    </div>
+                `;
+        }
+    }, 10000); // 10 second timeout
+
+    // Theme detection
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+
+    // Console welcome message
+    console.log('%c🚀 Easy Base Enterprise',
+        'color: #1976d2; font-size: 20px; font-weight: bold;');
+    console.log('%cApplication loaded successfully!',
+        'color: #4caf50; font-size: 14px;');
+    console.log('API Base URL:', window.APP_CONFIG.API_BASE_URL);
+    console.log('Version:', window.APP_CONFIG.APP_VERSION);
 </script>
+
+<!-- Vite will inject the script tag here during build -->
 </body>
 </html>
