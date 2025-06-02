@@ -6,13 +6,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * REST Controller for User Management
  * Provides full CRUD operations for user entities
  */
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")  // Changed from "/api/users" to "/users"
 @CrossOrigin(origins = "*")
 public class UserController {
 
@@ -31,6 +32,18 @@ public class UserController {
 
     public UserController() {
         System.out.println("UserController instantiated!");
+    }
+
+    /**
+     * Simple test endpoint
+     */
+    @GetMapping("/test")
+    public ResponseEntity<Map<String, String>> test() {
+        System.out.println("=== UserController.test() called ===");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "UserController is working!");
+        response.put("timestamp", LocalDateTime.now().toString());
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -55,19 +68,19 @@ public class UserController {
             filteredUsers = filteredUsers.stream()
                     .filter(user -> user.getName().toLowerCase().contains(search.toLowerCase()) ||
                             user.getEmail().toLowerCase().contains(search.toLowerCase()))
-                    .toList();
+                    .collect(Collectors.toList());
         }
 
         if (!role.isEmpty()) {
             filteredUsers = filteredUsers.stream()
                     .filter(user -> user.getRole().equalsIgnoreCase(role))
-                    .toList();
+                    .collect(Collectors.toList());
         }
 
         if (!status.isEmpty()) {
             filteredUsers = filteredUsers.stream()
                     .filter(user -> user.getStatus().equalsIgnoreCase(status))
-                    .toList();
+                    .collect(Collectors.toList());
         }
 
         // Apply pagination

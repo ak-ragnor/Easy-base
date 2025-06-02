@@ -2,6 +2,7 @@ package com.easyBase.web.controller.admin;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.Map;
  * Health check controller for monitoring application status
  */
 @RestController
+@RequestMapping("/admin")  // Added base path to work with /api/* servlet mapping
 public class HealthController {
 
     public HealthController() {
