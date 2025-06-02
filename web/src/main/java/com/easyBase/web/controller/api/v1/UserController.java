@@ -121,7 +121,7 @@ public class UserController {
             }
 
             // Convert to user's timezone if provided
-            if (userTimezone != null && timezoneService.isValidTimezone(userTimezone)) {
+            if (userTimezone != null && timezoneService.isValidTimezone(userTimezone) && timezoneService.isUserTimezoneEnabled()) {
                 filteredUsers = filteredUsers.stream()
                         .map(user -> convertToUserTimezone(user, userTimezone))
                         .collect(Collectors.toList());
