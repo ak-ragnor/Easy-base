@@ -129,7 +129,7 @@ public class UserController {
 
             // Apply pagination
             int totalElements = filteredUsers.size();
-            int totalPages = (int) Math.ceil((double) totalElements / size);
+            int totalPages = (int) Math.ceil((double) totalElements / Math.max(1, size));
             int startIndex = Math.max(0, page) * Math.max(1, size);
             int endIndex = Math.min(startIndex + Math.max(1, size), totalElements);
 
