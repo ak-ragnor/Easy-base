@@ -104,7 +104,6 @@ public class UserController {
             if (!search.isEmpty()) {
             if (!search.isEmpty()) {
                 filteredUsers = filteredUsers.stream()
-                        .filter(user -> (user.getName() != null && user.getName().toLowerCase().contains(search.toLowerCase())) ||
                                 (user.getEmail() != null && user.getEmail().toLowerCase().contains(search.toLowerCase())))
                         .collect(Collectors.toList());
             }
