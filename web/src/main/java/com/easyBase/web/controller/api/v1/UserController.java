@@ -1,124 +1,179 @@
 package com.easyBase.web.controller.api.v1;
 
+import com.easyBase.common.dto.user.UserDTO;
+import com.easyBase.common.dto.user.CreateUserRequest;
+import com.easyBase.common.dto.user.UpdateUserRequest;
+import com.easyBase.common.service.TimezoneService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.annotation.PostConstruct;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * REST Controller for User Management
- * Provides full CRUD operations for user entities
+ * REST Controller for User Management with full timezone support
  */
 @RestController
-@RequestMapping("/users")  // Changed from "/api/users" to "/users"
+@RequestMapping("/users")
 @CrossOrigin(origins = "*")
 public class UserController {
 
+    @Autowired
+    private TimezoneService timezoneService;
+
     // Mock data store - in real app this would be a service layer
-    private static final Map<Long, User> USERS = new HashMap<>();
+    private static final Map<Long, UserDTO> USERS = new HashMap<>();
     private static Long USER_ID_COUNTER = 1L;
 
-    static {
-        // Initialize with sample data
-        USERS.put(1L, new User(1L, "John Doe", "john.doe@example.com", "ADMIN", "ACTIVE", LocalDateTime.now()));
-        USERS.put(2L, new User(2L, "Jane Smith", "jane.smith@example.com", "USER", "ACTIVE", LocalDateTime.now()));
-        USERS.put(3L, new User(3L, "Bob Johnson", "bob.johnson@example.com", "MANAGER", "ACTIVE", LocalDateTime.now()));
-        USERS.put(4L, new User(4L, "Alice Brown", "alice.brown@example.com", "USER", "INACTIVE", LocalDateTime.now()));
+    // Initialize with sample data using different timezones
+    @PostConstruct
+    public void init() {
+        ZonedDateTime now = timezoneService.now();
+
+        USERS.put(1L, UserDTO.builder()
+                .id(1L)
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .role("ADMIN")
+                .status("ACTIVE")
+                .createdAt(now)
+                .lastModified(now)
+                .userTimezone("America/New_York")
+                .build());
+
+        USERS.put(2L, UserDTO.builder()
+                .id(2L)
+                .name("Jane Smith")
+                .email("jane.smith@example.com")
+                .role("USER")
+                .status("ACTIVE")
+                .createdAt(now)
+                .lastModified(now)
+                .userTimezone("Europe/London")
+                .build());
+
+        USERS.put(3L, UserDTO.builder()
+                .id(3L)
+                .name("Bob Johnson")
+                .email("bob.johnson@example.com")
+                .role("MANAGER")
+                .status("ACTIVE")
+                .createdAt(now)
+                .lastModified(now)
+                .userTimezone("Asia/Tokyo")
+                .build());
+
+        USERS.put(4L, UserDTO.builder()
+                .id(4L)
+                .name("Alice Brown")
+                .email("alice.brown@example.com")
+                .role("USER")
+                .status("INACTIVE")
+                .createdAt(now)
+                .lastModified(now)
+                .userTimezone("UTC")
+                .build());
+
         USER_ID_COUNTER = 5L;
-    }
-
-    public UserController() {
-        System.out.println("UserController instantiated!");
-    }
-
-    /**
-     * Simple test endpoint
-     */
-    @GetMapping("/test")
-    public ResponseEntity<Map<String, String>> test() {
-        System.out.println("=== UserController.test() called ===");
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "UserController is working!");
-        response.put("timestamp", LocalDateTime.now().toString());
-        return ResponseEntity.ok(response);
     }
 
     /**
      * Get all users with optional filtering and pagination
+     * Optionally convert to requester's timezone
      */
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAllUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "") String search,
-            @RequestParam(defaultValue = "") String role,
-            @RequestParam(defaultValue = "") String status) {
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "search", defaultValue = "") String search,
+            @RequestParam(name = "role", defaultValue = "") String role,
+            @RequestParam(name = "status", defaultValue = "") String status,
+            @RequestHeader(name = "X-User-Timezone", required = false) String userTimezone) {
 
         System.out.println("=== UserController.getAllUsers() called ===");
-        System.out.println("Parameters - page: " + page + ", size: " + size + ", search: '" + search +
-                "', role: '" + role + "', status: '" + status + "'");
+        System.out.println("User timezone header: " + userTimezone);
 
-        List<User> filteredUsers = new ArrayList<>(USERS.values());
+        try {
+            List<UserDTO> filteredUsers = new ArrayList<>(USERS.values());
+            // Apply filters
+            if (!search.isEmpty()) {
+            if (!search.isEmpty()) {
+                filteredUsers = filteredUsers.stream()
+                                (user.getEmail() != null && user.getEmail().toLowerCase().contains(search.toLowerCase())))
+                        .collect(Collectors.toList());
+            }
+            if (!role.isEmpty()) {
+                filteredUsers = filteredUsers.stream()
+                        .filter(user -> user.getRole().equalsIgnoreCase(role))
+                        .collect(Collectors.toList());
+            }
 
-        // Apply filters
-        if (!search.isEmpty()) {
-            filteredUsers = filteredUsers.stream()
-                    .filter(user -> user.getName().toLowerCase().contains(search.toLowerCase()) ||
-                            user.getEmail().toLowerCase().contains(search.toLowerCase()))
-                    .collect(Collectors.toList());
+            if (!status.isEmpty()) {
+                filteredUsers = filteredUsers.stream()
+                        .filter(user -> user.getStatus().equalsIgnoreCase(status))
+                        .collect(Collectors.toList());
+            }
+
+            // Convert to user's timezone if provided
+            if (userTimezone != null && timezoneService.isValidTimezone(userTimezone) && timezoneService.isUserTimezoneEnabled()) {
+                filteredUsers = filteredUsers.stream()
+                        .map(user -> convertToUserTimezone(user, userTimezone))
+                        .collect(Collectors.toList());
+            }
+
+            // Apply pagination
+            int totalElements = filteredUsers.size();
+            int totalPages = (int) Math.ceil((double) totalElements / Math.max(1, size));
+            int startIndex = Math.max(0, page) * Math.max(1, size);
+            int endIndex = Math.min(startIndex + Math.max(1, size), totalElements);
+
+            List<UserDTO> pageContent = startIndex < totalElements ?
+                    filteredUsers.subList(startIndex, endIndex) : new ArrayList<>();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("content", pageContent);
+            response.put("page", page);
+            response.put("size", size);
+            response.put("totalElements", totalElements);
+            response.put("totalPages", totalPages);
+            response.put("first", page == 0);
+            response.put("last", page >= totalPages - 1);
+            response.put("serverTimezone", timezoneService.getSystemTimezone());
+            response.put("timestamp", timezoneService.now());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.err.println("ERROR in getAllUsers: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-
-        if (!role.isEmpty()) {
-            filteredUsers = filteredUsers.stream()
-                    .filter(user -> user.getRole().equalsIgnoreCase(role))
-                    .collect(Collectors.toList());
-        }
-
-        if (!status.isEmpty()) {
-            filteredUsers = filteredUsers.stream()
-                    .filter(user -> user.getStatus().equalsIgnoreCase(status))
-                    .collect(Collectors.toList());
-        }
-
-        // Apply pagination
-        int totalElements = filteredUsers.size();
-        int totalPages = (int) Math.ceil((double) totalElements / size);
-        int startIndex = page * size;
-        int endIndex = Math.min(startIndex + size, totalElements);
-
-        List<User> pageContent = startIndex < totalElements ?
-                filteredUsers.subList(startIndex, endIndex) : new ArrayList<>();
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("content", pageContent);
-        response.put("page", page);
-        response.put("size", size);
-        response.put("totalElements", totalElements);
-        response.put("totalPages", totalPages);
-        response.put("first", page == 0);
-        response.put("last", page >= totalPages - 1);
-
-        System.out.println("Returning " + pageContent.size() + " users out of " + totalElements + " total");
-        return ResponseEntity.ok(response);
     }
 
     /**
      * Get user by ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> getUserById(
+            @PathVariable("id") Long id,
+            @RequestHeader(name = "X-User-Timezone", required = false) String userTimezone) {
+
         System.out.println("=== UserController.getUserById() called with ID: " + id + " ===");
 
-        User user = USERS.get(id);
+        UserDTO user = USERS.get(id);
         if (user == null) {
-            System.out.println("User not found with ID: " + id);
             return ResponseEntity.notFound().build();
         }
 
-        System.out.println("Found user: " + user.getName());
+        // Convert to user's timezone if provided
+        if (userTimezone != null && timezoneService.isValidTimezone(userTimezone)) {
+            user = convertToUserTimezone(user, userTimezone);
+        }
+
         return ResponseEntity.ok(user);
     }
 
@@ -126,32 +181,37 @@ public class UserController {
      * Create new user
      */
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<UserDTO> createUser(
+            @RequestBody CreateUserRequest request,
+            @RequestHeader(name = "X-User-Timezone", required = false) String userTimezone) {
+
         System.out.println("=== UserController.createUser() called ===");
-        System.out.println("Request: " + request);
 
         // Validate email uniqueness
         boolean emailExists = USERS.values().stream()
                 .anyMatch(user -> user.getEmail().equalsIgnoreCase(request.getEmail()));
 
         if (emailExists) {
-            System.out.println("Email already exists: " + request.getEmail());
             return ResponseEntity.badRequest().build();
         }
 
+        // Create new user with proper timezone
         Long newId = USER_ID_COUNTER++;
-        User newUser = new User(
-                newId,
-                request.getName(),
-                request.getEmail(),
-                request.getRole() != null ? request.getRole() : "USER",
-                "ACTIVE",
-                LocalDateTime.now()
-        );
+        ZonedDateTime now = timezoneService.now();
+
+        UserDTO newUser = UserDTO.builder()
+                .id(newId)
+                .name(request.getName())
+                .email(request.getEmail())
+                .role(request.getRole() != null ? request.getRole() : "USER")
+                .status("ACTIVE")
+                .createdAt(now)
+                .lastModified(now)
+                .userTimezone(userTimezone != null ? userTimezone : timezoneService.getSystemTimezone())
+                .build();
 
         USERS.put(newId, newUser);
 
-        System.out.println("Created user with ID: " + newId);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
@@ -159,13 +219,15 @@ public class UserController {
      * Update existing user
      */
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
-        System.out.println("=== UserController.updateUser() called with ID: " + id + " ===");
-        System.out.println("Request: " + request);
+    public ResponseEntity<UserDTO> updateUser(
+            @PathVariable("id") Long id,
+            @RequestBody UpdateUserRequest request,
+            @RequestHeader(name = "X-User-Timezone", required = false) String userTimezone) {
 
-        User existingUser = USERS.get(id);
+        System.out.println("=== UserController.updateUser() called with ID: " + id + " ===");
+
+        UserDTO existingUser = USERS.get(id);
         if (existingUser == null) {
-            System.out.println("User not found with ID: " + id);
             return ResponseEntity.notFound().build();
         }
 
@@ -176,7 +238,6 @@ public class UserController {
                             user.getEmail().equalsIgnoreCase(request.getEmail()));
 
             if (emailExists) {
-                System.out.println("Email already exists: " + request.getEmail());
                 return ResponseEntity.badRequest().build();
             }
         }
@@ -194,9 +255,12 @@ public class UserController {
         if (request.getStatus() != null) {
             existingUser.setStatus(request.getStatus());
         }
-        existingUser.setLastModified(LocalDateTime.now());
+        if (request.getTimezone() != null && timezoneService.isValidTimezone(request.getTimezone())) {
+            existingUser.setUserTimezone(request.getTimezone());
+        }
 
-        System.out.println("Updated user: " + existingUser.getName());
+        existingUser.setLastModified(timezoneService.now());
+
         return ResponseEntity.ok(existingUser);
     }
 
@@ -204,16 +268,14 @@ public class UserController {
      * Delete user
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
         System.out.println("=== UserController.deleteUser() called with ID: " + id + " ===");
 
-        User user = USERS.remove(id);
+        UserDTO user = USERS.remove(id);
         if (user == null) {
-            System.out.println("User not found with ID: " + id);
             return ResponseEntity.notFound().build();
         }
 
-        System.out.println("Deleted user: " + user.getName());
         return ResponseEntity.noContent().build();
     }
 
@@ -221,8 +283,11 @@ public class UserController {
      * Get user statistics
      */
     @GetMapping("/stats")
-    public ResponseEntity<Map<String, Object>> getUserStats() {
-        System.out.println("=== UserController.getUserStats() called ===");
+    public ResponseEntity<Map<String, Object>> getUserStats(
+            @RequestHeader(name = "X-User-Timezone", required = false) String userTimezone) {
+        if (userTimezone != null && !timezoneService.isValidTimezone(userTimezone)) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid timezone"));
+        }
 
         long totalUsers = USERS.size();
         long activeUsers = USERS.values().stream().filter(u -> "ACTIVE".equals(u.getStatus())).count();
@@ -233,109 +298,65 @@ public class UserController {
                 roleStats.merge(user.getRole(), 1L, Long::sum)
         );
 
+        // Timezone distribution
+        Map<String, Long> timezoneStats = new HashMap<>();
+        USERS.values().forEach(user ->
+                timezoneStats.merge(user.getUserTimezone(), 1L, Long::sum)
+        );
+
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalUsers", totalUsers);
         stats.put("activeUsers", activeUsers);
         stats.put("inactiveUsers", inactiveUsers);
         stats.put("roleDistribution", roleStats);
-        stats.put("lastUpdated", LocalDateTime.now().toString());
+        stats.put("timezoneDistribution", timezoneStats);
+        stats.put("serverTimezone", timezoneService.getSystemTimezone());
+        stats.put("lastUpdated", timezoneService.now());
 
         return ResponseEntity.ok(stats);
     }
 
-    // DTO Classes
-    public static class User {
-        private Long id;
-        private String name;
-        private String email;
-        private String role;
-        private String status;
-        private LocalDateTime createdAt;
-        private LocalDateTime lastModified;
+    /**
+     * Get available timezones
+     */
+    @GetMapping("/timezones")
+    public ResponseEntity<Map<String, Object>> getAvailableTimezones() {
+        List<String> timezones = Arrays.asList(
+                "UTC",
+                "America/New_York",
+                "America/Chicago",
+                "America/Denver",
+                "America/Los_Angeles",
+                "Europe/London",
+                "Europe/Paris",
+                "Europe/Berlin",
+                "Asia/Tokyo",
+                "Asia/Shanghai",
+                "Asia/Kolkata",
+                "Australia/Sydney",
+                "Pacific/Auckland"
+        );
 
-        public User() {}
+        Map<String, Object> response = new HashMap<>();
+        response.put("timezones", timezones);
+        response.put("default", timezoneService.getSystemTimezone());
 
-        public User(Long id, String name, String email, String role, String status, LocalDateTime createdAt) {
-            this.id = id;
-            this.name = name;
-            this.email = email;
-            this.role = role;
-            this.status = status;
-            this.createdAt = createdAt;
-            this.lastModified = createdAt;
-        }
-
-        // Getters and Setters
-        public Long getId() { return id; }
-        public void setId(Long id) { this.id = id; }
-
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-
-        public String getRole() { return role; }
-        public void setRole(String role) { this.role = role; }
-
-        public String getStatus() { return status; }
-        public void setStatus(String status) { this.status = status; }
-
-        public LocalDateTime getCreatedAt() { return createdAt; }
-        public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-        public LocalDateTime getLastModified() { return lastModified; }
-        public void setLastModified(LocalDateTime lastModified) { this.lastModified = lastModified; }
-
-        @Override
-        public String toString() {
-            return "User{id=" + id + ", name='" + name + "', email='" + email + "', role='" + role + "', status='" + status + "'}";
-        }
+        return ResponseEntity.ok(response);
     }
 
-    public static class CreateUserRequest {
-        private String name;
-        private String email;
-        private String role;
-
-        // Getters and Setters
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-
-        public String getRole() { return role; }
-        public void setRole(String role) { this.role = role; }
-
-        @Override
-        public String toString() {
-            return "CreateUserRequest{name='" + name + "', email='" + email + "', role='" + role + "'}";
-        }
-    }
-
-    public static class UpdateUserRequest {
-        private String name;
-        private String email;
-        private String role;
-        private String status;
-
-        // Getters and Setters
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-
-        public String getRole() { return role; }
-        public void setRole(String role) { this.role = role; }
-
-        public String getStatus() { return status; }
-        public void setStatus(String status) { this.status = status; }
-
-        @Override
-        public String toString() {
-            return "UpdateUserRequest{name='" + name + "', email='" + email + "', role='" + role + "', status='" + status + "'}";
-        }
+    /**
+     * Helper method to convert user dates to requested timezone
+     */
+    private UserDTO convertToUserTimezone(UserDTO user, String targetTimezone) {
+        return UserDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .status(user.getStatus())
+                .createdAt(timezoneService.convertTimezone(user.getCreatedAt(), targetTimezone))
+                .lastModified(timezoneService.convertTimezone(user.getLastModified(), targetTimezone))
+                .userTimezone(user.getUserTimezone())
+                .build();
     }
 }

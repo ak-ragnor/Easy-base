@@ -11,15 +11,71 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!-- Enable Spring MVC annotations -->
+    <!-- Component Scanning -->
+    <context:component-scan base-package="com.easyBase.web.controller"/>
+    <context:component-scan base-package="com.easyBase.web.config"/>
+
+    <!-- Property placeholder - optional, ignore if not found -->
+    <context:property-placeholder location="classpath:application.properties"
+                                  ignore-unresolvable="true"
+                                  ignore-resource-not-found="true"/>
+
+    <!-- Enable MVC with default configuration -->
     <mvc:annotation-driven/>
 
-    <!-- Component scanning for controllers -->
-    <context:component-scan base-package="com.easyBase.web.controller"/>
+    <!-- CORS Configuration -->
+    <mvc:cors>
+        <mvc:mapping path="/api/**"
+                     allowed-origins="*"
+                     allowed-methods="GET,POST,PUT,DELETE,OPTIONS,PATCH"
+                     allowed-headers="*"
+                     allow-credentials="false"
+                     max-age="3600"/>
+    </mvc:cors>
 
-    <!-- Interceptors for debugging -->
+    <!-- Interceptors -->
     <mvc:interceptors>
         <bean class="com.easyBase.web.interceptor.LoggingInterceptor"/>
+        <bean class="com.easyBase.web.interceptor.PerformanceInterceptor"/>
+
+    <!-- TODO: Add after User Crud
+        <bean class="com.easyBase.web.interceptor.SecurityHeadersInterceptor"/>
+    -->
     </mvc:interceptors>
+
+<!-- Static Resources -->
+    <mvc:resources mapping="/static/**" location="/static/" cache-period="3600"/>
+
+    <!-- Default Servlet Handler -->
+    <mvc:default-servlet-handler/>
+
+    <!-- ===== PHASE 2: ENHANCED ERROR HANDLING (To Add) ===== -->
+    <!-- TODO: Add after testing basic functionality
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="defaultErrorView" value="error"/>
+        <property name="exceptionMappings">
+            <props>
+                <prop key="java.lang.Exception">error</prop>
+            </props>
+        </property>
+    </bean>
+    -->
+
+    <!-- ===== PHASE 3: INTERNATIONALIZATION (To Add) ===== -->
+    <!-- TODO: Add when needed
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="classpath:messages/messages"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+    -->
+
+    <!-- ===== PHASE 4: ADVANCED FEATURES (To Add) ===== -->
+    <!-- TODO: Add when needed
+    - Content Negotiation
+    - File Upload Support
+    - Async Request Processing
+    - API Versioning
+    - Rate Limiting
+    -->
 
 </beans>
