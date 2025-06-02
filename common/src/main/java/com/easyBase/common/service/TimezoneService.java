@@ -33,6 +33,9 @@ public class TimezoneService {
      * Get the current time in a specific timezone
      */
     public ZonedDateTime now(String timezone) {
+        if (!isValidTimezone(timezone)) {
+            throw new IllegalArgumentException("Invalid timezone: " + timezone);
+        }
         return ZonedDateTime.now(ZoneId.of(timezone));
     }
 
