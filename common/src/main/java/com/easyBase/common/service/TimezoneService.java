@@ -50,6 +50,9 @@ public class TimezoneService {
      * Convert a LocalDateTime to ZonedDateTime using specific timezone
      */
     public ZonedDateTime toZonedDateTime(LocalDateTime localDateTime, String timezone) {
+        if (!isValidTimezone(timezone)) {
+            throw new IllegalArgumentException("Invalid timezone: " + timezone);
+        }
         return localDateTime.atZone(ZoneId.of(timezone));
     }
 
