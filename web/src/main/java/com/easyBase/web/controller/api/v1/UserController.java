@@ -287,6 +287,9 @@ public class UserController {
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getUserStats(
             @RequestHeader(name = "X-User-Timezone", required = false) String userTimezone) {
+        if (userTimezone != null && !timezoneService.isValidTimezone(userTimezone)) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid timezone"));
+        }
 
         long totalUsers = USERS.size();
         long activeUsers = USERS.values().stream().filter(u -> "ACTIVE".equals(u.getStatus())).count();
