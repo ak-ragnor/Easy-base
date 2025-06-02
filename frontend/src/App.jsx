@@ -28,8 +28,8 @@ function Dashboard() {
         const loadData = async () => {
             try {
                 console.log('Loading dashboard data...');
-                const healthData = await ApiService.get('/health');
-                const infoData = await ApiService.get('/info');
+                const healthData = await ApiService.get('/admin/health');
+                const infoData = await ApiService.get('/admin/info');
 
                 setSystemStatus({
                     health: healthData,
