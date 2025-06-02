@@ -15,6 +15,16 @@ import java.time.ZoneId;
 public class CustomZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateTime> {
 
     private final String timezone;
+    {
+        if (timezone == null || timezone.isBlank()) {
+            throw new IllegalArgumentException("Timezone cannot be null or empty");
+        }
+        try {
+            ZoneId.of(timezone);
+        } catch (DateTimeException e) {
+            throw new IllegalArgumentException("Invalid timezone: " + timezone, e);
+        }
+    }
     private final DateTimeFormatter formatter;
 
     public CustomZonedDateTimeDeserializer(DateTimeFormatter formatter, String timezone) {
