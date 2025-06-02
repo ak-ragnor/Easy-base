@@ -21,7 +21,12 @@ public class TimezoneInterceptor implements HandlerInterceptor {
     @Value("${app.timezone.header:X-User-Timezone}")
     private String timezoneHeader;
 
-    private static final ThreadLocal<String> TIMEZONE_CONTEXT = new ThreadLocal<>();
+    private static final ThreadLocal<String> TIMEZONE_CONTEXT = ThreadLocal.withInitial(() -> null);
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        TIMEZONE_CONTEXT.remove();
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
