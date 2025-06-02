@@ -130,8 +130,8 @@ public class UserController {
             // Apply pagination
             int totalElements = filteredUsers.size();
             int totalPages = (int) Math.ceil((double) totalElements / size);
-            int startIndex = page * size;
-            int endIndex = Math.min(startIndex + size, totalElements);
+            int startIndex = Math.max(0, page) * Math.max(1, size);
+            int endIndex = Math.min(startIndex + Math.max(1, size), totalElements);
 
             List<UserDTO> pageContent = startIndex < totalElements ?
                     filteredUsers.subList(startIndex, endIndex) : new ArrayList<>();
