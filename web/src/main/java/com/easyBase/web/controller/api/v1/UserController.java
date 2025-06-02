@@ -100,6 +100,7 @@ public class UserController {
         try {
             List<UserDTO> filteredUsers = new ArrayList<>(USERS.values());
 
+            List<UserDTO> filteredUsers = new ArrayList<>(USERS.values());
             // Apply filters
             if (!search.isEmpty()) {
             if (!search.isEmpty()) {
