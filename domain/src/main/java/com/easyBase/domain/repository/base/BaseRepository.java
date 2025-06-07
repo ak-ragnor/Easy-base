@@ -65,7 +65,7 @@ public interface BaseRepository<T extends BaseEntity, ID>
      * Find the most recently created entity
      * Often needed for dashboard "latest" displays
      */
-    @Query("SELECT e FROM #{#entityName} e ORDER BY e.createdAt DESC")
+    @Query("SELECT e FROM #{#entityName} e ORDER BY e.createdAt DESC LIMIT 1")
     Optional<T> findMostRecentlyCreated();
 
     // ===== DYNAMIC QUERY SUPPORT =====
