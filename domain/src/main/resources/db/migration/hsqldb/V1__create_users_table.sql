@@ -10,8 +10,7 @@
 -- User ID sequence with proper increment and caching
 CREATE SEQUENCE user_sequence
     START WITH 1000
-    INCREMENT BY 1
-    CACHE 50;
+    INCREMENT BY 1;
 
 -- ===== TABLES =====
 

@@ -19,8 +19,7 @@
 
     <!-- Property placeholder - ignore missing files -->
     <context:property-placeholder
-            location="classpath*:database/database-${spring.profiles.active:dev}.properties,
-                      classpath*:environment/${spring.profiles.active:development}.properties"
+            location="classpath:database/database-dev.properties"
             ignore-unresolvable="true"
             ignore-resource-not-found="true"/>
 
