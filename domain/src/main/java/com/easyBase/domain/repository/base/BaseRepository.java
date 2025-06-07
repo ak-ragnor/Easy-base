@@ -58,8 +58,7 @@ public interface BaseRepository<T extends BaseEntity, ID>
      * Performance-critical bulk operation
      */
     @Modifying
-    @Query(value = "UPDATE #{#entityName} e SET e.lastModified = CURRENT_TIMESTAMP WHERE e.id IN :ids", 
-           countQuery = "SELECT count(e) FROM #{#entityName} e WHERE e.id IN :ids")
+    @Query("UPDATE #{#entityName} e SET e.lastModified = CURRENT_TIMESTAMP WHERE e.id IN :ids")
     @BatchSize(size = 1000)
     int touchEntities(@Param("ids") List<ID> ids);
 
