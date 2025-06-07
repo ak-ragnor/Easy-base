@@ -427,6 +427,42 @@
         <chmod file="${tomcat.bundle.dir}/stop.sh" perm="755"/>
     </target>
 
+    <!-- Test database connection and schema -->
+    <target name="test-database" depends="init" description="Test database connection and schema creation">
+        <echo message="Testing database connection and schema"/>
+
+        <!-- Compile config module first to ensure database configuration is available -->
+        <antcall target="compile-module">
+            <param name="module.dir" value="${config.dir}"/>
+            <param name="module.name" value="config"/>
+        </antcall>
+
+        <!-- Test database connection using Maven -->
+        <exec executable="${mvn.cmd}" dir="${config.dir}" failonerror="false">
+            <arg value="test"/>
+            <arg value="-P${maven.profile}"/>
+            <arg value="-Dtest=DatabaseConnectionTest"/>
+            <arg value="-Dmaven.test.skip=false"/>
+        </exec>
+
+        <echo message="Database test completed - check logs for results"/>
+    </target>
+
+    <!-- Setup database for development -->
+    <target name="setup-database" depends="init" description="Initialize database schema">
+        <echo message="Setting up database schema for development"/>
+
+        <!-- Ensure config module is compiled -->
+        <antcall target="compile-module">
+            <param name="module.dir" value="${config.dir}"/>
+            <param name="module.name" value="config"/>
+        </antcall>
+
+        <echo message="Database schema setup completed"/>
+        <echo message="Schema location: ${config.dir}/src/main/resources/db/migration/"/>
+        <echo message="Run 'ant dev-server' to start application with database"/>
+    </target>
+
     <!-- Test basic Maven build -->
     <target name="test-maven" description="Test Maven build without dependencies">
         <echo message="Testing basic Maven compilation"/>

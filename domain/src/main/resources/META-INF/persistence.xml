@@ -8,22 +8,65 @@
     <persistence-unit name="easyBasePU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
-        <!-- Scan for entities -->
-        <class>com.easyBase.domain.entity.user.User</class>
-        <class>com.easyBase.domain.entity.user.Role</class>
-        <class>com.easyBase.domain.entity.user.Permission</class>
-        <class>com.easyBase.domain.entity.product.Product</class>
-        <class>com.easyBase.domain.entity.product.Category</class>
-        <class>com.easyBase.domain.entity.order.Order</class>
-        <class>com.easyBase.domain.entity.order.OrderItem</class>
-        <class>com.easyBase.domain.entity.audit.AuditLog</class>
+        <!-- ===== ENTITY CLASSES ===== -->
 
+        <!-- User Management Entities -->
+        <class>com.easyBase.domain.entity.user.User</class>
+
+        <!-- Enable entity auto-detection in addition to explicit classes -->
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
 
         <properties>
+            <!-- ===== HIBERNATE CONFIGURATION ===== -->
+
+            <!-- Entity Discovery -->
             <property name="hibernate.archive.autodetection" value="class"/>
+
+            <!-- SQL Logging (controlled by profile) -->
             <property name="hibernate.show_sql" value="false"/>
             <property name="hibernate.format_sql" value="false"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+
+            <!-- Performance Settings -->
+            <property name="hibernate.jdbc.batch_size" value="25"/>
+            <property name="hibernate.jdbc.fetch_size" value="100"/>
+            <property name="hibernate.order_inserts" value="true"/>
+            <property name="hibernate.order_updates" value="true"/>
+            <property name="hibernate.jdbc.batch_versioned_data" value="true"/>
+
+            <!-- Connection Settings -->
+            <property name="hibernate.connection.provider_disables_autocommit" value="true"/>
+
+            <!-- Naming Strategy -->
+            <property name="hibernate.physical_naming_strategy"
+                      value="org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy"/>
+            <property name="hibernate.implicit_naming_strategy"
+                      value="org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl"/>
+
+            <!-- Timezone Configuration -->
+            <property name="hibernate.jdbc.time_zone" value="UTC"/>
+
+            <!-- Cache Configuration -->
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.cache.use_query_cache" value="true"/>
+            <property name="hibernate.cache.region.factory_class"
+                      value="org.hibernate.cache.jcache.JCacheRegionFactory"/>
+            <property name="hibernate.javax.cache.provider"
+                      value="org.ehcache.jsr107.EhcacheCachingProvider"/>
+            <property name="hibernate.javax.cache.uri" value="classpath:cache/ehcache.xml"/>
+
+            <!-- Validation -->
+            <property name="hibernate.check_nullability" value="true"/>
+
+            <!-- Statistics (disabled by default, enable for monitoring) -->
+            <property name="hibernate.generate_statistics" value="false"/>
+
+            <!-- Slow Query Logging -->
+            <property name="hibernate.session.events.log.LOG_QUERIES_SLOWER_THAN_MS" value="100"/>
+
+            <!-- Bean Validation Integration -->
+            <property name="hibernate.validator.apply_to_ddl" value="false"/>
+            <property name="hibernate.validator.autoregister_listeners" value="true"/>
         </properties>
     </persistence-unit>
 </persistence>
