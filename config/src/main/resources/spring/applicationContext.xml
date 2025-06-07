@@ -24,8 +24,9 @@
             ignore-unresolvable="true"
             ignore-resource-not-found="true"/>
 
+    <import resource="applicationContext-data.xml"/>
+
     <!-- Don't import other contexts for now - keep it minimal -->
-    <!-- <import resource="applicationContext-data.xml"/> -->
     <!-- <import resource="applicationContext-security.xml"/> -->
     <!-- <import resource="applicationContext-integration.xml"/> -->
 

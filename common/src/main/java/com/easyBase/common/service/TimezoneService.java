@@ -121,4 +121,22 @@ public class TimezoneService {
         ZoneOffset offset = zoneId.getRules().getOffset(Instant.now());
         return offset.toString();
     }
+
+    /**
+     * Check if user timezone support is enabled in the application
+     *
+     * @return true if user timezone support is enabled
+     */
+    public boolean isUserTimezoneEnabled() {
+        return userTimezoneEnabled;
+    }
+
+    /**
+     * Enable or disable user timezone support
+     *
+     * @param enabled whether to enable user timezone support
+     */
+    public void setUserTimezoneEnabled(boolean enabled) {
+        this.userTimezoneEnabled = enabled;
+    }
 }

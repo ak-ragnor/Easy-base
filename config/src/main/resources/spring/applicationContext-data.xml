@@ -11,10 +11,13 @@
            http://www.springframework.org/schema/tx
            http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    <!-- JPA Repository scanning -->
+    <!-- ===== JPA REPOSITORY CONFIGURATION ===== -->
+    <!-- Enable JPA repositories with proper base packages -->
     <jpa:repositories base-package="com.easyBase.domain.repository.jpa"
                       entity-manager-factory-ref="entityManagerFactory"
                       transaction-manager-ref="transactionManager"/>
+
+    <!-- ===== DATASOURCE CONFIGURATION BY PROFILE ===== -->
 
     <!-- Development Profile DataSource (HSQLDB) -->
     <beans profile="dev,test">
@@ -23,6 +26,11 @@
             <property name="url" value="${db.url}"/>
             <property name="username" value="${db.username}"/>
             <property name="password" value="${db.password}"/>
+        </bean>
+
+        <!-- Enable SQL logging for development -->
+        <bean id="sqlLogger" class="java.lang.String">
+            <constructor-arg value="Development mode: SQL logging enabled"/>
         </bean>
     </beans>
 
@@ -34,36 +42,75 @@
         </bean>
     </beans>
 
-    <!-- JPA Entity Manager Factory -->
+    <!-- ===== JPA ENTITY MANAGER FACTORY ===== -->
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
+
+        <!-- Scan for entities in domain module -->
         <property name="packagesToScan" value="com.easyBase.domain.entity"/>
+
+        <!-- Hibernate JPA Vendor Adapter -->
         <property name="jpaVendorAdapter">
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
                 <property name="showSql" value="${jpa.hibernate.show_sql:false}"/>
                 <property name="databasePlatform" value="${jpa.hibernate.dialect}"/>
+                <property name="generateDdl" value="false"/>
             </bean>
         </property>
+
+        <!-- JPA Properties for Enterprise Configuration -->
         <property name="jpaProperties">
             <props>
+                <!-- Schema Management -->
                 <prop key="hibernate.hbm2ddl.auto">${jpa.hibernate.ddl-auto}</prop>
                 <prop key="hibernate.format_sql">${jpa.hibernate.format_sql:false}</prop>
                 <prop key="hibernate.use_sql_comments">true</prop>
                 <prop key="hibernate.show_sql">${jpa.hibernate.show_sql:false}</prop>
+
+                <!-- Performance & Optimization -->
+                <prop key="hibernate.jdbc.batch_size">25</prop>
+                <prop key="hibernate.jdbc.fetch_size">100</prop>
+                <prop key="hibernate.order_inserts">true</prop>
+                <prop key="hibernate.order_updates">true</prop>
+                <prop key="hibernate.jdbc.batch_versioned_data">true</prop>
+
+                <!-- Connection Pool Settings -->
+                <prop key="hibernate.connection.provider_disables_autocommit">true</prop>
+
+                <!-- Naming Strategy for Enterprise Standards -->
+                <prop key="hibernate.physical_naming_strategy">org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy</prop>
+                <prop key="hibernate.implicit_naming_strategy">org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl</prop>
+
+                <!-- Statistics for Monitoring -->
+                <prop key="hibernate.generate_statistics">false</prop>
+                <prop key="hibernate.session.events.log.LOG_QUERIES_SLOWER_THAN_MS">100</prop>
+
+                <!-- Second Level Cache Configuration -->
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.jcache.JCacheRegionFactory</prop>
                 <prop key="hibernate.javax.cache.provider">org.ehcache.jsr107.EhcacheCachingProvider</prop>
                 <prop key="hibernate.javax.cache.uri">classpath:cache/ehcache.xml</prop>
+
+                <!-- Timezone Configuration -->
+                <prop key="hibernate.jdbc.time_zone">UTC</prop>
+
+                <!-- Validation -->
+                <prop key="hibernate.check_nullability">true</prop>
             </props>
         </property>
     </bean>
 
-    <!-- Transaction Manager -->
+    <!-- ===== TRANSACTION MANAGEMENT ===== -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
+        <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <!-- Cache Manager -->
+    <!-- Enable Transaction Annotations -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- ===== CACHE MANAGER (EhCache) ===== -->
     <bean id="cacheManager" class="org.springframework.cache.jcache.JCacheCacheManager">
         <property name="cacheManager">
             <bean class="org.springframework.cache.jcache.JCacheManagerFactoryBean">
@@ -71,5 +118,28 @@
             </bean>
         </property>
     </bean>
+
+    <!-- ===== ENTERPRISE VALIDATION ===== -->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+
+    <!-- ===== DATABASE INITIALIZATION (Development Only) ===== -->
+    <beans profile="dev,test">
+        <!-- DataSource Initializer for development -->
+        <bean id="dataSourceInitializer" class="org.springframework.jdbc.datasource.init.DataSourceInitializer">
+            <property name="dataSource" ref="dataSource"/>
+            <property name="enabled" value="true"/>
+            <property name="databasePopulator">
+                <bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+                    <property name="scripts">
+                        <list>
+                            <value>classpath:db/migration/hsqldb/V1__create_users_table.sql</value>
+                        </list>
+                    </property>
+                    <property name="ignoreFailedDrops" value="true"/>
+                    <property name="continueOnError" value="false"/>
+                </bean>
+            </property>
+        </bean>
+    </beans>
 
 </beans>

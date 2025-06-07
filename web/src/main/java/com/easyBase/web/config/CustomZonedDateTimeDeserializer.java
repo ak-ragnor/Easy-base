@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
 import java.io.IOException;
+import java.time.DateTimeException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.ZoneId;
@@ -14,33 +15,28 @@ import java.time.ZoneId;
  */
 public class CustomZonedDateTimeDeserializer extends JsonDeserializer<ZonedDateTime> {
 
-    private final String timezone;
-    {
+    private final ZoneId zoneId;
+    private final DateTimeFormatter formatter;
+
+    public CustomZonedDateTimeDeserializer(DateTimeFormatter formatter, String timezone) {
         if (timezone == null || timezone.isBlank()) {
             throw new IllegalArgumentException("Timezone cannot be null or empty");
         }
         try {
-            ZoneId.of(timezone);
+            this.zoneId = ZoneId.of(timezone);
         } catch (DateTimeException e) {
             throw new IllegalArgumentException("Invalid timezone: " + timezone, e);
         }
-    }
-    private final DateTimeFormatter formatter;
-
-    public CustomZonedDateTimeDeserializer(DateTimeFormatter formatter, String timezone) {
         this.formatter = formatter;
-        this.timezone = timezone;
     }
 
     @Override
-    public ZonedDateTime deserialize(JsonParser p, DeserializationContext ctxt)
-            throws IOException {
+    public ZonedDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         String dateString = p.getText();
         if (dateString == null || dateString.isBlank()) {
             return null;
         }
         ZonedDateTime parsed = ZonedDateTime.parse(dateString, formatter);
-        return parsed.withZoneSameInstant(ZoneId.of(timezone));
+        return parsed.withZoneSameInstant(zoneId);
     }
 }
-

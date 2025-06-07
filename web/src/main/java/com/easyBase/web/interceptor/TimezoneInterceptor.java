@@ -56,13 +56,6 @@ public class TimezoneInterceptor implements HandlerInterceptor {
         }
     }
 
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
-            throws Exception {
-        // Clean up thread local
-        TIMEZONE_CONTEXT.remove();
-    }
-
     /**
      * Get the current request's timezone
      */
