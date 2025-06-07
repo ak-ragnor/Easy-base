@@ -211,9 +211,9 @@ public enum UserStatus {
             case ACTIVE:
                 return INACTIVE; // Deactivation
             case DISABLED:
-                return null; // No transition from disabled
+                throw new IllegalStateException("Cannot transition from DISABLED status");
             default:
-                return null;
+                throw new IllegalStateException("Unknown user status: " + this);
         }
     }
 
