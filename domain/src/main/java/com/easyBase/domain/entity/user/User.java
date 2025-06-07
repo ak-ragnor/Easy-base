@@ -48,7 +48,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
                 @Index(name = "idx_users_created_at", columnList = "created_at"),
                 @Index(name = "idx_users_role_status", columnList = "role, status")
         })
-@SequenceGenerator(name = "entity_seq", sequenceName = "user_sequence", allocationSize = 1)
+@SequenceGenerator(name = "entity_seq", sequenceName = "user_sequence", allocationSize = 1, initialValue = 1000)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "userCache")
 @NamedQueries({
         @NamedQuery(

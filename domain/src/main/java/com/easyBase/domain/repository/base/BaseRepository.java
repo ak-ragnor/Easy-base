@@ -59,7 +59,6 @@ public interface BaseRepository<T extends BaseEntity, ID>
      */
     @Modifying
     @Query("UPDATE #{#entityName} e SET e.lastModified = CURRENT_TIMESTAMP WHERE e.id IN :ids")
-    @BatchSize(size = 1000)
     int touchEntities(@Param("ids") List<ID> ids);
 
     /**
