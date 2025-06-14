@@ -1,25 +1,22 @@
 package com.easyBase.domain.entity.base;
 
 import jakarta.persistence.*;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * Enterprise Base Entity providing common functionality for all entities
+ * Base Entity providing common functionality for all entities
  *
- * Features:
- * - Primary key management
- * - Optimistic locking
- * - Equals/hashCode based on ID
- * - Serializable for distributed caching
- *
- * @author Enterprise Team
+ * @author Akhash R
  * @version 1.0
  * @since 1.0
  */
 @MappedSuperclass
 public abstract class BaseEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

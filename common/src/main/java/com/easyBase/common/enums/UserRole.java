@@ -12,6 +12,8 @@ package com.easyBase.common.enums;
  */
 public enum UserRole {
 
+    //adding for now there is no super admin
+    SUPER_ADMIN("SUPER_ADMIN", "SUPER_ADMIN", 1000),
     /**
      * System Administrator with full access to all system features
      * - Can manage all users and system settings

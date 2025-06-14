@@ -11,23 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Enterprise User Specifications for Dynamic Queries - Hybrid Approach
+ * User Specifications for Dynamic Queries
  *
- * This class provides reusable, composable query specifications for User entities.
- * Designed to work alongside custom @Query methods in UserRepository.
- *
- * HYBRID STRATEGY:
- * - Use specifications for complex, multi-criteria searches
- * - Use custom @Query methods for simple, performance-critical operations
- * - Combine both approaches for maximum flexibility and performance
- *
- * @author Enterprise Team
- * @version 2.0 - Hybrid Approach
+ * @author Akhash R
+ * @version 1.0
  * @since 1.0
  */
 public class UserSpecifications {
-
-    // ===== BASIC SPECIFICATIONS =====
 
     /**
      * Users with a specific role
@@ -130,8 +120,6 @@ public class UserSpecifications {
         };
     }
 
-    // ===== TIMEZONE SPECIFICATIONS =====
-
     /**
      * Users in a specific timezone
      */
@@ -155,8 +143,6 @@ public class UserSpecifications {
             return root.get("userTimezone").in(timezones);
         };
     }
-
-    // ===== DATE/TIME SPECIFICATIONS =====
 
     /**
      * Users created after a specific date
@@ -200,8 +186,6 @@ public class UserSpecifications {
         };
     }
 
-    // ===== BUSINESS LOGIC SPECIFICATIONS =====
-
     /**
      * Administrative users (ADMIN and MANAGER roles)
      */
@@ -235,11 +219,7 @@ public class UserSpecifications {
         return hasStatusIn(attentionStatuses);
     }
 
-    // ===== DYNAMIC SEARCH BUILDER =====
-
     /**
-     * 🚀 MAIN DYNAMIC SEARCH METHOD
-     *
      * This method builds a specification based on provided search criteria.
      * Only applies conditions for non-null/non-empty criteria.
      *
@@ -293,8 +273,6 @@ public class UserSpecifications {
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
-
-    // ===== UTILITY METHODS =====
 
     /**
      * Combine multiple specifications with AND logic
