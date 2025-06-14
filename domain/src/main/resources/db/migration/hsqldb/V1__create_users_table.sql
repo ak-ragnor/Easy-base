@@ -1,8 +1,8 @@
 -- =====================================================
--- Easy Base Enterprise - User Management Schema
+-- Easy Base - User Management Schemas
 -- Database: HSQLDB (Development & Testing)
 -- Version: 1.0
--- Description: Creates users table with enterprise standards
+-- Description: Creates users table
 -- =====================================================
 
 -- ===== SEQUENCES =====

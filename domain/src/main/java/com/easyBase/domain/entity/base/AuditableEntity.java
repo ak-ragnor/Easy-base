@@ -1,19 +1,14 @@
 package com.easyBase.domain.entity.base;
 
 import jakarta.persistence.*;
+
+import java.io.Serial;
 import java.time.ZonedDateTime;
 
 /**
- * Enterprise Auditable Entity providing audit trail functionality
+ * Auditable Entity providing audit trail functionality
  *
- * Features:
- * - Creation timestamp tracking
- * - Last modification timestamp tracking
- * - Automatic timestamp management via JPA lifecycle callbacks
- * - Timezone-aware timestamps using ZonedDateTime
- * - Enterprise audit standards compliance
- *
- * @author Enterprise Team
+ * @author Akhash R
  * @version 1.0
  * @since 1.0
  */
@@ -21,6 +16,7 @@ import java.time.ZonedDateTime;
 @EntityListeners(AuditableEntity.AuditListener.class)
 public abstract class AuditableEntity extends BaseEntity {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

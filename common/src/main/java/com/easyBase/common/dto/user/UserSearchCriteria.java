@@ -14,8 +14,8 @@ import java.time.ZonedDateTime;
  * For simple queries, use custom @Query methods in UserRepository.
  * For complex queries, use this DTO with UserSpecifications.
  *
- * @author Enterprise Team
- * @version 2.0 - Hybrid Approach
+ * @author Akhash R
+ * @version 1.0
  * @since 1.0
  */
 public class UserSearchCriteria {

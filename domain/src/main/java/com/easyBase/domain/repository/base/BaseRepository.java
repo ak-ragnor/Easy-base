@@ -15,29 +15,15 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Enterprise Base Repository Interface - Hybrid Approach
+ * Base Repository Interface
  *
- * Provides both custom queries for performance-critical operations
- * and dynamic query capabilities via JpaSpecificationExecutor.
- *
- * Features:
- * - Standard CRUD operations via JpaRepository
- * - Dynamic querying via JpaSpecificationExecutor
- * - Essential enterprise methods for common operations
- * - Optimized for both performance and flexibility
- *
- * @param <T>  the domain entity type extending BaseEntity
- * @param <ID> the entity identifier type (typically Long)
- *
- * @author Enterprise Team
- * @version 2.0 - Hybrid Approach
+ * @author Akhash R
+ * @version 1.0
  * @since 1.0
  */
 @NoRepositoryBean
 public interface BaseRepository<T extends BaseEntity, ID>
         extends JpaRepository<T, ID>, JpaSpecificationExecutor<T> {
-
-    // ===== ESSENTIAL CUSTOM QUERIES (Performance Critical) =====
 
     /**
      * Find entities created after a specific date

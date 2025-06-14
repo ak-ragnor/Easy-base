@@ -3,6 +3,8 @@ package com.easyBase.domain.entity.user;
 import com.easyBase.common.enums.UserRole;
 import com.easyBase.common.enums.UserStatus;
 import com.easyBase.domain.entity.base.AuditableEntity;
+import com.easyBase.domain.entity.site.Site;
+import com.easyBase.domain.entity.site.UserSite;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -11,27 +13,14 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Enterprise User Entity
  *
- * Represents a user in the system with comprehensive user management features.
- *
- * Features:
- * - Extends AuditableEntity for automatic audit trail
- * - Uses database sequences for ID generation
- * - Includes comprehensive validation constraints
- * - Supports timezone-aware operations
- * - Optimized for performance with proper indexing
- * - Cacheable for improved performance
- *
- * Database Design:
- * - Table: users
- * - Primary Key: id (sequence-generated)
- * - Unique Constraints: email
- * - Indexes: email, role, status
- * - Audit Fields: created_at, last_modified, version
- *
- * @author Enterprise Team
+ * @author Akhash R
  * @version 1.0
  * @since 1.0
  */
@@ -74,13 +63,23 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
         @NamedQuery(
                 name = "User.countByStatus",
                 query = "SELECT COUNT(u) FROM User u WHERE u.status = :status"
+        ),
+        @NamedQuery(
+                name = "User.findBySite",
+                query = "SELECT DISTINCT us.user FROM UserSite us WHERE us.site = :site AND us.isActive = true ORDER BY us.user.name"
+        ),
+        @NamedQuery(
+                name = "User.findBySiteCode",
+                query = "SELECT DISTINCT us.user FROM UserSite us WHERE us.site.code = :siteCode AND us.isActive = true ORDER BY us.user.name"
+        ),
+        @NamedQuery(
+                name = "User.countBySite",
+                query = "SELECT COUNT(DISTINCT us.user) FROM UserSite us WHERE us.site = :site AND us.isActive = true"
         )
 })
 public class User extends AuditableEntity {
 
     private static final long serialVersionUID = 1L;
-
-    // ===== CORE USER FIELDS =====
 
     /**
      * User's full name
@@ -102,283 +101,424 @@ public class User extends AuditableEntity {
     private String email;
 
     /**
-     * User's role in the system
-     * Determines access permissions and available features
+     * User's global role in the system
+     * Determines base access permissions and available features
+     * Can be overridden by site-specific roles in UserSite
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 20)
-    @NotNull(message = "Role is required")
-    private UserRole role = UserRole.USER;
+    @Column(name = "role", nullable = false)
+    @NotNull(message = "User role is required")
+    private UserRole role;
 
     /**
-     * User's account status
-     * Determines whether the user can access the system
+     * Current status of the user account
+     * Controls whether the user can access the system
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
-    @NotNull(message = "Status is required")
-    private UserStatus status = UserStatus.ACTIVE;
+    @Column(name = "status", nullable = false)
+    @NotNull(message = "User status is required")
+    private UserStatus status;
 
     /**
-     * User's preferred timezone for date/time display
-     * Used for timezone-aware operations and UI formatting
+     * User's preferred timezone for date/time displays
+     * Used for scheduling, timestamps, and user interface displays
+     * Must be a valid timezone identifier (e.g., "America/New_York", "UTC")
      */
     @Column(name = "user_timezone", length = 50)
     @Size(max = 50, message = "Timezone must not exceed 50 characters")
-    private String userTimezone = "UTC";
+    private String userTimezone;
+
+    /**
+     * User's preferred language code for localization
+     * Should follow ISO 639-1 format (e.g., "en", "es", "fr")
+     */
+    @Column(name = "language_preference", length = 10)
+    @Size(max = 10, message = "Language preference must not exceed 10 characters")
+    private String languagePreference;
+
+    /**
+     * User's phone number for contact and security purposes
+     */
+    @Column(name = "phone_number", length = 20)
+    @Size(max = 20, message = "Phone number must not exceed 20 characters")
+    private String phoneNumber;
+
+    /**
+     * Whether the user's email address has been verified
+     */
+    @Column(name = "email_verified", nullable = false)
+    private Boolean emailVerified = false;
+
+    /**
+     * Whether the user's phone number has been verified
+     */
+    @Column(name = "phone_verified", nullable = false)
+    private Boolean phoneVerified = false;
+
+    /**
+     * Whether two-factor authentication is enabled for this user
+     */
+    @Column(name = "two_factor_enabled", nullable = false)
+    private Boolean twoFactorEnabled = false;
+
+    // ===== RELATIONSHIPS =====
+
+    /**
+     * Sites associated with this user
+     * Many-to-many relationship managed through UserSite entity
+     * Loaded lazily for performance optimization
+     */
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "userSitesCache")
+    private Set<UserSite> userSites = new HashSet<>();
 
     // ===== CONSTRUCTORS =====
 
     /**
-     * Default constructor required by JPA
+     * Default constructor for JPA
      */
     public User() {
         super();
+        this.emailVerified = false;
+        this.phoneVerified = false;
+        this.twoFactorEnabled = false;
     }
 
     /**
-     * Constructor with required fields for business logic
+     * Constructor with required fields
      *
-     * @param name  the user's full name
-     * @param email the user's email address
+     * @param name   User's full name
+     * @param email  User's email address
+     * @param role   User's role
+     * @param status User's status
      */
-    public User(String name, String email) {
-        super();
+    public User(String name, String email, UserRole role, UserStatus status) {
+        this();
         this.name = name;
         this.email = email;
-        this.role = UserRole.USER;
-        this.status = UserStatus.ACTIVE;
-        this.userTimezone = "UTC";
+        this.role = role;
+        this.status = status;
     }
 
-    /**
-     * Constructor with all fields except audit fields
-     *
-     * @param name         the user's full name
-     * @param email        the user's email address
-     * @param role         the user's role
-     * @param status       the user's status
-     * @param userTimezone the user's timezone
-     */
-    public User(String name, String email, UserRole role, UserStatus status, String userTimezone) {
-        super();
-        this.name = name;
-        this.email = email;
-        this.role = role != null ? role : UserRole.USER;
-        this.status = status != null ? status : UserStatus.ACTIVE;
-        this.userTimezone = userTimezone != null ? userTimezone : "UTC";
-    }
-
-    // ===== GETTERS AND SETTERS =====
-
-    /**
-     * Gets the user's full name
-     *
-     * @return the user's name
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Sets the user's full name
-     *
-     * @param name the user's name
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * Gets the user's email address
-     *
-     * @return the user's email
-     */
     public String getEmail() {
         return email;
     }
 
-    /**
-     * Sets the user's email address
-     *
-     * @param email the user's email
-     */
     public void setEmail(String email) {
         this.email = email;
     }
 
-    /**
-     * Gets the user's role
-     *
-     * @return the user's role
-     */
     public UserRole getRole() {
         return role;
     }
 
-    /**
-     * Sets the user's role
-     *
-     * @param role the user's role
-     */
     public void setRole(UserRole role) {
-        this.role = role != null ? role : UserRole.USER;
+        this.role = role;
     }
 
-    /**
-     * Gets the user's account status
-     *
-     * @return the user's status
-     */
     public UserStatus getStatus() {
         return status;
     }
 
-    /**
-     * Sets the user's account status
-     *
-     * @param status the user's status
-     */
     public void setStatus(UserStatus status) {
-        this.status = status != null ? status : UserStatus.ACTIVE;
+        this.status = status;
     }
 
-    /**
-     * Gets the user's timezone preference
-     *
-     * @return the user's timezone
-     */
     public String getUserTimezone() {
         return userTimezone;
     }
 
-    /**
-     * Sets the user's timezone preference
-     *
-     * @param userTimezone the user's timezone
-     */
     public void setUserTimezone(String userTimezone) {
-        this.userTimezone = userTimezone != null ? userTimezone : "UTC";
+        this.userTimezone = userTimezone;
     }
 
-    // ===== BUSINESS METHODS =====
+    public String getLanguagePreference() {
+        return languagePreference;
+    }
+
+    public void setLanguagePreference(String languagePreference) {
+        this.languagePreference = languagePreference;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public Boolean getPhoneVerified() {
+        return phoneVerified;
+    }
+
+    public void setPhoneVerified(Boolean phoneVerified) {
+        this.phoneVerified = phoneVerified;
+    }
+
+    public Boolean getTwoFactorEnabled() {
+        return twoFactorEnabled;
+    }
+
+    public void setTwoFactorEnabled(Boolean twoFactorEnabled) {
+        this.twoFactorEnabled = twoFactorEnabled;
+    }
+
+    public Set<UserSite> getUserSites() {
+        return userSites;
+    }
+
+    public void setUserSites(Set<UserSite> userSites) {
+        this.userSites = userSites;
+    }
+
+    // ===== SITE-RELATED BUSINESS METHODS =====
 
     /**
-     * Checks if the user can log into the system
+     * Add this user to a site
      *
-     * @return true if the user can log in
+     * @param site The site to add the user to
+     * @return The created UserSite relationship
      */
-    public boolean canLogin() {
-        return status != null && status.canLogin();
+    public UserSite addToSite(Site site) {
+        UserSite userSite = new UserSite(this, site);
+        this.userSites.add(userSite);
+        if (site.getUserSites() != null) {
+            site.getUserSites().add(userSite);
+        }
+        return userSite;
     }
 
     /**
-     * Checks if the user account is active
+     * Add this user to a site with a specific role
      *
-     * @return true if the user is active
+     * @param site     The site to add the user to
+     * @param siteRole The role for this user within the site
+     * @return The created UserSite relationship
+     */
+    public UserSite addToSite(Site site, UserRole siteRole) {
+        UserSite userSite = new UserSite(this, site, siteRole);
+        this.userSites.add(userSite);
+        if (site.getUserSites() != null) {
+            site.getUserSites().add(userSite);
+        }
+        return userSite;
+    }
+
+    /**
+     * Remove this user from a site
+     *
+     * @param site The site to remove the user from
+     * @return true if the user was removed
+     */
+    public boolean removeFromSite(Site site) {
+        UserSite userSiteToRemove = null;
+        for (UserSite userSite : this.userSites) {
+            if (userSite.getSite().equals(site)) {
+                userSiteToRemove = userSite;
+                break;
+            }
+        }
+
+        if (userSiteToRemove != null) {
+            this.userSites.remove(userSiteToRemove);
+            if (site.getUserSites() != null) {
+                site.getUserSites().remove(userSiteToRemove);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check if this user has access to a specific site
+     *
+     * @param site The site to check
+     * @return true if the user has active access to the site
+     */
+    public boolean hasAccessToSite(Site site) {
+        return userSites.stream()
+                .anyMatch(userSite -> userSite.getSite().equals(site) &&
+                        userSite.getIsActive() &&
+                        userSite.isValidAccess());
+    }
+
+    /**
+     * Check if this user has access to a site by site code
+     *
+     * @param siteCode The site code to check
+     * @return true if the user has active access to the site
+     */
+    public boolean hasAccessToSite(String siteCode) {
+        return userSites.stream()
+                .anyMatch(userSite -> userSite.getSite().getCode().equals(siteCode) &&
+                        userSite.getIsActive() &&
+                        userSite.isValidAccess());
+    }
+
+    /**
+     * Get the user's role within a specific site
+     * Returns the site-specific role if set, otherwise the user's global role
+     *
+     * @param site The site to check
+     * @return The effective role for this user within the site
+     */
+    public UserRole getRoleInSite(Site site) {
+        return userSites.stream()
+                .filter(userSite -> userSite.getSite().equals(site) &&
+                        userSite.getIsActive() &&
+                        userSite.isValidAccess())
+                .map(UserSite::getEffectiveRole)
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Get all sites this user has access to
+     *
+     * @return Set of sites the user can access
+     */
+    public Set<Site> getAccessibleSites() {
+        return userSites.stream()
+                .filter(userSite -> userSite.getIsActive() && userSite.isValidAccess())
+                .map(UserSite::getSite)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Get all active UserSite relationships
+     *
+     * @return Set of active UserSite relationships
+     */
+    public Set<UserSite> getActiveUserSites() {
+        return userSites.stream()
+                .filter(userSite -> userSite.getIsActive() && userSite.isValidAccess())
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Check if this user has admin access to any site
+     *
+     * @return true if the user has admin access to at least one site
+     */
+    public boolean hasAdminAccessToAnySite() {
+        return userSites.stream()
+                .anyMatch(userSite -> userSite.getIsActive() &&
+                        userSite.isValidAccess() &&
+                        userSite.hasAdminAccess());
+    }
+
+    /**
+     * Check if this user has admin access to a specific site
+     *
+     * @param site The site to check
+     * @return true if the user has admin access to the site
+     */
+    public boolean hasAdminAccessToSite(Site site) {
+        return userSites.stream()
+                .anyMatch(userSite -> userSite.getSite().equals(site) &&
+                        userSite.getIsActive() &&
+                        userSite.isValidAccess() &&
+                        userSite.hasAdminAccess());
+    }
+
+    // ===== USER STATUS BUSINESS METHODS =====
+
+    /**
+     * Check if the user is active and can access the system
+     *
+     * @return true if the user status allows system access
      */
     public boolean isActive() {
         return status == UserStatus.ACTIVE;
     }
 
     /**
-     * Checks if the user has administrative privileges
+     * Check if the user account is locked
      *
-     * @return true if the user is an admin or manager
+     * @return true if the user account is locked
      */
-    public boolean isAdministrative() {
-        return role != null && role.isAdministrative();
+    public boolean isLocked() {
+        return status == UserStatus.LOCKED;
     }
 
     /**
-     * Checks if the user is a system administrator
+     * Check if the user account is suspended
      *
-     * @return true if the user is an admin
+     * @return true if the user account is suspended
      */
-    public boolean isAdmin() {
-        return role == UserRole.ADMIN;
+    public boolean isSuspended() {
+        return status == UserStatus.SUSPENDED;
     }
 
     /**
-     * Checks if the user can manage other users with the specified role
+     * Check if the user has completed email verification
      *
-     * @param targetRole the role to check management privileges for
-     * @return true if the user can manage users with the target role
+     * @return true if email is verified
      */
-    public boolean canManageRole(UserRole targetRole) {
-        return role != null && role.canManage(targetRole);
+    public boolean isEmailVerified() {
+        return emailVerified != null && emailVerified;
     }
 
     /**
-     * Activates the user account
-     * Changes status to ACTIVE if reactivation is allowed
-     */
-    public void activate() {
-        if (status != null && status.canReactivate()) {
-            this.status = UserStatus.ACTIVE;
-        }
-    }
-
-    /**
-     * Deactivates the user account
-     * Changes status to INACTIVE
-     */
-    public void deactivate() {
-        this.status = UserStatus.INACTIVE;
-    }
-
-    /**
-     * Locks the user account for security reasons
-     * Changes status to LOCKED
-     */
-    public void lock() {
-        this.status = UserStatus.LOCKED;
-    }
-
-    /**
-     * Suspends the user account
-     * Changes status to SUSPENDED
-     */
-    public void suspend() {
-        this.status = UserStatus.SUSPENDED;
-    }
-
-    /**
-     * Permanently disables the user account
-     * Changes status to DISABLED
-     */
-    public void disable() {
-        this.status = UserStatus.DISABLED;
-    }
-
-    /**
-     * Gets the user's display name for UI purposes
+     * Check if the user has completed phone verification
      *
-     * @return formatted display name
+     * @return true if phone is verified
      */
-    public String getDisplayName() {
-        return String.format("%s (%s)", name, email);
+    public boolean isPhoneVerified() {
+        return phoneVerified != null && phoneVerified;
     }
 
     /**
-     * Gets a short identifier for the user
+     * Check if two-factor authentication is enabled
      *
-     * @return short identifier
+     * @return true if 2FA is enabled
      */
-    public String getShortIdentifier() {
-        return String.format("User#%s", getId());
+    public boolean isTwoFactorEnabled() {
+        return twoFactorEnabled != null && twoFactorEnabled;
     }
 
-    // ===== OBJECT METHODS =====
+    // ===== EQUALS, HASHCODE, AND TOSTRING =====
 
-    /**
-     * Enhanced string representation for debugging and logging
-     *
-     * @return string representation
-     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+
+        User user = (User) o;
+        return email != null && email.equals(user.getEmail());
+    }
+
+    @Override
+    public int hashCode() {
+        return email != null ? email.hashCode() : 0;
+    }
+
     @Override
     public String toString() {
-        return String.format("User{id=%s, name='%s', email='%s', role=%s, status=%s, timezone='%s', version=%s}",
-                getId(), name, email, role, status, userTimezone, getVersion());
+        return "User{" +
+                "id=" + getId() +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", role=" + role +
+                ", status=" + status +
+                ", sitesCount=" + (userSites != null ? userSites.size() : 0) +
+                '}';
     }
 }
