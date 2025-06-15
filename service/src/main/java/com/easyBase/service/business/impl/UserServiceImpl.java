@@ -8,7 +8,7 @@ import com.easyBase.common.enums.UserRole;
 import com.easyBase.common.enums.UserStatus;
 import com.easyBase.common.service.TimezoneService;
 import com.easyBase.domain.entity.user.User;
-import com.easyBase.domain.repository.jpa.UserRepository;
+import com.easyBase.domain.repository.jpa.user.UserRepository;
 import com.easyBase.domain.specification.UserSpecifications;
 import com.easyBase.service.business.UserService;
 import com.easyBase.service.exception.BusinessException;
@@ -26,7 +26,7 @@ import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.time.ZonedDateTime;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

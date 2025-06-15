@@ -127,11 +127,10 @@ public interface SiteService {
      *
      * @param siteId         Site ID
      * @param userId         User ID to remove
-     * @param revokedByUserId ID of user revoking access
      * @throws ResourceNotFoundException if site, user, or relationship not found
      * @throws BusinessException if validation fails
      */
-    void removeUserFromSite(@NotNull Long siteId, @NotNull Long userId, @NotNull Long revokedByUserId);
+    void removeUserFromSite(@NotNull Long siteId, @NotNull Long userId);
 
     /**
      * Find users in a site

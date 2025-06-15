@@ -6,8 +6,9 @@ import com.easyBase.common.enums.UserRole;
 import com.easyBase.domain.entity.site.Site;
 import com.easyBase.domain.entity.site.UserSite;
 import com.easyBase.domain.entity.user.User;
-import com.easyBase.domain.repository.jpa.SiteRepository;
-import com.easyBase.domain.repository.jpa.UserRepository;
+import com.easyBase.domain.repository.jpa.site.SiteRepository;
+import com.easyBase.domain.repository.jpa.site.UserSiteRepository;
+import com.easyBase.domain.repository.jpa.user.UserRepository;
 import com.easyBase.domain.specification.SiteSpecifications;
 import com.easyBase.service.business.SiteService;
 import com.easyBase.service.exception.BusinessException;
@@ -50,6 +51,9 @@ public class SiteServiceImpl implements SiteService {
 
     @Autowired
     private SiteMapper siteMapper;
+
+    @Autowired
+    private UserSiteRepository userSiteRepository;
 
     @Override
     public SiteDTO createSite(@Valid @NotNull CreateSiteRequest request) {
@@ -164,9 +168,8 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public UserSiteDTO addUserToSite(@NotNull Long siteId, @NotNull Long userId,
-                                     UserRole siteRole, @NotNull Long grantedByUserId, String notes) {
-        logger.debug("Adding user {} to site {} with role {}", userId, siteId, siteRole);
+    public UserSiteDTO addUserToSite(Long siteId, Long userId, UserRole siteRole,
+                                     Long grantedByUserId, String notes) {
 
         Site site = siteRepository.findById(siteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Site not found with ID: " + siteId));
@@ -178,42 +181,43 @@ public class SiteServiceImpl implements SiteService {
             throw new BusinessException("User already has access to site: " + site.getCode());
         }
 
-        UserSite userSite = siteMapper.createUserSite(user, site, siteRole, grantedByUserId);
-        if (notes != null && !notes.trim().isEmpty()) {
-            userSite.setNotes(notes.trim());
+        Optional<UserSite> existingUserSite = userSiteRepository.findByUserIdAndSiteId(userId, siteId);
+
+        UserSite userSite;
+
+        if (existingUserSite.isPresent()) {
+            userSite = existingUserSite.get();
+            logger.info("Updating existing user-site association for user {} and site {}", userId, siteId);
+
+            userSite.updateAssociation(siteRole, notes, grantedByUserId);
+            userSite.setIsActive(true);
+
+        } else {
+            logger.info("Creating new user-site association for user {} and site {}", userId, siteId);
+
+            userSite = new UserSite(user, site, siteRole, grantedByUserId);
         }
 
-        site.getUserSites().add(userSite);
-        user.getUserSites().add(userSite);
+        userSite = userSiteRepository.save(userSite);
 
-        siteRepository.save(site);
+        logger.info("Successfully saved user-site association for user {} and site {}", userId, siteId);
 
-        logger.info("Added user {} to site {} with role {}", user.getEmail(), site.getCode(), siteRole);
-        return siteMapper.toDTO(userSite);
+        UserSite userSiteWithDetails = userSiteRepository.findByUserIdAndSiteIdWithDetails(userId, siteId)
+                .orElse(userSite);
+
+        return siteMapper.toDTO(userSiteWithDetails);
     }
 
     @Override
-    public void removeUserFromSite(@NotNull Long siteId, @NotNull Long userId, @NotNull Long revokedByUserId) {
-        logger.debug("Removing user {} from site {}", userId, siteId);
-
-        Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new ResourceNotFoundException("Site not found with ID: " + siteId));
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
-
-        // Find the user-site relationship
-        UserSite userSite = site.getUserSites().stream()
-                .filter(us -> us.getUser().getId().equals(userId))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "User-site relationship not found for user " + userId + " and site " + siteId));
-
-        // Deactivate the relationship instead of deleting (for audit trail)
-        userSite.deactivate(revokedByUserId);
-
-        siteRepository.save(site);
-        logger.info("Removed user {} from site {}", user.getEmail(), site.getCode());
+    @Transactional
+    public void removeUserFromSite(Long siteId, Long userId) {
+        if (userSiteRepository.existsByUserIdAndSiteIdAndIsActive(userId, siteId, true)) {
+            userSiteRepository.deactivateUserSite(userId, siteId);
+            logger.info("Deactivated user {} from site {}", userId, siteId);
+        } else {
+            throw new ResourceNotFoundException(
+                    String.format("Active association between user %d and site %d not found", userId, siteId));
+        }
     }
 
     @Override

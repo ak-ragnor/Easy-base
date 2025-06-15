@@ -203,13 +203,6 @@ public class SiteController extends BaseController {
     }
 
     @PostMapping("/{siteId}/users/{userId}")
-    @Operation(summary = "Add user to site", description = "Grants a user access to a site")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User added to site successfully"),
-            @ApiResponse(responseCode = "404", description = "Site or user not found"),
-            @ApiResponse(responseCode = "409", description = "User already has access to site"),
-            @ApiResponse(responseCode = "403", description = "Insufficient permissions")
-    })
     public ResponseEntity<UserSiteDTO> addUserToSite(
             @Parameter(description = "Site ID") @PathVariable Long siteId,
             @Parameter(description = "User ID") @PathVariable Long userId,
@@ -218,12 +211,11 @@ public class SiteController extends BaseController {
 
         logger.info("Adding user {} to site {} with role {}", userId, siteId, siteRole);
 
-        Long grantedByUserId = getCurrentUserId();
 
+        Long grantedByUserId = getCurrentUserId();
         UserSiteDTO userSite = siteService.addUserToSite(siteId, userId, siteRole, grantedByUserId, notes);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userSite);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userSite);
     }
 
     @DeleteMapping("/{siteId}/users/{userId}")
@@ -239,9 +231,7 @@ public class SiteController extends BaseController {
 
         logger.info("Removing user {} from site {}", userId, siteId);
 
-        Long revokedByUserId = getCurrentUserId();
-
-        siteService.removeUserFromSite(siteId, userId, revokedByUserId);
+        siteService.removeUserFromSite(siteId, userId);
 
         return ResponseEntity.noContent().build();
     }
