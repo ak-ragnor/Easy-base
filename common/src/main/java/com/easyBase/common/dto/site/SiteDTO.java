@@ -4,6 +4,7 @@ import com.easyBase.common.enums.SiteStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
@@ -13,12 +14,13 @@ import java.time.ZonedDateTime;
  * Data Transfer Object representing a site for API responses.
  * Extends BaseDTO to include audit fields.
  *
- * @author Enterprise Team
+ * @author Akhash R
  * @version 1.0
  * @since 1.0
  */
 public class SiteDTO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Long id;

@@ -46,8 +46,6 @@ public class UserSiteId implements Serializable {
         this.site = site;
     }
 
-    // ===== GETTERS AND SETTERS =====
-
     public Long getUser() {
         return user;
     }
@@ -63,8 +61,6 @@ public class UserSiteId implements Serializable {
     public void setSite(Long site) {
         this.site = site;
     }
-
-    // ===== EQUALS, HASHCODE, AND TOSTRING =====
 
     @Override
     public boolean equals(Object o) {

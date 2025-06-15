@@ -261,8 +261,6 @@ public class UserMapper {
         }
     }
 
-    // ===== ENTERPRISE UTILITIES =====
-
     /**
      * Create a summary DTO with limited information
      * Useful for listings and dropdown selections

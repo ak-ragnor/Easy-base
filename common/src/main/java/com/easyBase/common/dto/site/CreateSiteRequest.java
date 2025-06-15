@@ -1,4 +1,3 @@
-// ===== CREATE SITE REQUEST DTO =====
 package com.easyBase.common.dto.site;
 
 import com.easyBase.common.enums.SiteStatus;
@@ -15,7 +14,7 @@ import java.io.Serializable;
  * Data Transfer Object for creating new sites in the system.
  * Contains validation constraints to ensure data integrity.
  *
- * @author Enterprise Team
+ * @author Akhash R
  * @version 1.0
  * @since 1.0
  */
@@ -88,8 +87,3 @@ public class CreateSiteRequest implements Serializable {
                 '}';
     }
 }
-
-// ===== UPDATE SITE REQUEST DTO =====
-
-
-// ===== SITE DTO =====

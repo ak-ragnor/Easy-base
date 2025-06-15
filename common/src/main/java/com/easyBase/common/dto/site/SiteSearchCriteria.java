@@ -13,7 +13,7 @@ import java.util.List;
  * Data Transfer Object for site search and filtering operations.
  * Used with specifications for dynamic query building.
  *
- * @author Enterprise Team
+ * @author Akhash R
  * @version 1.0
  * @since 1.0
  */

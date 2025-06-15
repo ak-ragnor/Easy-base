@@ -3,6 +3,8 @@ package com.easyBase.service.business;
 import com.easyBase.common.dto.site.*;
 import com.easyBase.common.enums.SiteStatus;
 import com.easyBase.common.enums.UserRole;
+import com.easyBase.service.exception.BusinessException;
+import com.easyBase.service.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -18,21 +20,11 @@ import java.util.Map;
  * Includes site CRUD operations, user-site relationship management,
  * and advanced search capabilities.
  *
- * Key Features:
- * - Full CRUD operations for sites
- * - User-site relationship management
- * - Advanced search and filtering
- * - Bulk operations for administrative tasks
- * - Site access control and validation
- * - Statistical and analytical methods
- *
- * @author Enterprise Team
+ * @author Akhash R
  * @version 1.0
  * @since 1.0
  */
 public interface SiteService {
-
-    // ===== CORE CRUD OPERATIONS =====
 
     /**
      * Create a new site
@@ -73,16 +65,6 @@ public interface SiteService {
     SiteDTO updateSite(@NotNull Long id, @Valid @NotNull UpdateSiteRequest request);
 
     /**
-     * Delete a site
-     * Note: This will also remove all user-site relationships
-     *
-     * @param id Site ID to delete
-     * @throws ResourceNotFoundException if site not found
-     * @throws BusinessException if site has active users and force is not enabled
-     */
-    void deleteSite(@NotNull Long id);
-
-    /**
      * Delete a site with force option
      *
      * @param id    Site ID to delete
@@ -91,8 +73,6 @@ public interface SiteService {
      * @throws BusinessException if site has active users and force is false
      */
     void deleteSite(@NotNull Long id, boolean force);
-
-    // ===== SEARCH AND LISTING OPERATIONS =====
 
     /**
      * Find all sites with pagination
@@ -128,24 +108,6 @@ public interface SiteService {
     List<SiteDTO> findActiveSites();
 
     /**
-     * Find all accessible sites (active or maintenance)
-     *
-     * @return List of accessible SiteDTOs
-     */
-    List<SiteDTO> findAccessibleSites();
-
-    /**
-     * Find sites where user has admin access
-     *
-     * @param userId   User ID
-     * @param pageable Pagination parameters
-     * @return Page of SiteDTOs where user has admin access
-     */
-    Page<SiteDTO> findAdminSitesByUser(@NotNull Long userId, Pageable pageable);
-
-    // ===== USER-SITE RELATIONSHIP MANAGEMENT =====
-
-    /**
      * Add a user to a site
      *
      * @param siteId          Site ID
@@ -172,42 +134,6 @@ public interface SiteService {
     void removeUserFromSite(@NotNull Long siteId, @NotNull Long userId, @NotNull Long revokedByUserId);
 
     /**
-     * Update user's role in a site
-     *
-     * @param siteId         Site ID
-     * @param userId         User ID
-     * @param newSiteRole    New site-specific role
-     * @param modifiedByUserId ID of user making the change
-     * @return Updated UserSiteDTO
-     * @throws ResourceNotFoundException if site, user, or relationship not found
-     * @throws BusinessException if validation fails
-     */
-    UserSiteDTO updateUserSiteRole(@NotNull Long siteId, @NotNull Long userId,
-                                   UserRole newSiteRole, @NotNull Long modifiedByUserId);
-
-    /**
-     * Activate user access to a site
-     *
-     * @param siteId         Site ID
-     * @param userId         User ID
-     * @param activatedByUserId ID of user activating access
-     * @return Updated UserSiteDTO
-     * @throws ResourceNotFoundException if site, user, or relationship not found
-     */
-    UserSiteDTO activateUserSiteAccess(@NotNull Long siteId, @NotNull Long userId, @NotNull Long activatedByUserId);
-
-    /**
-     * Deactivate user access to a site
-     *
-     * @param siteId           Site ID
-     * @param userId           User ID
-     * @param deactivatedByUserId ID of user deactivating access
-     * @return Updated UserSiteDTO
-     * @throws ResourceNotFoundException if site, user, or relationship not found
-     */
-    UserSiteDTO deactivateUserSiteAccess(@NotNull Long siteId, @NotNull Long userId, @NotNull Long deactivatedByUserId);
-
-    /**
      * Find users in a site
      *
      * @param siteId   Site ID
@@ -217,15 +143,6 @@ public interface SiteService {
     Page<UserSiteDTO> findUsersBySite(@NotNull Long siteId, Pageable pageable);
 
     /**
-     * Find sites for a user
-     *
-     * @param userId   User ID
-     * @param pageable Pagination parameters
-     * @return Page of UserSiteDTOs for the user
-     */
-    Page<UserSiteDTO> findSitesByUser(@NotNull Long userId, Pageable pageable);
-
-    /**
      * Check if user has access to a site
      *
      * @param userId User ID
@@ -233,60 +150,6 @@ public interface SiteService {
      * @return true if user has active access to the site
      */
     boolean hasUserAccessToSite(@NotNull Long userId, @NotNull Long siteId);
-
-    /**
-     * Check if user has admin access to a site
-     *
-     * @param userId User ID
-     * @param siteId Site ID
-     * @return true if user has admin access to the site
-     */
-    boolean hasUserAdminAccessToSite(@NotNull Long userId, @NotNull Long siteId);
-
-    /**
-     * Get user's effective role in a site
-     *
-     * @param userId User ID
-     * @param siteId Site ID
-     * @return UserRole or null if user has no access
-     */
-    UserRole getUserRoleInSite(@NotNull Long userId, @NotNull Long siteId);
-
-    // ===== BULK OPERATIONS =====
-
-    /**
-     * Bulk update site status
-     *
-     * @param siteIds   List of site IDs to update
-     * @param newStatus New status to set
-     * @param updatedByUserId ID of user performing the update
-     * @return Number of sites updated
-     */
-    int bulkUpdateSiteStatus(@NotNull List<Long> siteIds, @NotNull SiteStatus newStatus, @NotNull Long updatedByUserId);
-
-    /**
-     * Bulk add users to a site
-     *
-     * @param siteId          Site ID
-     * @param userIds         List of user IDs to add
-     * @param siteRole        Site-specific role for all users
-     * @param grantedByUserId ID of user granting access
-     * @return List of created UserSiteDTOs
-     */
-    List<UserSiteDTO> bulkAddUsersToSite(@NotNull Long siteId, @NotNull List<Long> userIds,
-                                         UserRole siteRole, @NotNull Long grantedByUserId);
-
-    /**
-     * Bulk remove users from a site
-     *
-     * @param siteId         Site ID
-     * @param userIds        List of user IDs to remove
-     * @param revokedByUserId ID of user revoking access
-     * @return Number of users removed
-     */
-    int bulkRemoveUsersFromSite(@NotNull Long siteId, @NotNull List<Long> userIds, @NotNull Long revokedByUserId);
-
-    // ===== VALIDATION AND BUSINESS RULES =====
 
     /**
      * Check if site code is available
@@ -314,80 +177,10 @@ public interface SiteService {
     boolean canDeleteSite(@NotNull Long siteId);
 
     /**
-     * Validate site access for user
-     *
-     * @param userId User ID
-     * @param siteId Site ID
-     * @throws BusinessException if user cannot access the site
-     */
-    void validateSiteAccess(@NotNull Long userId, @NotNull Long siteId);
-
-    // ===== STATISTICAL AND ANALYTICAL METHODS =====
-
-    /**
-     * Get site statistics
-     *
-     * @param siteId Site ID
-     * @return Map containing various statistics about the site
-     */
-    Map<String, Object> getSiteStatistics(@NotNull Long siteId);
-
-    /**
-     * Get overall system site statistics
-     *
-     * @return Map containing system-wide site statistics
-     */
-    Map<String, Object> getSystemSiteStatistics();
-
-    /**
-     * Get site status distribution
-     *
-     * @return Map of site status to count
-     */
-    Map<SiteStatus, Long> getSiteStatusDistribution();
-
-    /**
-     * Get timezone distribution across sites
-     *
-     * @return Map of timezone to site count
-     */
-    Map<String, Long> getTimezoneDistribution();
-
-    /**
-     * Get language distribution across sites
-     *
-     * @return Map of language code to site count
-     */
-    Map<String, Long> getLanguageDistribution();
-
-    /**
-     * Count total sites
-     *
-     * @return Total number of sites
-     */
-    long countTotalSites();
-
-    /**
-     * Count sites by status
-     *
-     * @param status Site status
-     * @return Number of sites with the specified status
-     */
-    long countSitesByStatus(@NotNull SiteStatus status);
-
-    /**
      * Count active users in a site
      *
      * @param siteId Site ID
      * @return Number of active users in the site
      */
     long countActiveUsersInSite(@NotNull Long siteId);
-
-    /**
-     * Count total users in a site
-     *
-     * @param siteId Site ID
-     * @return Total number of users in the site
-     */
-    long countTotalUsersInSite(@NotNull Long siteId);
 }
