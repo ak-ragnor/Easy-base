@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -23,31 +24,18 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
-import java.util.Map;
 
 /**
- * Site REST Controller
+ * Site REST Controller Implementation
  *
- * Provides RESTful API endpoints for site management operations.
- * Includes comprehensive CRUD operations, search capabilities,
- * and user-site relationship management.
- *
- * Security:
- * - Most operations require ADMIN or SUPER_ADMIN role
- * - Read operations may be accessible to authenticated users
- * - Site-specific access control based on user-site relationships
- *
- * API Versioning: v1
- * Base Path: /api/v1/sites
- *
- * @author Enterprise Team
+ * @author Akhash R
  * @version 1.0
  * @since 1.0
  */
 @RestController
-@RequestMapping("/api/v1/sites")
+@RequestMapping("/v1/sites")
 @Validated
 @Tag(name = "Site Management", description = "Site management operations")
 public class SiteController extends BaseController {
@@ -56,8 +44,6 @@ public class SiteController extends BaseController {
 
     @Autowired
     private SiteService siteService;
-
-    // ===== CORE CRUD OPERATIONS =====
 
     @PostMapping
     @Operation(summary = "Create a new site", description = "Creates a new site in the system")
@@ -151,17 +137,19 @@ public class SiteController extends BaseController {
         return ResponseEntity.noContent().build();
     }
 
-    // ===== SEARCH AND LISTING OPERATIONS =====
-
     @GetMapping
     @Operation(summary = "Get all sites", description = "Retrieves all sites with pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Sites retrieved successfully")
     })
     public ResponseEntity<Page<SiteDTO>> getAllSites(
-            @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
 
-        logger.debug("Getting all sites with pagination: {}", pageable);
+        int validatedSize = Math.min(Math.max(size, 1), 100); // Between 1 and 100
+        int validatedPage = Math.max(page, 0); // Non-negative
+
+        Pageable pageable = PageRequest.of(validatedPage, validatedSize, Sort.by("name"));
 
         Page<SiteDTO> sites = siteService.findAllSites(pageable);
 
@@ -214,22 +202,6 @@ public class SiteController extends BaseController {
         return ResponseEntity.ok(sites);
     }
 
-    @GetMapping("/accessible")
-    @Operation(summary = "Get accessible sites", description = "Retrieves all accessible sites (active or maintenance)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessible sites retrieved successfully")
-    })
-    public ResponseEntity<List<SiteDTO>> getAccessibleSites() {
-
-        logger.debug("Getting all accessible sites");
-
-        List<SiteDTO> sites = siteService.findAccessibleSites();
-
-        return ResponseEntity.ok(sites);
-    }
-
-    // ===== USER-SITE RELATIONSHIP OPERATIONS =====
-
     @PostMapping("/{siteId}/users/{userId}")
     @Operation(summary = "Add user to site", description = "Grants a user access to a site")
     @ApiResponses(value = {
@@ -246,7 +218,6 @@ public class SiteController extends BaseController {
 
         logger.info("Adding user {} to site {} with role {}", userId, siteId, siteRole);
 
-        // Get current user ID from security context (implementation would depend on security setup)
         Long grantedByUserId = getCurrentUserId();
 
         UserSiteDTO userSite = siteService.addUserToSite(siteId, userId, siteRole, grantedByUserId, notes);
@@ -268,76 +239,11 @@ public class SiteController extends BaseController {
 
         logger.info("Removing user {} from site {}", userId, siteId);
 
-        // Get current user ID from security context
         Long revokedByUserId = getCurrentUserId();
 
         siteService.removeUserFromSite(siteId, userId, revokedByUserId);
 
         return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/{siteId}/users/{userId}/role")
-    @Operation(summary = "Update user role in site", description = "Updates a user's role within a specific site")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User role updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Site, user, or relationship not found"),
-            @ApiResponse(responseCode = "403", description = "Insufficient permissions")
-    })
-    public ResponseEntity<UserSiteDTO> updateUserSiteRole(
-            @Parameter(description = "Site ID") @PathVariable Long siteId,
-            @Parameter(description = "User ID") @PathVariable Long userId,
-            @Parameter(description = "New site-specific role") @RequestParam @NotNull UserRole newSiteRole) {
-
-        logger.info("Updating user {} role in site {} to {}", userId, siteId, newSiteRole);
-
-        // Get current user ID from security context
-        Long modifiedByUserId = getCurrentUserId();
-
-        UserSiteDTO userSite = siteService.updateUserSiteRole(siteId, userId, newSiteRole, modifiedByUserId);
-
-        return ResponseEntity.ok(userSite);
-    }
-
-    @PostMapping("/{siteId}/users/{userId}/activate")
-    @Operation(summary = "Activate user access", description = "Activates a user's access to a site")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User access activated successfully"),
-            @ApiResponse(responseCode = "404", description = "Site, user, or relationship not found"),
-            @ApiResponse(responseCode = "403", description = "Insufficient permissions")
-    })
-    public ResponseEntity<UserSiteDTO> activateUserSiteAccess(
-            @Parameter(description = "Site ID") @PathVariable Long siteId,
-            @Parameter(description = "User ID") @PathVariable Long userId) {
-
-        logger.info("Activating user {} access to site {}", userId, siteId);
-
-        // Get current user ID from security context
-        Long activatedByUserId = getCurrentUserId();
-
-        UserSiteDTO userSite = siteService.activateUserSiteAccess(siteId, userId, activatedByUserId);
-
-        return ResponseEntity.ok(userSite);
-    }
-
-    @PostMapping("/{siteId}/users/{userId}/deactivate")
-    @Operation(summary = "Deactivate user access", description = "Deactivates a user's access to a site")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User access deactivated successfully"),
-            @ApiResponse(responseCode = "404", description = "Site, user, or relationship not found"),
-            @ApiResponse(responseCode = "403", description = "Insufficient permissions")
-    })
-    public ResponseEntity<UserSiteDTO> deactivateUserSiteAccess(
-            @Parameter(description = "Site ID") @PathVariable Long siteId,
-            @Parameter(description = "User ID") @PathVariable Long userId) {
-
-        logger.info("Deactivating user {} access to site {}", userId, siteId);
-
-        // Get current user ID from security context
-        Long deactivatedByUserId = getCurrentUserId();
-
-        UserSiteDTO userSite = siteService.deactivateUserSiteAccess(siteId, userId, deactivatedByUserId);
-
-        return ResponseEntity.ok(userSite);
     }
 
     @GetMapping("/{siteId}/users")
@@ -357,191 +263,6 @@ public class SiteController extends BaseController {
 
         return ResponseEntity.ok(userSites);
     }
-
-    // ===== BULK OPERATIONS =====
-
-    @PostMapping("/bulk/status")
-    @Operation(summary = "Bulk update site status", description = "Updates status for multiple sites (SUPER_ADMIN only)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Sites updated successfully"),
-            @ApiResponse(responseCode = "403", description = "Insufficient permissions")
-    })
-    public ResponseEntity<Map<String, Object>> bulkUpdateSiteStatus(
-            @Parameter(description = "List of site IDs") @RequestParam List<Long> siteIds,
-            @Parameter(description = "New status") @RequestParam SiteStatus newStatus) {
-
-        logger.info("Bulk updating {} sites to status {}", siteIds.size(), newStatus);
-
-        // Get current user ID from security context
-        Long updatedByUserId = getCurrentUserId();
-
-        int updatedCount = siteService.bulkUpdateSiteStatus(siteIds, newStatus, updatedByUserId);
-
-        Map<String, Object> response = Map.of(
-                "updatedCount", updatedCount,
-                "requestedCount", siteIds.size(),
-                "newStatus", newStatus
-        );
-
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/{siteId}/users/bulk")
-    @Operation(summary = "Bulk add users to site", description = "Adds multiple users to a site")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Users added successfully"),
-            @ApiResponse(responseCode = "404", description = "Site not found"),
-            @ApiResponse(responseCode = "403", description = "Insufficient permissions")
-    })
-    public ResponseEntity<Map<String, Object>> bulkAddUsersToSite(
-            @Parameter(description = "Site ID") @PathVariable Long siteId,
-            @Parameter(description = "List of user IDs") @RequestParam List<Long> userIds,
-            @Parameter(description = "Site-specific role for all users") @RequestParam(required = false) UserRole siteRole) {
-
-        logger.info("Bulk adding {} users to site {} with role {}", userIds.size(), siteId, siteRole);
-
-        // Get current user ID from security context
-        Long grantedByUserId = getCurrentUserId();
-
-        List<UserSiteDTO> userSites = siteService.bulkAddUsersToSite(siteId, userIds, siteRole, grantedByUserId);
-
-        Map<String, Object> response = Map.of(
-                "addedCount", userSites.size(),
-                "requestedCount", userIds.size(),
-                "userSites", userSites
-        );
-
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/{siteId}/users/bulk")
-    @Operation(summary = "Bulk remove users from site", description = "Removes multiple users from a site")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Users removed successfully"),
-            @ApiResponse(responseCode = "404", description = "Site not found"),
-            @ApiResponse(responseCode = "403", description = "Insufficient permissions")
-    })
-    public ResponseEntity<Map<String, Object>> bulkRemoveUsersFromSite(
-            @Parameter(description = "Site ID") @PathVariable Long siteId,
-            @Parameter(description = "List of user IDs") @RequestParam List<Long> userIds) {
-
-        logger.info("Bulk removing {} users from site {}", userIds.size(), siteId);
-
-        // Get current user ID from security context
-        Long revokedByUserId = getCurrentUserId();
-
-        int removedCount = siteService.bulkRemoveUsersFromSite(siteId, userIds, revokedByUserId);
-
-        Map<String, Object> response = Map.of(
-                "removedCount", removedCount,
-                "requestedCount", userIds.size()
-        );
-
-        return ResponseEntity.ok(response);
-    }
-
-    // ===== VALIDATION AND UTILITY OPERATIONS =====
-
-    @GetMapping("/validate/code/{code}")
-    @Operation(summary = "Check site code availability", description = "Checks if a site code is available")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Code availability checked")
-    })
-    public ResponseEntity<Map<String, Object>> checkSiteCodeAvailability(
-            @Parameter(description = "Site code to check") @PathVariable String code) {
-
-        logger.debug("Checking availability of site code: {}", code);
-
-        boolean available = siteService.isSiteCodeAvailable(code);
-        boolean validFormat = true;
-
-        try {
-            siteService.validateSiteCode(code);
-        } catch (Exception e) {
-            validFormat = false;
-        }
-
-        Map<String, Object> response = Map.of(
-                "code", code,
-                "available", available,
-                "validFormat", validFormat
-        );
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/{siteId}/can-delete")
-    @Operation(summary = "Check if site can be deleted", description = "Checks if a site can be safely deleted")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Delete eligibility checked"),
-            @ApiResponse(responseCode = "404", description = "Site not found")
-    })
-    public ResponseEntity<Map<String, Object>> checkSiteCanBeDeleted(
-            @Parameter(description = "Site ID") @PathVariable Long siteId) {
-
-        logger.debug("Checking if site {} can be deleted", siteId);
-
-        boolean canDelete = siteService.canDeleteSite(siteId);
-        long activeUsers = siteService.countActiveUsersInSite(siteId);
-        long totalUsers = siteService.countTotalUsersInSite(siteId);
-
-        Map<String, Object> response = Map.of(
-                "siteId", siteId,
-                "canDelete", canDelete,
-                "activeUsers", activeUsers,
-                "totalUsers", totalUsers
-        );
-
-        return ResponseEntity.ok(response);
-    }
-
-    // ===== STATISTICS AND ANALYTICS =====
-
-    @GetMapping("/{siteId}/statistics")
-    @Operation(summary = "Get site statistics", description = "Retrieves detailed statistics for a site")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Statistics retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Site not found")
-    })
-    public ResponseEntity<Map<String, Object>> getSiteStatistics(
-            @Parameter(description = "Site ID") @PathVariable Long siteId) {
-
-        logger.debug("Getting statistics for site: {}", siteId);
-
-        Map<String, Object> statistics = siteService.getSiteStatistics(siteId);
-
-        return ResponseEntity.ok(statistics);
-    }
-
-    @GetMapping("/statistics/system")
-    @Operation(summary = "Get system site statistics", description = "Retrieves system-wide site statistics")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "System statistics retrieved successfully")
-    })
-    public ResponseEntity<Map<String, Object>> getSystemSiteStatistics() {
-
-        logger.debug("Getting system-wide site statistics");
-
-        Map<String, Object> statistics = siteService.getSystemSiteStatistics();
-
-        return ResponseEntity.ok(statistics);
-    }
-
-    @GetMapping("/statistics/status-distribution")
-    @Operation(summary = "Get site status distribution", description = "Retrieves distribution of sites by status")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Status distribution retrieved successfully")
-    })
-    public ResponseEntity<Map<SiteStatus, Long>> getSiteStatusDistribution() {
-
-        logger.debug("Getting site status distribution");
-
-        Map<SiteStatus, Long> distribution = siteService.getSiteStatusDistribution();
-
-        return ResponseEntity.ok(distribution);
-    }
-
-    // ===== HELPER METHODS =====
 
     /**
      * Get current user ID from security context

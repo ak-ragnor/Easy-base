@@ -7,32 +7,14 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 /**
  * UserSite Mapping Entity
  *
- * Represents the many-to-many relationship between Users and Sites.
- * This entity allows additional fields to be stored for the relationship,
- * such as site-specific roles, access granted dates, and access status.
- *
- * Features:
- * - Extends AuditableEntity for automatic audit trail
- * - Composite primary key (user_id, site_id)
- * - Site-specific role assignment capability
- * - Access control and tracking fields
- * - Optimized for performance with proper indexing
- * - Cacheable for improved performance
- *
- * Database Design:
- * - Table: user_sites
- * - Primary Key: Composite (user_id, site_id)
- * - Foreign Keys: user_id -> users(id), site_id -> sites(id)
- * - Indexes: user_id, site_id, role, is_active
- * - Audit Fields: created_at, last_modified, version
- *
- * @author Enterprise Team
+ * @author Akhash R
  * @version 1.0
  * @since 1.0
  */
@@ -98,9 +80,8 @@ import java.time.ZonedDateTime;
 @IdClass(UserSiteId.class)
 public class UserSite implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-
-    // ===== COMPOSITE PRIMARY KEY FIELDS =====
 
     /**
      * User in the relationship

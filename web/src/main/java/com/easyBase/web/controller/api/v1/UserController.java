@@ -19,17 +19,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import java.time.ZonedDateTime;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 🚀 Complete User REST Controller Implementation
+ * User REST Controller Implementation
  *
- * This is the working implementation that integrates with the existing
- * service layer, replacing the commented-out version.
- *
- * @author Enterprise Team
+ * @author Akhash R
  * @version 1.0
  * @since 1.0
  */
@@ -45,8 +42,6 @@ public class UserController extends BaseController {
 
     @Autowired
     private TimezoneService timezoneService;
-
-    // ===== CORE CRUD OPERATIONS =====
 
     /**
      * Get all users with optional filtering and pagination
@@ -64,16 +59,13 @@ public class UserController extends BaseController {
                 page, size, search, role, status);
 
         try {
-            // Build pageable with bounds checking
             int validatedSize = Math.min(Math.max(size, 1), 100); // Between 1 and 100
             int validatedPage = Math.max(page, 0); // Non-negative
 
             Pageable pageable = PageRequest.of(validatedPage, validatedSize, Sort.by("name"));
 
-            // Get all users (for now - will implement filtering later)
             Page<UserDTO> users = userService.findAll(pageable);
 
-            // Apply client-side filtering (temporary until service layer filtering is implemented)
             List<UserDTO> filteredUsers = users.getContent();
 
             if (!search.isEmpty()) {
@@ -96,15 +88,13 @@ public class UserController extends BaseController {
                         .collect(Collectors.toList());
             }
 
-            // Convert to user's timezone if provided
             if (userTimezone != null && timezoneService.isValidTimezone(userTimezone) &&
                     timezoneService.isUserTimezoneEnabled()) {
                 filteredUsers = filteredUsers.stream()
-                        .map(user -> convertToUserTimezone(user, userTimezone))
+                        .map(user -> _convertToUserTimezone(user, userTimezone))
                         .collect(Collectors.toList());
             }
 
-            // Build response with pagination metadata
             long totalElements = filteredUsers.size();
             int totalPages = (int) Math.ceil((double) totalElements / validatedSize);
             int startIndex = validatedPage * validatedSize;
@@ -127,7 +117,7 @@ public class UserController extends BaseController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            logger.error("ERROR in getAllUsers: " + e.getMessage(), e);
+            logger.error("ERROR in getAllUsers: {}", e.getMessage(), e);
 
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
@@ -151,9 +141,8 @@ public class UserController extends BaseController {
         try {
             UserDTO user = userService.findById(id);
 
-            // Convert to user's timezone if provided
             if (userTimezone != null && timezoneService.isValidTimezone(userTimezone)) {
-                user = convertToUserTimezone(user, userTimezone);
+                user = _convertToUserTimezone(user, userTimezone);
             }
 
             ApiResponse<UserDTO> response = ApiResponse.<UserDTO>builder()
@@ -387,12 +376,10 @@ public class UserController extends BaseController {
         }
     }
 
-    // ===== HELPER METHODS =====
-
     /**
      * Helper method to convert user dates to requested timezone
      */
-    private UserDTO convertToUserTimezone(UserDTO user, String targetTimezone) {
+    private UserDTO _convertToUserTimezone(UserDTO user, String targetTimezone) {
         if (user == null || targetTimezone == null) {
             return user;
         }

@@ -33,8 +33,6 @@ public abstract class AuditableEntity extends BaseEntity {
     @Column(name = "last_modified", nullable = false)
     private ZonedDateTime lastModified;
 
-    // ===== CONSTRUCTORS =====
-
     /**
      * Default constructor required by JPA
      */
@@ -50,8 +48,6 @@ public abstract class AuditableEntity extends BaseEntity {
     protected AuditableEntity(Long id) {
         super(id);
     }
-
-    // ===== GETTERS AND SETTERS =====
 
     /**
      * Gets the creation timestamp
@@ -88,8 +84,6 @@ public abstract class AuditableEntity extends BaseEntity {
     public void setLastModified(ZonedDateTime lastModified) {
         this.lastModified = lastModified;
     }
-
-    // ===== BUSINESS METHODS =====
 
     /**
      * Manually touch the entity to update the last modified timestamp
@@ -135,8 +129,6 @@ public abstract class AuditableEntity extends BaseEntity {
         return String.format("%s{id=%s, version=%s, createdAt=%s, lastModified=%s}",
                 getClass().getSimpleName(), getId(), getVersion(), createdAt, lastModified);
     }
-
-    // ===== JPA LIFECYCLE CALLBACKS =====
 
     /**
      * Enterprise Audit Listener for automatic timestamp management

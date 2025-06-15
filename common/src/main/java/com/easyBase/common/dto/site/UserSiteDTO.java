@@ -3,6 +3,7 @@ package com.easyBase.common.dto.site;
 import com.easyBase.common.dto.user.UserDTO;
 import com.easyBase.common.enums.UserRole;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
@@ -12,15 +13,15 @@ import java.time.ZonedDateTime;
  * Data Transfer Object representing a user-site relationship.
  * Used for managing user access to sites.
  *
- * @author Enterprise Team
+ * @author Akhash R
  * @version 1.0
  * @since 1.0
  */
 public class UserSiteDTO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    // Audit fields (since UserSite doesn't extend BaseEntity)
     private ZonedDateTime createdAt;
     private ZonedDateTime lastModified;
     private Long version;

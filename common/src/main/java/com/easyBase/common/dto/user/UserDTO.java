@@ -43,7 +43,6 @@ public class UserDTO {
         this.userTimezone = userTimezone;
     }
 
-    // Builder pattern for easy construction
     public static Builder builder() {
         return new Builder();
     }
@@ -103,7 +102,6 @@ public class UserDTO {
         }
     }
 
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

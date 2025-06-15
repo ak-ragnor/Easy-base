@@ -15,7 +15,7 @@ import java.io.Serializable;
  * Data Transfer Object for updating existing sites.
  * Contains validation constraints to ensure data integrity.
  *
- * @author Enterprise Team
+ * @author Akhsah R
  * @version 1.0
  * @since 1.0
  */
@@ -53,7 +53,6 @@ public class UpdateSiteRequest implements Serializable {
         this.languageCode = languageCode;
     }
 
-    // Getters and Setters
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
