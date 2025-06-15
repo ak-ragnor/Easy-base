@@ -1,4 +1,4 @@
-package com.easyBase.domain.repository.jpa;
+package com.easyBase.domain.repository.jpa.site;
 
 import com.easyBase.common.enums.SiteStatus;
 import com.easyBase.domain.entity.site.Site;
@@ -270,8 +270,8 @@ public interface SiteRepository extends BaseRepository<Site, Long> {
      * @return List of sites where the user has admin access
      */
     @Query("SELECT DISTINCT us.site FROM UserSite us WHERE us.user.id = :userId AND us.isActive = true AND " +
-            "(us.siteRole IN (com.easyBase.common.enums.UserRole.ADMIN, com.easyBase.common.enums.UserRole.SUPER_ADMIN) OR " +
-            "(us.siteRole IS NULL AND us.user.role IN (com.easyBase.common.enums.UserRole.ADMIN, com.easyBase.common.enums.UserRole.SUPER_ADMIN))) " +
+            "(us.role IN (com.easyBase.common.enums.UserRole.ADMIN, com.easyBase.common.enums.UserRole.SUPER_ADMIN) OR " +
+            "(us.role IS NULL AND us.user.role IN (com.easyBase.common.enums.UserRole.ADMIN, com.easyBase.common.enums.UserRole.SUPER_ADMIN))) " +
             "ORDER BY us.site.name")
     List<Site> findAdminSitesByUserId(@Param("userId") Long userId);
 
