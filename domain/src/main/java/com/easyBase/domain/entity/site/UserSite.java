@@ -420,7 +420,9 @@ public class UserSite {
         if (notes != null) {
             this.notes = notes;
         }
-        this.grantedByUserId = updatedBy;
+        if (updatedBy != null) {
+            this.grantedByUserId = updatedBy;
+        }
         this.lastModified = ZonedDateTime.now();
     }
 }
