@@ -421,6 +421,6 @@ public class UserSite {
             this.notes = notes;
         }
         this.grantedByUserId = updatedBy;
-        this.lastModified = ZonedDateTime.from(LocalDateTime.now());
+        this.lastModified = ZonedDateTime.now();
     }
 }
