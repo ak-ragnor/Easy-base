@@ -4,6 +4,7 @@ import com.easyBase.common.dto.site.CreateSiteRequest;
 import com.easyBase.common.dto.site.SiteDTO;
 import com.easyBase.common.dto.site.UpdateSiteRequest;
 import com.easyBase.common.dto.site.UserSiteDTO;
+import com.easyBase.common.enums.UserRole;
 import com.easyBase.domain.entity.site.Site;
 import com.easyBase.domain.entity.site.UserSite;
 import com.easyBase.domain.entity.user.User;
@@ -167,7 +168,7 @@ public class SiteMapper {
             dto.setSite(toSimpleDTO(userSite.getSite()));
         }
 
-        dto.setSiteRole(userSite.getSiteRole());
+        dto.setSiteRole(userSite.getRole());
         dto.setEffectiveRole(userSite.getEffectiveRole());
         dto.setIsActive(userSite.getIsActive());
         dto.setAccessGrantedAt(userSite.getAccessGrantedAt());
@@ -179,23 +180,6 @@ public class SiteMapper {
         dto.setValidAccess(userSite.isValidAccess());
         dto.setAdminAccess(userSite.hasAdminAccess());
 
-        return dto;
-    }
-
-    /**
-     * Convert UserSite entity to UserSiteDTO with user names resolved
-     *
-     * @param userSite           UserSite entity to convert
-     * @param grantedByUserName  Name of user who granted access
-     * @param revokedByUserName  Name of user who revoked access
-     * @return UserSiteDTO or null if input is null
-     */
-    public UserSiteDTO toDTO(UserSite userSite, String grantedByUserName, String revokedByUserName) {
-        UserSiteDTO dto = toDTO(userSite);
-        if (dto != null) {
-            dto.setGrantedByUserName(grantedByUserName);
-            dto.setRevokedByUserName(revokedByUserName);
-        }
         return dto;
     }
 
@@ -275,14 +259,14 @@ public class SiteMapper {
      * @return UserSite entity
      */
     public UserSite createUserSite(User user, Site site,
-                                   com.easyBase.common.enums.UserRole siteRole,
+                                   UserRole siteRole,
                                    Long grantedByUserId) {
         UserSite userSite = new UserSite(user, site);
 
-        userSite.setSiteRole(siteRole);
+        userSite.setRole(siteRole);
         userSite.setGrantedByUserId(grantedByUserId);
-        ZonedDateTime now = ZonedDateTime.now();
-        userSite.setAccessGrantedAt(now);
+        userSite.setIsActive(true);
+        userSite.setAccessGrantedAt(ZonedDateTime.now());
 
         return userSite;
     }

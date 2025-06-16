@@ -7,8 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import java.io.Serial;
-import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 /**
@@ -54,11 +53,11 @@ import java.time.ZonedDateTime;
         ),
         @NamedQuery(
                 name = "UserSite.findByUserAndRole",
-                query = "SELECT us FROM UserSite us WHERE us.user = :user AND us.siteRole = :role ORDER BY us.site.name"
+                query = "SELECT us FROM UserSite us WHERE us.user = :user AND us.role = :role ORDER BY us.site.name"
         ),
         @NamedQuery(
                 name = "UserSite.findBySiteAndRole",
-                query = "SELECT us FROM UserSite us WHERE us.site = :site AND us.siteRole = :role ORDER BY us.user.name"
+                query = "SELECT us FROM UserSite us WHERE us.site = :site AND us.role = :role ORDER BY us.user.name"
         ),
         @NamedQuery(
                 name = "UserSite.countByUser",
@@ -78,10 +77,7 @@ import java.time.ZonedDateTime;
         )
 })
 @IdClass(UserSiteId.class)
-public class UserSite implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class UserSite {
 
     /**
      * User in the relationship
@@ -103,8 +99,6 @@ public class UserSite implements Serializable {
     @NotNull(message = "Site is required")
     private Site site;
 
-    // ===== RELATIONSHIP FIELDS =====
-
     /**
      * User's role within this specific site
      * Can be different from their global role
@@ -112,7 +106,7 @@ public class UserSite implements Serializable {
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "site_role")
-    private UserRole siteRole;
+    private UserRole role;
 
     /**
      * Whether this user-site relationship is currently active
@@ -181,8 +175,6 @@ public class UserSite implements Serializable {
     @Column(name = "version", nullable = false)
     private Long version = 0L;
 
-    // ===== CONSTRUCTORS =====
-
     /**
      * Default constructor for JPA
      */
@@ -212,11 +204,11 @@ public class UserSite implements Serializable {
      *
      * @param user     The user
      * @param site     The site
-     * @param siteRole The user's role within this site
+     * @param role The user's role within this site
      */
-    public UserSite(User user, Site site, UserRole siteRole) {
+    public UserSite(User user, Site site, UserRole role) {
         this(user, site);
-        this.siteRole = siteRole;
+        this.role = role;
     }
 
     /**
@@ -224,11 +216,11 @@ public class UserSite implements Serializable {
      *
      * @param user           The user
      * @param site           The site
-     * @param siteRole       The user's role within this site
+     * @param role       The user's role within this site
      * @param grantedByUserId ID of the user who granted access
      */
-    public UserSite(User user, Site site, UserRole siteRole, Long grantedByUserId) {
-        this(user, site, siteRole);
+    public UserSite(User user, Site site, UserRole role, Long grantedByUserId) {
+        this(user, site, role);
         this.grantedByUserId = grantedByUserId;
     }
 
@@ -250,12 +242,12 @@ public class UserSite implements Serializable {
         this.site = site;
     }
 
-    public UserRole getSiteRole() {
-        return siteRole;
+    public UserRole getRole() {
+        return role;
     }
 
-    public void setSiteRole(UserRole siteRole) {
-        this.siteRole = siteRole;
+    public void setRole(UserRole siteRole) {
+        this.role = siteRole;
     }
 
     public Boolean getIsActive() {
@@ -306,8 +298,6 @@ public class UserSite implements Serializable {
         this.notes = notes;
     }
 
-    // ===== AUDIT FIELD GETTERS AND SETTERS =====
-
     public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
@@ -331,8 +321,6 @@ public class UserSite implements Serializable {
     public void setVersion(Long version) {
         this.version = version;
     }
-
-    // ===== BUSINESS METHODS =====
 
     /**
      * JPA callback to update lastModified timestamp before updates
@@ -369,7 +357,7 @@ public class UserSite implements Serializable {
      * @return The effective role for this user-site relationship
      */
     public UserRole getEffectiveRole() {
-        return siteRole != null ? siteRole : (user != null ? user.getRole() : null);
+        return role != null ? role : (user != null ? user.getRole() : null);
     }
 
     /**
@@ -419,9 +407,22 @@ public class UserSite implements Serializable {
         return "UserSite{" +
                 "user=" + (user != null ? user.getEmail() : "null") +
                 ", site=" + (site != null ? site.getCode() : "null") +
-                ", siteRole=" + siteRole +
+                ", siteRole=" + role +
                 ", isActive=" + isActive +
                 ", accessGrantedAt=" + accessGrantedAt +
                 '}';
+    }
+
+    public void updateAssociation(UserRole role, String notes, Long updatedBy) {
+        if (role != null) {
+            this.role = role;
+        }
+        if (notes != null) {
+            this.notes = notes;
+        }
+        if (updatedBy != null) {
+            this.grantedByUserId = updatedBy;
+        }
+        this.lastModified = ZonedDateTime.now();
     }
 }

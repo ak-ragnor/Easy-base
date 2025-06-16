@@ -1,4 +1,4 @@
-package com.easyBase.domain.repository.jpa;
+package com.easyBase.domain.repository.jpa.user;
 
 import com.easyBase.common.enums.UserRole;
 import com.easyBase.common.enums.UserStatus;
