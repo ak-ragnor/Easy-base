@@ -11,71 +11,59 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!-- Component Scanning -->
-    <context:component-scan base-package="com.easyBase.web.controller"/>
-    <context:component-scan base-package="com.easyBase.web.config"/>
-
-    <!-- Property placeholder - optional, ignore if not found -->
-    <context:property-placeholder location="classpath:application.properties"
-                                  ignore-unresolvable="true"
-                                  ignore-resource-not-found="true"/>
-
-    <!-- Enable MVC with default configuration -->
+    <!-- Enable Spring MVC annotation support -->
     <mvc:annotation-driven/>
 
-    <!-- CORS Configuration -->
-    <mvc:cors>
-        <mvc:mapping path="/api/**"
-                     allowed-origins="*"
-                     allowed-methods="GET,POST,PUT,DELETE,OPTIONS,PATCH"
-                     allowed-headers="*"
-                     allow-credentials="false"
-                     max-age="3600"/>
-    </mvc:cors>
+    <!-- Component scanning for web controllers -->
+    <context:component-scan base-package="com.easyBase.web.controller"/>
 
-    <!-- Interceptors -->
+    <!-- Static resource handling -->
+    <mvc:resources mapping="/static/**" location="/static/"/>
+    <mvc:resources mapping="/css/**" location="/css/"/>
+    <mvc:resources mapping="/js/**" location="/js/"/>
+    <mvc:resources mapping="/images/**" location="/images/"/>
+
+    <!-- View resolver for JSPs (if needed) -->
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!-- Exception handlers -->
+    <bean id="globalExceptionHandler"
+          class="com.easyBase.web.advice.GlobalExceptionHandler"/>
+
+    <!-- Service Context Interceptor to clean up ThreadLocal -->
     <mvc:interceptors>
-        <bean class="com.easyBase.web.interceptor.LoggingInterceptor"/>
-        <bean class="com.easyBase.web.interceptor.PerformanceInterceptor"/>
+        <mvc:interceptor>
+            <mvc:mapping path="/api/**"/>
+            <bean class="com.easyBase.web.interceptor.ServiceContextInterceptor"/>
+        </mvc:interceptor>
 
-    <!-- TODO: Add after User Crud
-        <bean class="com.easyBase.web.interceptor.SecurityHeadersInterceptor"/>
-    -->
+        <!-- Logging interceptor for site authentication -->
+        <mvc:interceptor>
+            <mvc:mapping path="/api/*/login"/>
+            <mvc:mapping path="/api/site/*/login"/>
+            <bean class="com.easyBase.web.interceptor.SiteAuthLoggingInterceptor"/>
+        </mvc:interceptor>
     </mvc:interceptors>
 
-<!-- Static Resources -->
-    <mvc:resources mapping="/static/**" location="/static/" cache-period="3600"/>
-
-    <!-- Default Servlet Handler -->
-    <mvc:default-servlet-handler/>
-
-    <!-- ===== PHASE 2: ENHANCED ERROR HANDLING (To Add) ===== -->
-    <!-- TODO: Add after testing basic functionality
-    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
-        <property name="defaultErrorView" value="error"/>
-        <property name="exceptionMappings">
-            <props>
-                <prop key="java.lang.Exception">error</prop>
-            </props>
-        </property>
-    </bean>
-    -->
-
-    <!-- ===== PHASE 3: INTERNATIONALIZATION (To Add) ===== -->
-    <!-- TODO: Add when needed
-    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
-        <property name="basename" value="classpath:messages/messages"/>
-        <property name="defaultEncoding" value="UTF-8"/>
-    </bean>
-    -->
-
-    <!-- ===== PHASE 4: ADVANCED FEATURES (To Add) ===== -->
-    <!-- TODO: Add when needed
-    - Content Negotiation
-    - File Upload Support
-    - Async Request Processing
-    - API Versioning
-    - Rate Limiting
-    -->
+    <!-- Message converters for JSON -->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper">
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                        <property name="dateFormat">
+                            <bean class="java.text.SimpleDateFormat">
+                                <constructor-arg value="yyyy-MM-dd'T'HH:mm:ss.SSSXXX"/>
+                            </bean>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
 
 </beans>

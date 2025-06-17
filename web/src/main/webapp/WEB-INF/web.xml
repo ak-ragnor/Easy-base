@@ -16,7 +16,10 @@
     <!-- Spring Root Application Context -->
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:spring/applicationContext.xml</param-value>
+        <param-value>
+            classpath:spring/applicationContext.xml
+            classpath:spring/applicationContext-security.xml
+        </param-value>
     </context-param>
 
     <!-- Spring Context Loader Listener -->
@@ -42,6 +45,26 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <!-- Spring Security Filter Chain -->
+    <filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- Service Context Cleanup Filter  -->
+    <filter>
+        <filter-name>serviceContextCleanupFilter</filter-name>
+        <filter-class>com.easyBase.web.filter.ServiceContextCleanupFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>serviceContextCleanupFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <!-- CORS Filter for Development -->
     <filter>
         <filter-name>corsFilter</filter-name>
@@ -62,7 +85,7 @@
 
     <!-- Spring MVC Dispatcher Servlet for API -->
     <servlet>
-        <servlet-name>apiServlet</servlet-name>
+        <servlet-name>dispatcher</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
@@ -70,6 +93,10 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
 
     <!-- Public Endpoints Servlet (optional - for health checks outside /api) -->
     <servlet>
@@ -92,12 +119,6 @@
         </init-param>
         <load-on-startup>3</load-on-startup>
     </servlet>
-
-    <!-- API Requests to Spring MVC -->
-    <servlet-mapping>
-        <servlet-name>apiServlet</servlet-name>
-        <url-pattern>/api/*</url-pattern>
-    </servlet-mapping>
 
     <!-- Public endpoints (health checks) -->
     <servlet-mapping>

@@ -34,8 +34,6 @@ public abstract class BaseEntity implements Serializable {
     @Column(name = "version", nullable = false)
     private Long version = 0L;
 
-    // ===== CONSTRUCTORS =====
-
     /**
      * Default constructor required by JPA
      */
@@ -51,8 +49,6 @@ public abstract class BaseEntity implements Serializable {
     protected BaseEntity(Long id) {
         this.id = id;
     }
-
-    // ===== GETTERS AND SETTERS =====
 
     /**
      * Gets the entity ID
@@ -90,8 +86,6 @@ public abstract class BaseEntity implements Serializable {
         this.version = version;
     }
 
-    // ===== BUSINESS METHODS =====
-
     /**
      * Checks if this entity is new (not yet persisted)
      *
@@ -109,8 +103,6 @@ public abstract class BaseEntity implements Serializable {
     public boolean isPersisted() {
         return getId() != null;
     }
-
-    // ===== OBJECT METHODS =====
 
     /**
      * Enterprise-standard equals method based on ID

@@ -144,6 +144,13 @@ public class User extends AuditableEntity {
     private String phoneNumber;
 
     /**
+     * User's password for security purposes
+     */
+    @Column(name = "password", length = 20)
+    @NotNull(message = "Password is required")
+    private String password;
+
+    /**
      * Whether the user's email address has been verified
      */
     @Column(name = "email_verified", nullable = false)
@@ -161,8 +168,6 @@ public class User extends AuditableEntity {
     @Column(name = "two_factor_enabled", nullable = false)
     private Boolean twoFactorEnabled = false;
 
-    // ===== RELATIONSHIPS =====
-
     /**
      * Sites associated with this user
      * Many-to-many relationship managed through UserSite entity
@@ -171,8 +176,6 @@ public class User extends AuditableEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "userSitesCache")
     private Set<UserSite> userSites = new HashSet<>();
-
-    // ===== CONSTRUCTORS =====
 
     /**
      * Default constructor for JPA
@@ -256,6 +259,14 @@ public class User extends AuditableEntity {
         this.phoneNumber = phoneNumber;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public Boolean getEmailVerified() {
         return emailVerified;
     }
@@ -286,64 +297,6 @@ public class User extends AuditableEntity {
 
     public void setUserSites(Set<UserSite> userSites) {
         this.userSites = userSites;
-    }
-
-    // ===== SITE-RELATED BUSINESS METHODS =====
-
-    /**
-     * Add this user to a site
-     *
-     * @param site The site to add the user to
-     * @return The created UserSite relationship
-     */
-    public UserSite addToSite(Site site) {
-        UserSite userSite = new UserSite(this, site);
-        this.userSites.add(userSite);
-        if (site.getUserSites() != null) {
-            site.getUserSites().add(userSite);
-        }
-        return userSite;
-    }
-
-    /**
-     * Add this user to a site with a specific role
-     *
-     * @param site     The site to add the user to
-     * @param siteRole The role for this user within the site
-     * @return The created UserSite relationship
-     */
-    public UserSite addToSite(Site site, UserRole siteRole) {
-        UserSite userSite = new UserSite(this, site, siteRole);
-        this.userSites.add(userSite);
-        if (site.getUserSites() != null) {
-            site.getUserSites().add(userSite);
-        }
-        return userSite;
-    }
-
-    /**
-     * Remove this user from a site
-     *
-     * @param site The site to remove the user from
-     * @return true if the user was removed
-     */
-    public boolean removeFromSite(Site site) {
-        UserSite userSiteToRemove = null;
-        for (UserSite userSite : this.userSites) {
-            if (userSite.getSite().equals(site)) {
-                userSiteToRemove = userSite;
-                break;
-            }
-        }
-
-        if (userSiteToRemove != null) {
-            this.userSites.remove(userSiteToRemove);
-            if (site.getUserSites() != null) {
-                site.getUserSites().remove(userSiteToRemove);
-            }
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -438,7 +391,6 @@ public class User extends AuditableEntity {
                         userSite.hasAdminAccess());
     }
 
-    // ===== USER STATUS BUSINESS METHODS =====
 
     /**
      * Check if the user is active and can access the system
@@ -493,8 +445,6 @@ public class User extends AuditableEntity {
     public boolean isTwoFactorEnabled() {
         return twoFactorEnabled != null && twoFactorEnabled;
     }
-
-    // ===== EQUALS, HASHCODE, AND TOSTRING =====
 
     @Override
     public boolean equals(Object o) {

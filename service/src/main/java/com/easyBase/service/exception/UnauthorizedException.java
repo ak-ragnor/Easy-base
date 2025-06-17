@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.io.Serial;
 
 /**
- * Access denied exception
+ * unauthorized exception
  *
- * Thrown when a user doesn't have permission to perform an operation.
+ * Thrown when a user is not authorized.
  * Results in HTTP 403 Forbidden responses.
  *
  * @author Akhash R
@@ -16,20 +16,20 @@ import java.io.Serial;
  * @since 1.0
  */
 @ResponseStatus(HttpStatus.FORBIDDEN)
-public class AccessDeniedException extends ServiceException {
+public class UnauthorizedException extends ServiceException {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public AccessDeniedException(String message) {
+    public UnauthorizedException(String message) {
         super(message);
     }
 
-    public AccessDeniedException(String message, Throwable cause) {
+    public UnauthorizedException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public AccessDeniedException(String errorCode, String message, Object... parameters) {
+    public UnauthorizedException(String errorCode, String message, Object... parameters) {
         super(errorCode, message, parameters);
     }
 }
