@@ -12,6 +12,10 @@
     <security:global-method-security pre-post-annotations="enabled"
                                      secured-annotations="enabled"/>
 
+    <bean id="siteJwtAuthenticationFilter"
+          class="com.easyBase.security.jwt.SiteJwtAuthenticationFilter">
+    </bean>
+
     <!-- HTTP Security Configuration -->
     <security:http auto-config="false"
                    use-expressions="true"
@@ -23,8 +27,15 @@
         <security:intercept-url pattern="/api/health/**" access="permitAll"/>
         <security:intercept-url pattern="/api/info/**" access="permitAll"/>
 
+        <!-- Site login endpoints -->
+        <security:intercept-url pattern="/api/*/login" access="permitAll"/>
+        <security:intercept-url pattern="/api/site/*/login" access="permitAll"/>
+
         <!-- Admin endpoints -->
         <security:intercept-url pattern="/api/admin/**" access="hasRole('ADMIN')"/>
+
+        <!-- Site-specific endpoints -->
+        <security:intercept-url pattern="/api/*/session/**" access="isAuthenticated()"/>
 
         <!-- Authenticated endpoints -->
         <security:intercept-url pattern="/api/**" access="isAuthenticated()"/>
@@ -41,7 +52,7 @@
         <security:intercept-url pattern="/protected/**" access="isAuthenticated()"/>
 
         <!-- CORS -->
-        <security:cors/>
+        <security:cors configuration-source-ref="corsConfigurationSource"/>
 
         <!-- CSRF disabled for REST API -->
         <security:csrf disabled="true"/>
@@ -53,13 +64,16 @@
             <security:xss-protection/>
         </security:headers>
 
-        <!-- Custom authentication entry point for development -->
+        <!-- Custom authentication entry point -->
         <security:http-basic entry-point-ref="customAuthenticationEntryPoint"/>
+
+        <!-- Add JWT authentication filter -->
+        <security:custom-filter ref="siteJwtAuthenticationFilter" before="BASIC_AUTH_FILTER"/>
 
     </security:http>
 
-    <!-- Simple Authentication Manager for Development -->
-    <security:authentication-manager>
+    <!-- Authentication Manager for legacy/admin access -->
+    <security:authentication-manager id="authenticationManager">
         <security:authentication-provider>
             <security:user-service>
                 <security:user name="admin" password="{noop}admin" authorities="ROLE_ADMIN"/>
@@ -72,25 +86,40 @@
     <bean id="customAuthenticationEntryPoint"
           class="com.easyBase.security.CustomAuthenticationEntryPoint"/>
 
-    <!-- CORS Configuration -->
+    <!-- FIXED CORS Configuration -->
     <bean id="corsConfigurationSource"
-          class="org.springframework.web.cors.CorsConfigurationSource">
-        <constructor-arg>
+          class="org.springframework.web.cors.UrlBasedCorsConfigurationSource">
+        <property name="corsConfigurations">
             <map>
                 <entry key="/**">
                     <bean class="org.springframework.web.cors.CorsConfiguration">
-                        <property name="allowedOriginPatterns" value="*"/>
-                        <property name="allowedMethods" value="GET,POST,PUT,DELETE,OPTIONS"/>
-                        <property name="allowedHeaders" value="*"/>
+                        <property name="allowedOriginPatterns">
+                            <list>
+                                <value>*</value>
+                            </list>
+                        </property>
+                        <property name="allowedMethods">
+                            <list>
+                                <value>GET</value>
+                                <value>POST</value>
+                                <value>PUT</value>
+                                <value>DELETE</value>
+                                <value>OPTIONS</value>
+                            </list>
+                        </property>
+                        <property name="allowedHeaders">
+                            <list>
+                                <value>*</value>
+                            </list>
+                        </property>
                         <property name="allowCredentials" value="true"/>
                         <property name="maxAge" value="3600"/>
                     </bean>
                 </entry>
             </map>
-        </constructor-arg>
+        </property>
     </bean>
 
-    <!-- Password Encoder -->
     <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
         <constructor-arg value="12"/>
     </bean>

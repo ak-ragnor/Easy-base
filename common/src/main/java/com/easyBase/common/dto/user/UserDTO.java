@@ -28,7 +28,6 @@ public class UserDTO {
     @JsonProperty("timezone")
     private String userTimezone;
 
-    // Constructors
     public UserDTO() {}
 
     public UserDTO(Long id, String name, String email, String role, String status,
