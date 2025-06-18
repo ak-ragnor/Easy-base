@@ -8,8 +8,8 @@ import com.easyBase.domain.entity.user.User;
 import com.easyBase.domain.repository.jpa.site.SiteRepository;
 import com.easyBase.domain.repository.jpa.site.UserSiteRepository;
 import com.easyBase.domain.repository.jpa.user.UserRepository;
-import com.easyBase.security.context.ServiceContext;
-import com.easyBase.security.context.ServiceContextHolder;
+import com.easyBase.common.security.ServiceContext;
+import com.easyBase.common.security.ServiceContextHolder;
 import com.easyBase.security.context.ServiceContextImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -123,7 +123,7 @@ public class SiteJwtAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            ServiceContext serviceContext = new ServiceContextImpl(user, site, userSite, claims);
+            ServiceContext serviceContext = new ServiceContextImpl(claims);
 
             ServiceContextHolder.setContext(serviceContext);
 

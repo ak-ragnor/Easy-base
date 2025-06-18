@@ -1,7 +1,7 @@
 package com.easyBase.web.interceptor;
 
-import com.easyBase.security.context.ServiceContext;
-import com.easyBase.security.context.ServiceContextHolder;
+import com.easyBase.common.security.ServiceContext;
+import com.easyBase.common.security.ServiceContextHolder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -24,8 +24,8 @@ public class ServiceContextInterceptor implements HandlerInterceptor {
             _log.debug("Request {} {} - User: {}, Site: {}",
                     request.getMethod(),
                     request.getRequestURI(),
-                    context.getCurrentUser() != null ? context.getCurrentUser().getEmail() : "unknown",
-                    context.getCurrentSite() != null ? context.getCurrentSite().getCode() : "unknown");
+                    context.getCurrentUserId() != null ? context.getCurrentUserId() : "unknown",
+                    context.getCurrentSiteId() != null ? context.getCurrentSiteId() : "unknown");
         } else {
             _log.debug("Request {} {} - No authentication context",
                     request.getMethod(),
@@ -39,13 +39,6 @@ public class ServiceContextInterceptor implements HandlerInterceptor {
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
                            ModelAndView modelAndView) throws Exception {
 
-        // Optional: Add context information to response headers for debugging
-        ServiceContext context = ServiceContextHolder.getContext();
-
-        if (context.isAuthenticated() && _log.isDebugEnabled()) {
-            response.addHeader("X-Debug-User", context.getCurrentUser().getEmail());
-            response.addHeader("X-Debug-Site", context.getCurrentSite().getCode());
-        }
     }
 
     @Override

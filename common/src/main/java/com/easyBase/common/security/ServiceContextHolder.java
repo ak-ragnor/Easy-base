@@ -1,8 +1,10 @@
-package com.easyBase.security.context;
+package com.easyBase.common.security;
 
 /**
  * ThreadLocal holder for ServiceContext
  * Manages per-request context storage
+ *
+ * This class is in the common module to avoid circular dependencies
  */
 public class ServiceContextHolder {
 
@@ -19,12 +21,7 @@ public class ServiceContextHolder {
      * Get context for current thread
      */
     public static ServiceContext getContext() {
-        ServiceContext context = contextHolder.get();
-        if (context == null) {
-            context = createEmptyContext();
-            contextHolder.set(context);
-        }
-        return context;
+        return contextHolder.get();
     }
 
     /**
@@ -35,9 +32,9 @@ public class ServiceContextHolder {
     }
 
     /**
-     * Create empty context
+     * Check if context exists
      */
-    private static ServiceContext createEmptyContext() {
-        return new ServiceContextImpl();
+    public static boolean hasContext() {
+        return contextHolder.get() != null;
     }
 }

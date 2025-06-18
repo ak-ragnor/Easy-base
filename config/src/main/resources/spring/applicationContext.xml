@@ -17,12 +17,14 @@
     <!-- Enable annotation config -->
     <context:annotation-config/>
 
-    <!-- Property placeholder - ignore missing files -->
+    <!-- Property placeholder - Load multiple property files -->
     <context:property-placeholder
-            location="classpath:database/database-dev.properties"
+            location="classpath:database/database-dev.properties,
+                      classpath:application.properties"
             ignore-unresolvable="true"
             ignore-resource-not-found="true"/>
 
+    <!-- Import other configuration files -->
     <import resource="applicationContext-data.xml"/>
     <import resource="applicationContext-security.xml"/>
 

@@ -59,9 +59,5 @@
             <artifactId>jakarta.servlet-api</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.easyBase</groupId>
-            <artifactId>easy-base-service</artifactId>
-        </dependency>
     </dependencies>
 </project>

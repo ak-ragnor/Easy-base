@@ -1,4 +1,4 @@
-package com.easyBase.security.context;
+package com.easyBase.common.security;
 
 import org.springframework.stereotype.Component;
 
