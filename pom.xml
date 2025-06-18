@@ -73,8 +73,8 @@
         <module>common</module>
         <module>config</module>
         <module>domain</module>
-        <module>service</module>
         <module>security</module>
+        <module>service</module>
         <module>integration</module>
         <module>monitoring</module>
         <module>web</module>

@@ -1,7 +1,7 @@
 //package com.easyBase.security.authorization;
 //
-//import com.easyBase.security.context.ServiceContext;
-//import com.easyBase.security.context.ServiceContextHolder;
+//import com.easyBase.common.security.ServiceContext;
+//import com.easyBase.common.security.ServiceContextHolder;
 //import com.easyBase.domain.entity.user.User;
 //import com.easyBase.domain.entity.site.Site;
 //import com.easyBase.common.enums.UserRole;

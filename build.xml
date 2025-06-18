@@ -124,7 +124,7 @@
     <target name="compile-backend" depends="init" description="Compile Java modules except web">
         <echo message="Compiling backend Java modules"/>
 
-        <!-- First, clean Maven cache for spring-data issues -->
+        <!-- Clean Maven cache for spring-data issues -->
         <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="false">
             <arg value="dependency:purge-local-repository"/>
             <arg value="-DmanualInclude=org.springframework.data:spring-data-bom"/>

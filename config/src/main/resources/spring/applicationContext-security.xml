@@ -17,9 +17,11 @@
     </bean>
 
     <!-- HTTP Security Configuration -->
-    <security:http auto-config="false"
+    <security:http pattern="/**"
+                   auto-config="false"
                    use-expressions="true"
-                   create-session="stateless">
+                   create-session="stateless"
+                   entry-point-ref="customAuthenticationEntryPoint">
 
         <!-- Public endpoints -->
         <security:intercept-url pattern="/api/public/**" access="permitAll"/>
@@ -64,9 +66,6 @@
             <security:xss-protection/>
         </security:headers>
 
-        <!-- Custom authentication entry point -->
-        <security:http-basic entry-point-ref="customAuthenticationEntryPoint"/>
-
         <!-- Add JWT authentication filter -->
         <security:custom-filter ref="siteJwtAuthenticationFilter" before="BASIC_AUTH_FILTER"/>
 
@@ -86,7 +85,7 @@
     <bean id="customAuthenticationEntryPoint"
           class="com.easyBase.security.CustomAuthenticationEntryPoint"/>
 
-    <!-- FIXED CORS Configuration -->
+    <!-- CORS Configuration -->
     <bean id="corsConfigurationSource"
           class="org.springframework.web.cors.UrlBasedCorsConfigurationSource">
         <property name="corsConfigurations">

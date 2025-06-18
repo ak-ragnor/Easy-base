@@ -1,51 +1,41 @@
 package com.easyBase.security.context;
 
-import com.easyBase.domain.entity.site.Site;
-import com.easyBase.domain.entity.site.UserSite;
-import com.easyBase.domain.entity.user.User;
 import com.easyBase.common.enums.UserRole;
+import com.easyBase.common.security.ServiceContext;
 import com.easyBase.security.jwt.JwtTokenClaims;
 
 import java.time.ZonedDateTime;
 
 /**
  * ServiceContext Implementation
- * Provides access to current user and site information
+ * Provides access to current user and site information from JWT claims
  */
 public class ServiceContextImpl implements ServiceContext {
 
-    private final User currentUser;
-    private final Site currentSite;
-    private final UserSite userSiteAssociation;
     private final JwtTokenClaims tokenClaims;
 
-    public ServiceContextImpl() {
-        this.currentUser = null;
-        this.currentSite = null;
-        this.userSiteAssociation = null;
-        this.tokenClaims = null;
-    }
-
-    public ServiceContextImpl(User user, Site site, UserSite userSite, JwtTokenClaims claims) {
-        this.currentUser = user;
-        this.currentSite = site;
-        this.userSiteAssociation = userSite;
-        this.tokenClaims = claims;
+    public ServiceContextImpl(JwtTokenClaims tokenClaims) {
+        this.tokenClaims = tokenClaims;
     }
 
     @Override
-    public User getCurrentUser() {
-        return currentUser;
+    public Long getCurrentUserId() {
+        return tokenClaims != null ? tokenClaims.getUserId() : null;
     }
 
     @Override
-    public Site getCurrentSite() {
-        return currentSite;
+    public String getCurrentUserEmail() {
+        return tokenClaims != null ? tokenClaims.getUserEmail() : null;
     }
 
     @Override
-    public UserSite getUserSiteAssociation() {
-        return userSiteAssociation;
+    public Long getCurrentSiteId() {
+        return tokenClaims != null ? tokenClaims.getSiteId() : null;
+    }
+
+    @Override
+    public String getCurrentSiteCode() {
+        return tokenClaims != null ? tokenClaims.getSiteCode() : null;
     }
 
     @Override
@@ -54,28 +44,20 @@ public class ServiceContextImpl implements ServiceContext {
     }
 
     @Override
-    public boolean hasCurrentUser() {
-        return currentUser != null;
-    }
-
-    @Override
-    public boolean hasCurrentSite() {
-        return currentSite != null;
-    }
-
-    @Override
     public boolean isAuthenticated() {
-        return hasCurrentUser() && hasCurrentSite() && userSiteAssociation != null;
+        return tokenClaims != null &&
+                tokenClaims.getUserId() != null &&
+                tokenClaims.getSiteId() != null;
     }
 
     @Override
     public UserRole getCurrentUserRole() {
-        return currentUser != null ? currentUser.getRole() : null;
+        return tokenClaims != null ? tokenClaims.getUserRole() : null;
     }
 
     @Override
     public UserRole getCurrentSiteRole() {
-        return userSiteAssociation != null ? userSiteAssociation.getRole() : null;
+        return tokenClaims != null ? tokenClaims.getSiteRole() : null;
     }
 
     @Override
@@ -86,8 +68,10 @@ public class ServiceContextImpl implements ServiceContext {
     @Override
     public String toString() {
         return "ServiceContextImpl{" +
-                "user=" + (currentUser != null ? currentUser.getEmail() : "null") +
-                ", site=" + (currentSite != null ? currentSite.getCode() : "null") +
+                "userId=" + getCurrentUserId() +
+                ", userEmail=" + getCurrentUserEmail() +
+                ", siteId=" + getCurrentSiteId() +
+                ", siteCode=" + getCurrentSiteCode() +
                 ", authenticated=" + isAuthenticated() +
                 '}';
     }

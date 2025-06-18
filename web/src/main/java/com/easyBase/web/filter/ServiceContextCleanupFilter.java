@@ -1,6 +1,6 @@
 package com.easyBase.web.filter;
 
-import com.easyBase.security.context.ServiceContextHolder;
+import com.easyBase.common.security.ServiceContextHolder;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
