@@ -1,530 +1,345 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="easy-base" default="all" basedir=".">
+<project name="enterprise-app" default="all" basedir=".">
 
-    <!-- Property definitions -->
-    <property file="build.properties"/>
     <property name="app.name" value="easy-base"/>
-    <property name="app.version" value="1.0.0-SNAPSHOT"/>
-
-    <!-- Directory structure -->
-    <property name="basedir" value="."/>
-    <property name="build.dir" value="${basedir}/target"/>
-    <property name="dist.dir" value="${build.dir}/dist"/>
+    <property name="app.version" value="1.0.0"/>
+    <property name="src.dir" value="src/main/java"/>
+    <property name="resources.dir" value="src/main/resources"/>
+    <property name="webapp.dir" value="src/main/webapp"/>
+    <property name="test.dir" value="src/test/java"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="build.dir" value="target"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="test.classes.dir" value="${build.dir}/test-classes"/>
     <property name="war.dir" value="${build.dir}/war"/>
-    <property name="tomcat.bundle.dir" value="${build.dir}/tomcat-bundle"/>
-    <property name="docs.dir" value="${build.dir}/docs"/>
-    <property name="logs.dir" value="${build.dir}/logs"/>
 
-    <!-- Module directories -->
-    <property name="common.dir" value="${basedir}/common"/>
-    <property name="config.dir" value="${basedir}/config"/>
-    <property name="domain.dir" value="${basedir}/domain"/>
-    <property name="service.dir" value="${basedir}/service"/>
-    <property name="security.dir" value="${basedir}/security"/>
-    <property name="integration.dir" value="${basedir}/integration"/>
-    <property name="monitoring.dir" value="${basedir}/monitoring"/>
-    <property name="web.dir" value="${basedir}/web"/>
-    <property name="frontend.dir" value="${basedir}/frontend"/>
+    <!-- Tomcat Bundle Properties -->
+    <property name="tomcat.version" value="9.0.68"/>
+    <property name="tomcat.download.url" value="https://archive.apache.org/dist/tomcat/tomcat-9/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.tar.gz"/>
+    <property name="bundle.dir" value="../${app.name}-bundle"/>
+    <property name="tomcat.home" value="${bundle.dir}/apache-tomcat-${tomcat.version}"/>
 
-    <!-- Jetty/Tomcat configuration -->
-    <property name="jetty.port" value="8080"/>
-    <property name="jetty.context" value="/easy-base"/>
-    <property name="jetty.logs.dir" value="${logs.dir}/jetty"/>
+    <!-- Compilation properties -->
+    <property name="java.version" value="1.8"/>
+    <property name="encoding" value="UTF-8"/>
 
-    <!-- Maven executable -->
-    <condition property="mvn.cmd" value="mvn.cmd" else="mvn">
-        <os family="windows"/>
-    </condition>
+    <!-- Define classpaths -->
+    <path id="compile.classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
 
-    <!-- NPM executable -->
-    <condition property="npm.cmd" value="npm.cmd" else="npm">
-        <os family="windows"/>
-    </condition>
+    <!-- Clean target -->
+    <target name="clean" description="Clean build artifacts">
+        <delete dir="${build.dir}"/>
+    </target>
 
-    <!-- Build profiles -->
-    <property name="maven.profile" value="dev"/>
-    <property name="spring.profile" value="dev"/>
+    <!-- Deep clean including bundle -->
+    <target name="clean-all" depends="clean" description="Clean everything including bundle">
+        <delete dir="${bundle.dir}"/>
+    </target>
 
-    <!-- Main targets -->
-    <target name="all" depends="clean,init,compile-backend,frontend-build,compile-web,package,documentation"
-            description="Complete build process"/>
-
-    <target name="quick" depends="clean,init,compile-backend,frontend-build,compile-web,package"
-            description="Quick build without tests"/>
-
-    <target name="dev-quick" depends="clean,init,compile,package"
-            description="Development build without frontend"/>
-
-    <!-- Initialization -->
-    <target name="init" description="Initialize build environment">
-        <echo message="Initializing build environment for ${app.name} v${app.version}"/>
-        <echo message="Build profile: ${maven.profile}"/>
-        <echo message="Spring profile: ${spring.profile}"/>
-
-        <!-- Create build directories -->
+    <!-- Initialize target -->
+    <target name="init" depends="clean">
         <mkdir dir="${build.dir}"/>
-        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${test.classes.dir}"/>
         <mkdir dir="${war.dir}"/>
-        <mkdir dir="${tomcat.bundle.dir}"/>
-        <mkdir dir="${docs.dir}"/>
-        <mkdir dir="${logs.dir}"/>
-        <mkdir dir="${jetty.logs.dir}"/>
 
-        <!-- Timestamp for builds -->
-        <tstamp>
-            <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss"/>
-            <format property="build.date" pattern="yyyy-MM-dd"/>
-        </tstamp>
-
-        <echo message="Build started at: ${build.timestamp}"/>
-        <echo message="Logs will be written to: ${logs.dir}"/>
-    </target>
-
-    <!-- Clean build artifacts -->
-    <target name="clean" description="Clean all build artifacts">
-        <echo message="Cleaning build artifacts"/>
-
-        <!-- Clean main build directory -->
-        <delete dir="${build.dir}" failonerror="false"/>
-
-        <!-- Clean Maven modules -->
-        <antcall target="maven-clean"/>
-
-        <!-- Clean frontend -->
-        <antcall target="frontend-clean"/>
-
-        <!-- Clean logs -->
-        <delete dir="logs" failonerror="false"/>
-
-        <echo message="Clean completed"/>
-    </target>
-
-    <!-- Maven clean for all modules -->
-    <target name="maven-clean" description="Clean all Maven modules">
-        <echo message="Cleaning Maven modules"/>
-        <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="false">
-            <arg value="clean"/>
-            <arg value="-P${maven.profile}"/>
-        </exec>
-    </target>
-
-    <!-- Frontend clean -->
-    <target name="frontend-clean" description="Clean frontend build">
-        <echo message="Cleaning frontend build"/>
-        <delete dir="${frontend.dir}/dist" failonerror="false"/>
-        <delete dir="${frontend.dir}/build" failonerror="false"/>
-        <delete dir="${frontend.dir}/node_modules/.cache" failonerror="false"/>
-    </target>
-
-    <!-- Compile all modules -->
-    <target name="compile" depends="compile-backend,frontend-build,compile-web"
-            description="Compile all modules in correct order"/>
-
-    <!-- Compile backend modules -->
-    <target name="compile-backend" depends="init" description="Compile Java modules except web">
-        <echo message="Compiling backend Java modules"/>
-
-        <!-- Clean Maven cache for spring-data issues -->
-        <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="false">
-            <arg value="dependency:purge-local-repository"/>
-            <arg value="-DmanualInclude=org.springframework.data:spring-data-bom"/>
-        </exec>
-
-        <antcall target="compile-module">
-            <param name="module.dir" value="${common.dir}"/>
-            <param name="module.name" value="common"/>
-        </antcall>
-
-        <antcall target="compile-module">
-            <param name="module.dir" value="${config.dir}"/>
-            <param name="module.name" value="config"/>
-        </antcall>
-
-        <antcall target="compile-module">
-            <param name="module.dir" value="${domain.dir}"/>
-            <param name="module.name" value="domain"/>
-        </antcall>
-
-        <antcall target="compile-module">
-            <param name="module.dir" value="${security.dir}"/>
-            <param name="module.name" value="security"/>
-        </antcall>
-
-        <antcall target="compile-module">
-            <param name="module.dir" value="${service.dir}"/>
-            <param name="module.name" value="service"/>
-        </antcall>
-
-        <antcall target="compile-module">
-            <param name="module.dir" value="${integration.dir}"/>
-            <param name="module.name" value="integration"/>
-        </antcall>
-
-        <antcall target="compile-module">
-            <param name="module.dir" value="${monitoring.dir}"/>
-            <param name="module.name" value="monitoring"/>
-        </antcall>
-
-        <echo message="Backend compilation completed"/>
-    </target>
-
-    <!-- Compile individual module -->
-    <target name="compile-module" description="Compile individual module">
-        <echo message="Compiling module: ${module.name}"/>
-        <exec executable="${mvn.cmd}" dir="${module.dir}" failonerror="true">
-            <arg value="clean"/>
-            <arg value="install"/>
-            <arg value="-P${maven.profile}"/>
-            <arg value="-Dmaven.test.skip=true"/>
-        </exec>
-    </target>
-
-    <target name="compile-web" depends="frontend-build" description="Compile web module">
-        <echo message="Compiling web module"/>
-
-        <antcall target="compile-module">
-            <param name="module.dir" value="${web.dir}"/>
-            <param name="module.name" value="web"/>
-        </antcall>
-
-        <echo message="Web compilation completed"/>
-    </target>
-
-    <!-- Frontend build -->
-    <target name="frontend-build" depends="init" description="Build React frontend">
-        <echo message="Building React frontend for enterprise SPA"/>
-
-        <!-- Check if node_modules exists -->
-        <available file="${frontend.dir}/node_modules" type="dir" property="node_modules.exists"/>
-
-        <!-- Install dependencies if needed -->
-        <antcall target="frontend-install"/>
-
-        <!-- Build frontend -->
-        <echo message="Building React application for production"/>
-        <exec executable="${npm.cmd}" dir="${frontend.dir}" failonerror="true">
-            <arg value="run"/>
-            <arg value="build"/>
-        </exec>
-
-        <!-- CRITICAL: Copy ALL build files to webapp root -->
-        <echo message="Copying React SPA build to webapp root"/>
-
-        <!-- First, clean the webapp directory (except WEB-INF) -->
-        <delete includeemptydirs="true">
-            <fileset dir="${web.dir}/src/main/webapp" includes="**/*" excludes="WEB-INF/**,*.html"/>
-        </delete>
-
-        <!-- Copy everything from frontend/build to webapp root -->
-        <copy todir="${web.dir}/src/main/webapp" failonerror="true" overwrite="true">
-            <fileset dir="${frontend.dir}/build">
+        <!-- Copy resources -->
+        <copy todir="${classes.dir}">
+            <fileset dir="${resources.dir}">
                 <include name="**/*"/>
             </fileset>
         </copy>
-
-        <!-- Verify the copy worked -->
-        <echo message="Checking copied files:"/>
-        <exec executable="find" dir="${web.dir}/src/main/webapp" failonerror="false">
-            <arg value="."/>
-            <arg value="-name"/>
-            <arg value="*.js"/>
-        </exec>
-
-        <echo message="Frontend build and copy completed successfully"/>
     </target>
 
-    <!-- Frontend dependency installation -->
-    <target name="frontend-install" unless="node_modules.exists" description="Install frontend dependencies">
-        <echo message="Installing frontend dependencies"/>
-        <exec executable="${npm.cmd}" dir="${frontend.dir}" failonerror="true">
-            <arg value="install"/>
-        </exec>
+    <!-- Compile target -->
+    <target name="compile" depends="init" description="Compile Java sources">
+        <javac srcdir="${src.dir}"
+               destdir="${classes.dir}"
+               debug="true"
+               includeantruntime="false"
+               encoding="${encoding}"
+               source="${java.version}"
+               target="${java.version}">
+            <classpath refid="compile.classpath"/>
+            <compilerarg value="-parameters"/>
+            <compilerarg value="-Xlint:unchecked"/>
+        </javac>
     </target>
 
-    <!-- Package application -->
-    <target name="package" depends="compile" description="Package application as WAR">
-        <echo message="Packaging enterprise application"/>
-
-        <!-- Create WAR using Maven -->
-        <exec executable="${mvn.cmd}" dir="${web.dir}" failonerror="true">
-            <arg value="package"/>
-            <arg value="-P${maven.profile}"/>
-            <arg value="-Dmaven.test.skip=true"/>
-        </exec>
-
-        <!-- Copy WAR to build directory -->
-        <copy file="${web.dir}/target/easy-base.war"
-              tofile="${dist.dir}/${app.name}.war"/>
-
-        <echo message="Enterprise WAR packaging completed: ${dist.dir}/${app.name}.war"/>
-    </target>
-
-    <!-- Generate documentation -->
-    <target name="documentation" description="Generate documentation">
-        <echo message="Generating enterprise documentation"/>
-
-        <!-- Generate JavaDoc -->
-        <antcall target="generate-javadoc"/>
-    </target>
-
-    <!-- Generate JavaDoc -->
-    <target name="generate-javadoc" description="Generate JavaDoc">
-        <echo message="Generating JavaDoc for all modules"/>
-        <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="false">
-            <arg value="javadoc:aggregate"/>
-            <arg value="-P${maven.profile}"/>
-        </exec>
-    </target>
-
-    <!-- Development server with enhanced logging -->
-    <target name="dev-server" description="Start development server with comprehensive logging">
-        <echo message="================================================="/>
-        <echo message="Starting Easy Base Enterprise Development Server"/>
-        <echo message="================================================="/>
-        <echo message="Context Path: ${jetty.context}"/>
-        <echo message="Port: ${jetty.port}"/>
-        <echo message="Profile: ${spring.profile}"/>
-        <echo message="Logs Directory: ${jetty.logs.dir}"/>
-        <echo message="================================================="/>
-
-        <!-- Build first -->
-        <antcall target="quick"/>
-
-        <!-- Create log configuration -->
-        <echo message="Setting up logging configuration"/>
-        <mkdir dir="${jetty.logs.dir}"/>
-
-        <!-- Create logback configuration for development -->
-        <echo file="${jetty.logs.dir}/logback-dev.xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${jetty.logs.dir}/easy-base-dev.log</file>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <logger name="com.easyBase" level="DEBUG"/>
-    <logger name="org.springframework" level="INFO"/>
-    <logger name="org.eclipse.jetty" level="INFO"/>
-    <logger name="org.hibernate" level="WARN"/>
-
-    <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
-    </root>
-</configuration>]]></echo>
-
-        <!-- Start Jetty server with enhanced logging -->
-        <echo message="Starting Jetty development server..."/>
-        <echo message="Application URL: http://localhost:${jetty.port}${jetty.context}"/>
-        <echo message="API Health Check: http://localhost:${jetty.port}${jetty.context}/api/health"/>
-        <echo message="Dashboard: http://localhost:${jetty.port}${jetty.context}/dashboard"/>
-        <echo message="Users: http://localhost:${jetty.port}${jetty.context}/users"/>
-        <echo message="================================================="/>
-        <echo message="Server logs will appear below and in: ${jetty.logs.dir}/easy-base-dev.log"/>
-        <echo message="Press Ctrl+C to stop the server"/>
-        <echo message="================================================="/>
-
-        <exec executable="${mvn.cmd}" dir="${web.dir}" spawn="false">
-            <arg value="jetty:run"/>
-            <arg value="-Dspring.profiles.active=${spring.profile}"/>
-            <arg value="-Djetty.port=${jetty.port}"/>
-            <arg value="-Dlogback.configurationFile=${jetty.logs.dir}/logback-dev.xml"/>
-            <arg value="-Dfile.encoding=UTF-8"/>
-            <arg value="-Duser.timezone=UTC"/>
-            <env key="JAVA_OPTS" value="-Xms512m -Xmx1024m -XX:+UseG1GC"/>
-        </exec>
-    </target>
-
-    <!-- Production Tomcat bundle -->
-    <target name="tomcat-bundle" depends="package" description="Create production Tomcat bundle">
-        <echo message="Creating production Tomcat bundle"/>
-
-        <!-- Download and extract Tomcat if needed -->
-        <antcall target="setup-tomcat"/>
-
-        <!-- Configure Tomcat for production -->
-        <antcall target="configure-tomcat"/>
-
-        <!-- Deploy WAR to Tomcat -->
-        <copy file="${dist.dir}/${app.name}.war"
-              todir="${tomcat.bundle.dir}/apache-tomcat-9.0.85/webapps/"/>
-
-        <!-- Create startup scripts -->
-        <antcall target="create-scripts"/>
-
-        <echo message="Tomcat bundle created in: ${tomcat.bundle.dir}"/>
-    </target>
-
-    <!-- Setup Tomcat -->
-    <target name="setup-tomcat" description="Download and setup Tomcat">
-        <property name="tomcat.url" value="https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.85/bin/apache-tomcat-9.0.85.tar.gz"/>
-        <property name="tomcat.archive" value="${build.dir}/apache-tomcat-9.0.85.tar.gz"/>
-
-        <mkdir dir="${tomcat.bundle.dir}"/>
-
-        <echo message="Downloading Tomcat (if not exists)"/>
-        <get src="${tomcat.url}" dest="${tomcat.archive}" skipexisting="true"/>
-
-        <echo message="Extracting Tomcat"/>
-        <untar src="${tomcat.archive}" dest="${tomcat.bundle.dir}" compression="gzip"/>
-
-        <chmod perm="755">
-            <fileset dir="${tomcat.bundle.dir}/apache-tomcat-9.0.85/bin">
-                <include name="*.sh"/>
+    <!-- Build WAR -->
+    <target name="war" depends="compile" description="Build WAR file">
+        <!-- Prepare WAR directory structure -->
+        <copy todir="${war.dir}">
+            <fileset dir="${webapp.dir}">
+                <exclude name="WEB-INF/web.xml.backup"/>
+                <exclude name="WEB-INF/spring/**"/>
             </fileset>
-        </chmod>
+        </copy>
+
+        <!-- Copy classes -->
+        <copy todir="${war.dir}/WEB-INF/classes">
+            <fileset dir="${classes.dir}"/>
+        </copy>
+
+        <!-- Copy libraries -->
+        <copy todir="${war.dir}/WEB-INF/lib">
+            <fileset dir="${lib.dir}">
+                <include name="*.jar"/>
+                <exclude name="servlet-api*.jar"/>
+                <exclude name="jsp-api*.jar"/>
+                <exclude name="el-api*.jar"/>
+                <exclude name="tomcat-*.jar"/>
+            </fileset>
+        </copy>
+
+        <tstamp>
+            <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
+        </tstamp>
+
+        <!-- Create WAR file -->
+        <war destfile="${build.dir}/${app.name}.war"
+             basedir="${war.dir}">
+            <manifest>
+                <attribute name="Implementation-Title" value="${app.name}"/>
+                <attribute name="Implementation-Version" value="${app.version}"/>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Built-Date" value="${TODAY}"/>
+            </manifest>
+        </war>
     </target>
 
-    <!-- Configure Tomcat -->
-    <target name="configure-tomcat" description="Configure Tomcat for production">
-        <echo message="Configuring Tomcat for Easy Base Enterprise"/>
-
-        <!-- Create server.xml -->
-        <!-- Create context.xml with JNDI datasource -->
-        <!-- Create setenv.sh with JVM options -->
-
-        <echo message="Tomcat configured for production deployment"/>
+    <!-- Download Tomcat if not present -->
+    <target name="download-tomcat" unless="tomcat.present">
+        <mkdir dir="${bundle.dir}"/>
+        <echo message="Downloading Tomcat ${tomcat.version}..."/>
+        <get src="${tomcat.download.url}"
+             dest="${bundle.dir}/tomcat.tar.gz"
+             verbose="true"
+             usetimestamp="true"/>
+        <untar src="${bundle.dir}/tomcat.tar.gz"
+               dest="${bundle.dir}"
+               compression="gzip"/>
+        <delete file="${bundle.dir}/tomcat.tar.gz"/>
+        <chmod dir="${tomcat.home}/bin" perm="755" includes="*.sh"/>
     </target>
 
-    <!-- Create deployment scripts -->
-    <target name="create-scripts" description="Create deployment and management scripts">
-        <echo message="Creating deployment scripts"/>
+    <!-- Check if Tomcat exists -->
+    <target name="check-tomcat">
+        <available file="${tomcat.home}" type="dir" property="tomcat.present"/>
+    </target>
 
-        <!-- Create start script -->
-        <echo file="${tomcat.bundle.dir}/start.sh">#!/bin/bash
-            export CATALINA_HOME="${tomcat.bundle.dir}/apache-tomcat-9.0.85"
-            export CATALINA_BASE="${tomcat.bundle.dir}/apache-tomcat-9.0.85"
-            export JAVA_OPTS="-Xms1024m -Xmx2048m -XX:+UseG1GC -Dspring.profiles.active=prod"
+    <!-- Setup Tomcat Bundle -->
+    <target name="setup-tomcat" depends="check-tomcat,download-tomcat" description="Setup Tomcat with configuration">
+        <!-- Remove default webapps -->
+        <delete dir="${tomcat.home}/webapps/ROOT"/>
+        <delete dir="${tomcat.home}/webapps/docs"/>
+        <delete dir="${tomcat.home}/webapps/examples"/>
+        <delete dir="${tomcat.home}/webapps/host-manager"/>
+        <delete dir="${tomcat.home}/webapps/manager"/>
 
-            echo "Starting Easy Base Enterprise Application..."
-            echo "Catalina Home: $CATALINA_HOME"
-            echo "Java Options: $JAVA_OPTS"
+        <!-- Copy our configuration files -->
+        <copy todir="${tomcat.home}/conf" overwrite="true">
+            <fileset dir="deployment/tomcat">
+                <include name="server.xml"/>
+                <include name="context.xml"/>
+                <include name="catalina.properties"/>
+            </fileset>
+        </copy>
 
-            $CATALINA_HOME/bin/startup.sh
+        <!-- Copy JDBC drivers to Tomcat lib -->
+        <copy todir="${tomcat.home}/lib">
+            <fileset dir="${lib.dir}">
+                <include name="postgresql-*.jar"/>
+                <include name="hsqldb-*.jar"/>
+                <include name="HikariCP-*.jar"/>
+            </fileset>
+        </copy>
 
-            echo "Application starting..."
-            echo "URL: http://localhost:8080/easy-base"
-            echo "Logs: $CATALINA_HOME/logs/"
+        <!-- Create necessary directories -->
+        <mkdir dir="${tomcat.home}/logs"/>
+        <mkdir dir="${tomcat.home}/temp"/>
+        <mkdir dir="${tomcat.home}/work"/>
+
+        <!-- Create setenv.sh for environment variables -->
+        <echo file="${tomcat.home}/bin/setenv.sh">#!/bin/bash
+            # Environment settings for ${app.name}
+
+            # Memory settings
+            export CATALINA_OPTS="$CATALINA_OPTS -Xms512m"
+            export CATALINA_OPTS="$CATALINA_OPTS -Xmx2048m"
+            export CATALINA_OPTS="$CATALINA_OPTS -XX:MaxPermSize=256m"
+
+            # Spring Profile
+            export CATALINA_OPTS="$CATALINA_OPTS -Dspring.profiles.active=${spring.profiles.active}"
+
+            # Application settings
+            export CATALINA_OPTS="$CATALINA_OPTS -Dapp.name=${app.name}"
+            export CATALINA_OPTS="$CATALINA_OPTS -Dapp.version=${app.version}"
+
+            # JMX for monitoring (optional)
+            export CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote"
+            export CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote.port=9999"
+            export CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote.ssl=false"
+            export CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote.authenticate=false"
+
+            echo "Starting ${app.name} with profile: ${spring.profiles.active}"
+        </echo>
+        <chmod file="${tomcat.home}/bin/setenv.sh" perm="755"/>
+
+        <!-- Create setenv.bat for Windows -->
+        <echo file="${tomcat.home}/bin/setenv.bat">@echo off
+            rem Environment settings for ${app.name}
+
+            set "CATALINA_OPTS=%CATALINA_OPTS% -Xms512m"
+            set "CATALINA_OPTS=%CATALINA_OPTS% -Xmx2048m"
+            set "CATALINA_OPTS=%CATALINA_OPTS% -XX:MaxPermSize=256m"
+            set "CATALINA_OPTS=%CATALINA_OPTS% -Dspring.profiles.active=${spring.profiles.active}"
+            set "CATALINA_OPTS=%CATALINA_OPTS% -Dapp.name=${app.name}"
+            set "CATALINA_OPTS=%CATALINA_OPTS% -Dapp.version=${app.version}"
+
+            echo Starting ${app.name} with profile: ${spring.profiles.active}
+        </echo>
+    </target>
+
+    <!-- Deploy WAR to bundle -->
+    <target name="deploy-to-bundle" depends="war,setup-tomcat" description="Deploy WAR to Tomcat bundle">
+        <copy file="${build.dir}/${app.name}.war"
+              todir="${tomcat.home}/webapps"
+              overwrite="true"/>
+        <echo message="Deployed ${app.name}.war to Tomcat bundle"/>
+    </target>
+
+    <!-- Create convenience scripts -->
+    <target name="create-scripts" depends="setup-tomcat">
+        <!-- Start script -->
+        <echo file="${bundle.dir}/start.sh">#!/bin/bash
+            cd $(dirname $0)
+            echo "Starting ${app.name}..."
+            ./apache-tomcat-${tomcat.version}/bin/startup.sh
+            sleep 5
+            echo "Application should be available at: http://localhost:8080/${app.name}"
+            echo "Logs: tail -f apache-tomcat-${tomcat.version}/logs/catalina.out"
+        </echo>
+        <chmod file="${bundle.dir}/start.sh" perm="755"/>
+
+        <!-- Stop script -->
+        <echo file="${bundle.dir}/stop.sh">#!/bin/bash
+            cd $(dirname $0)
+            echo "Stopping ${app.name}..."
+            ./apache-tomcat-${tomcat.version}/bin/shutdown.sh
+        </echo>
+        <chmod file="${bundle.dir}/stop.sh" perm="755"/>
+
+        <!-- Restart script -->
+        <echo file="${bundle.dir}/restart.sh">#!/bin/bash
+            cd $(dirname $0)
+            ./stop.sh
+            sleep 5
+            ./start.sh
+        </echo>
+        <chmod file="${bundle.dir}/restart.sh" perm="755"/>
+
+        <!-- Logs script -->
+        <echo file="${bundle.dir}/logs.sh">#!/bin/bash
+            cd $(dirname $0)
+            tail -f apache-tomcat-${tomcat.version}/logs/catalina.out
+        </echo>
+        <chmod file="${bundle.dir}/logs.sh" perm="755"/>
+
+        <!-- Deploy script for fast redeploy -->
+        <echo file="${bundle.dir}/deploy.sh">#!/bin/bash
+            cd $(dirname $0)
+            if [ -f "$1" ]; then
+            echo "Deploying $1..."
+            cp $1 apache-tomcat-${tomcat.version}/webapps/${app.name}.war
+            echo "Deployment complete. Check logs for status."
+            else
+            echo "Usage: ./deploy.sh path/to/${app.name}.war"
+            fi
+        </echo>
+        <chmod file="${bundle.dir}/deploy.sh" perm="755"/>
+
+        <!-- Windows scripts -->
+        <echo file="${bundle.dir}/start.bat">@echo off
+            cd /d %~dp0
+            echo Starting ${app.name}...
+            call apache-tomcat-${tomcat.version}\bin\startup.bat
+            echo Application should be available at: http://localhost:8080/${app.name}
         </echo>
 
-        <chmod file="${tomcat.bundle.dir}/start.sh" perm="755"/>
-
-        <!-- Create stop script -->
-        <echo file="${tomcat.bundle.dir}/stop.sh">#!/bin/bash
-            export CATALINA_HOME="${tomcat.bundle.dir}/apache-tomcat-9.0.85"
-            echo "Stopping Easy Base Enterprise Application..."
-            $CATALINA_HOME/bin/shutdown.sh
+        <echo file="${bundle.dir}/stop.bat">@echo off
+            cd /d %~dp0
+            echo Stopping ${app.name}...
+            call apache-tomcat-${tomcat.version}\bin\shutdown.bat
         </echo>
-
-        <chmod file="${tomcat.bundle.dir}/stop.sh" perm="755"/>
     </target>
 
-    <!-- Test database connection and schema -->
-    <target name="test-database" depends="init" description="Test database connection and schema creation">
-        <echo message="Testing database connection and schema"/>
+    <!-- Quick deploy target -->
+    <target name="deploy" depends="war" description="Quick deploy - just build WAR and copy to existing bundle">
+        <available file="${tomcat.home}/webapps" type="dir" property="bundle.exists"/>
+        <fail unless="bundle.exists" message="Tomcat bundle not found. Run 'ant all' first."/>
 
-        <!-- Compile config module first to ensure database configuration is available -->
-        <antcall target="compile-module">
-            <param name="module.dir" value="${config.dir}"/>
-            <param name="module.name" value="config"/>
-        </antcall>
+        <copy file="${build.dir}/${app.name}.war"
+              todir="${tomcat.home}/webapps"
+              overwrite="true"/>
+        <echo message="WAR deployed. Tomcat will auto-reload the application."/>
+    </target>
 
-        <!-- Test database connection using Maven -->
-        <exec executable="${mvn.cmd}" dir="${config.dir}" failonerror="false">
-            <arg value="test"/>
-            <arg value="-P${maven.profile}"/>
-            <arg value="-Dtest=DatabaseConnectionTest"/>
-            <arg value="-Dmaven.test.skip=false"/>
+    <!-- Run bundle -->
+    <target name="run" description="Start the Tomcat bundle">
+        <exec executable="${bundle.dir}/start.sh" os="Linux,Mac OS X"/>
+        <exec executable="cmd" os="Windows">
+            <arg value="/c"/>
+            <arg value="${bundle.dir}/start.bat"/>
         </exec>
-
-        <echo message="Database test completed - check logs for results"/>
+        <echo message="Tomcat started. Application available at http://localhost:8080/${app.name}"/>
     </target>
 
-    <!-- Setup database for development -->
-    <target name="setup-database" depends="init" description="Initialize database schema">
-        <echo message="Setting up database schema for development"/>
-
-        <!-- Ensure config module is compiled -->
-        <antcall target="compile-module">
-            <param name="module.dir" value="${config.dir}"/>
-            <param name="module.name" value="config"/>
-        </antcall>
-
-        <echo message="Database schema setup completed"/>
-        <echo message="Schema location: ${config.dir}/src/main/resources/db/migration/"/>
-        <echo message="Run 'ant dev-server' to start application with database"/>
-    </target>
-
-    <!-- Test basic Maven build -->
-    <target name="test-maven" description="Test Maven build without dependencies">
-        <echo message="Testing basic Maven compilation"/>
-        <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="false">
-            <arg value="clean"/>
-            <arg value="compile"/>
-            <arg value="-P${maven.profile}"/>
-            <arg value="-Dmaven.test.skip=true"/>
-            <arg value="-X"/>
+    <!-- Stop bundle -->
+    <target name="stop" description="Stop the Tomcat bundle">
+        <exec executable="${bundle.dir}/stop.sh" os="Linux,Mac OS X"/>
+        <exec executable="cmd" os="Windows">
+            <arg value="/c"/>
+            <arg value="${bundle.dir}/stop.bat"/>
         </exec>
     </target>
 
-    <!-- Show server logs -->
-    <target name="show-logs" description="Show development server logs">
-        <echo message="=== Easy Base Development Server Logs ==="/>
-        <available file="${jetty.logs.dir}/easy-base-dev.log" property="log.exists"/>
-        <antcall target="tail-log"/>
+    <!-- Main build target -->
+    <target name="all" depends="clean,compile,deploy-to-bundle,create-scripts" description="Full build with Tomcat bundle">
+        <echo message="========================================="/>
+        <echo message="Build completed successfully!"/>
+        <echo message="========================================="/>
+        <echo message="Bundle location: ${bundle.dir}"/>
+        <echo message=""/>
+        <echo message="To start the application:"/>
+        <echo message="  cd ${bundle.dir}"/>
+        <echo message="  ./start.sh"/>
+        <echo message=""/>
+        <echo message="Or from this directory:"/>
+        <echo message="  ant run"/>
+        <echo message=""/>
+        <echo message="For quick redeploy:"/>
+        <echo message="  ant deploy"/>
+        <echo message="========================================="/>
     </target>
 
-    <target name="tail-log" if="log.exists">
-        <exec executable="tail" os="Linux,Mac OS X" spawn="false">
-            <arg value="-f"/>
-            <arg value="${jetty.logs.dir}/easy-base-dev.log"/>
-        </exec>
+    <!-- Profile-specific builds -->
+    <target name="dev" description="Build for development">
+        <property name="spring.profiles.active" value="dev"/>
+        <antcall target="all"/>
     </target>
 
-    <!-- Help target -->
-    <target name="help" description="Display build targets">
-        <echo message="============================================"/>
-        <echo message="Easy Base Enterprise Build System"/>
-        <echo message="============================================"/>
-        <echo message="Available build targets:"/>
-        <echo message=""/>
-        <echo message="Core Targets:"/>
-        <echo message="  all              - Complete build process"/>
-        <echo message="  quick            - Quick build with frontend"/>
-        <echo message="  dev-quick        - Development build (no frontend)"/>
-        <echo message="  clean            - Clean all build artifacts"/>
-        <echo message=""/>
-        <echo message="Development:"/>
-        <echo message="  dev-server       - Start Jetty development server"/>
-        <echo message="  show-logs        - Show development server logs"/>
-        <echo message="  frontend-build   - Build React SPA only"/>
-        <echo message=""/>
-        <echo message="Compilation:"/>
-        <echo message="  compile          - Compile all Java modules"/>
-        <echo message="  compile-backend  - Compile backend modules only"/>
-        <echo message="  compile-web      - Compile web module only"/>
-        <echo message=""/>
-        <echo message="Packaging &amp; Deployment:"/>
-        <echo message="  package          - Package application as WAR"/>
-        <echo message="  tomcat-bundle    - Create production Tomcat bundle"/>
-        <echo message=""/>
-        <echo message="Documentation:"/>
-        <echo message="  documentation    - Generate documentation"/>
-        <echo message=""/>
-        <echo message="Testing &amp; Utilities:"/>
-        <echo message="  test-maven       - Test Maven build"/>
-        <echo message="  help             - Display this help"/>
-        <echo message="============================================"/>
-        <echo message="Quick Start: ant dev-server"/>
-        <echo message="============================================"/>
+    <target name="staging" description="Build for staging">
+        <property name="spring.profiles.active" value="staging"/>
+        <antcall target="all"/>
     </target>
 
+    <target name="prod" description="Build for production">
+        <property name="spring.profiles.active" value="prod"/>
+        <antcall target="all"/>
+    </target>
 </project>

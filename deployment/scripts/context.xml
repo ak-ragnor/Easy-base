@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <!-- Default set of monitored resources -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <WatchedResource>WEB-INF/tomcat-web.xml</WatchedResource>
+    <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+
+    <!-- Production DataSource via JNDI -->
+    <Resource name="jdbc/easyBaseDB"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="com.zaxxer.hikari.HikariJNDIFactory"
+              dataSourceClassName="org.postgresql.ds.PGSimpleDataSource"
+              minimumIdle="5"
+              maximumPoolSize="20"
+              connectionTimeout="30000"
+              dataSource.serverName="localhost"
+              dataSource.portNumber="5432"
+              dataSource.databaseName="easybase"
+              dataSource.user="easybase"
+              dataSource.password="password"/>
+</Context>

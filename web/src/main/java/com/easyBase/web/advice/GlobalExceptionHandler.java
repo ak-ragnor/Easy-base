@@ -1,181 +1,120 @@
 package com.easyBase.web.advice;
 
-import com.easyBase.service.exception.UnauthorizedException;
-import com.easyBase.service.exception.ResourceNotFoundException;
-import com.easyBase.service.exception.BusinessException;
+import com.easyBase.common.dto.ErrorResponse;
+import com.easyBase.common.dto.ErrorResponse.FieldError;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- * Global Exception Handler with Site Authentication Support
- */
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Handle site authentication unauthorized exceptions
-     */
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<Map<String, Object>> handleUnauthorizedException(
-            UnauthorizedException ex, WebRequest request) {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-        _auditLog.warn("Unauthorized access attempt: {} - Path: {}",
-                ex.getMessage(), request.getDescription(false));
+    @Value("${spring.profiles.active:dev}")
+    private String activeProfile;
 
-        Map<String, Object> errorResponse = createErrorResponse(
-                "UNAUTHORIZED",
-                ex.getMessage(),
-                HttpStatus.UNAUTHORIZED.value()
-        );
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-    }
-
-    /**
-     * Handle Spring Security authentication exceptions
-     */
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<Map<String, Object>> handleAuthenticationException(
-            AuthenticationException ex, WebRequest request) {
-
-        _auditLog.warn("Authentication failed: {} - Path: {}",
-                ex.getMessage(), request.getDescription(false));
-
-        Map<String, Object> errorResponse = createErrorResponse(
-                "AUTHENTICATION_FAILED",
-                "Authentication failed",
-                HttpStatus.UNAUTHORIZED.value()
-        );
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-    }
-
-    /**
-     * Handle Spring Security access denied exceptions
-     */
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(
-            AccessDeniedException ex, WebRequest request) {
-
-        _auditLog.warn("Access denied: {} - Path: {}",
-                ex.getMessage(), request.getDescription(false));
-
-        Map<String, Object> errorResponse = createErrorResponse(
-                "ACCESS_DENIED",
-                "Access denied",
-                HttpStatus.FORBIDDEN.value()
-        );
-
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
-    }
-
-    /**
-     * Handle resource not found exceptions
-     */
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(
-            ResourceNotFoundException ex, WebRequest request) {
-
-        _log.warn("Resource not found: {} - Path: {}",
-                ex.getMessage(), request.getDescription(false));
-
-        Map<String, Object> errorResponse = createErrorResponse(
-                "RESOURCE_NOT_FOUND",
-                ex.getMessage(),
-                HttpStatus.NOT_FOUND.value()
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-    }
-
-    /**
-     * Handle business exceptions
-     */
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<Map<String, Object>> handleBusinessException(
-            BusinessException ex, WebRequest request) {
-
-        _log.warn("Business rule violation: {} - Path: {}",
-                ex.getMessage(), request.getDescription(false));
-
-        Map<String, Object> errorResponse = createErrorResponse(
-                "BUSINESS_RULE_VIOLATION",
-                ex.getMessage(),
-                HttpStatus.BAD_REQUEST.value()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
-
-    /**
-     * Handle validation exceptions
-     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(
-            MethodArgumentNotValidException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(
+            MethodArgumentNotValidException ex, HttpServletRequest request) {
 
-        Map<String, String> validationErrors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            validationErrors.put(fieldName, errorMessage);
-        });
+        List<FieldError> fieldErrors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> new FieldError(
+                        error.getField(),
+                        error.getRejectedValue(),
+                        error.getDefaultMessage()
+                ))
+                .collect(Collectors.toList());
 
-        Map<String, Object> errorResponse = createErrorResponse(
-                "VALIDATION_FAILED",
-                "Input validation failed",
-                HttpStatus.BAD_REQUEST.value()
+        ErrorResponse response = createErrorResponse(
+                "Validation failed",
+                HttpStatus.BAD_REQUEST,
+                request
         );
-        errorResponse.put("validationErrors", validationErrors);
+        response.setFieldErrors(fieldErrors);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * Handle general exceptions
-     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+            AccessDeniedException ex, HttpServletRequest request) {
+
+        ErrorResponse response = createErrorResponse(
+                "Access denied",
+                HttpStatus.FORBIDDEN,
+                request
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(
+            AuthenticationException ex, HttpServletRequest request) {
+
+        ErrorResponse response = createErrorResponse(
+                ex.getMessage(),
+                HttpStatus.UNAUTHORIZED,
+                request
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGenericException(
-            Exception ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleGlobalException(
+            Exception ex, HttpServletRequest request) {
 
-        _log.error("Unexpected error: {} - Path: {}",
-                ex.getMessage(), request.getDescription(false), ex);
+        logger.error("Unhandled exception", ex);
 
-        Map<String, Object> errorResponse = createErrorResponse(
-                "INTERNAL_SERVER_ERROR",
+        ErrorResponse response = createErrorResponse(
                 "An unexpected error occurred",
-                HttpStatus.INTERNAL_SERVER_ERROR.value()
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                request
         );
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        // Include stack trace in dev mode
+        if ("dev".equals(activeProfile)) {
+            response.setStackTrace(getStackTrace(ex));
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    /**
-     * Create standardized error response
-     */
-    private Map<String, Object> createErrorResponse(String errorCode, String message, int status) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("success", false);
-        errorResponse.put("errorCode", errorCode);
-        errorResponse.put("message", message);
-        errorResponse.put("status", status);
-        errorResponse.put("timestamp", ZonedDateTime.now());
-        return errorResponse;
+    private ErrorResponse createErrorResponse(String message, HttpStatus status, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse();
+        response.setSuccess(false);
+        response.setMessage(message);
+        response.setError(status.getReasonPhrase());
+        response.setStatus(status.value());
+        response.setPath(request.getRequestURI());
+        response.setTimestamp(LocalDateTime.now());
+        return response;
     }
 
-    private static final Logger _log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-    private static final Logger _auditLog = LoggerFactory.getLogger("SECURITY_AUDIT");
+    private String getStackTrace(Exception ex) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ex.printStackTrace(pw);
+        return sw.toString();
+    }
 }
