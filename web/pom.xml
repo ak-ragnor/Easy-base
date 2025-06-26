@@ -24,10 +24,6 @@
         </dependency>
         <dependency>
             <groupId>com.easyBase</groupId>
-            <artifactId>easy-base-config</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.easyBase</groupId>
             <artifactId>easy-base-domain</artifactId>
         </dependency>
         <dependency>
