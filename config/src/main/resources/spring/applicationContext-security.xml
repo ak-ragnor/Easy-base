@@ -9,118 +9,58 @@
            http://www.springframework.org/schema/security/spring-security.xsd">
 
     <!-- Enable method security -->
-    <security:global-method-security pre-post-annotations="enabled"
-                                     secured-annotations="enabled"/>
+    <security:global-method-security pre-post-annotations="enabled"/>
 
-    <bean id="siteJwtAuthenticationFilter"
-          class="com.easyBase.security.jwt.SiteJwtAuthenticationFilter">
-    </bean>
-
-    <!-- HTTP Security Configuration -->
+    <!-- Protected endpoints with JWT -->
     <security:http pattern="/**"
                    auto-config="false"
                    use-expressions="true"
                    create-session="stateless"
+                   authentication-manager-ref="noOpAuthenticationManager"
                    entry-point-ref="customAuthenticationEntryPoint">
 
-        <!-- Public endpoints -->
-        <security:intercept-url pattern="/api/public/**" access="permitAll"/>
-        <security:intercept-url pattern="/api/auth/**" access="permitAll"/>
-        <security:intercept-url pattern="/api/health/**" access="permitAll"/>
-        <security:intercept-url pattern="/api/info/**" access="permitAll"/>
+        <security:intercept-url pattern="**/api/auth/**" access="permitAll()"/>
+        <security:intercept-url pattern="**/api/public/**" access="permitAll()"/>
+        <security:intercept-url pattern="**/api/health/**" access="permitAll()"/>
 
-        <!-- Site login endpoints -->
-        <security:intercept-url pattern="/api/*/login" access="permitAll"/>
-        <security:intercept-url pattern="/api/site/*/login" access="permitAll"/>
+        <!-- Everything else requires authentication -->
+        <security:intercept-url pattern="/**" access="isAuthenticated()"/>
 
-        <!-- Admin endpoints -->
-        <security:intercept-url pattern="/api/admin/**" access="hasRole('ADMIN')"/>
-
-        <!-- Site-specific endpoints -->
-        <security:intercept-url pattern="/api/*/session/**" access="isAuthenticated()"/>
-
-        <!-- Authenticated endpoints -->
-        <security:intercept-url pattern="/api/**" access="isAuthenticated()"/>
-
-        <!-- Static resources -->
-        <security:intercept-url pattern="/static/**" access="permitAll"/>
-        <security:intercept-url pattern="/css/**" access="permitAll"/>
-        <security:intercept-url pattern="/js/**" access="permitAll"/>
-        <security:intercept-url pattern="/images/**" access="permitAll"/>
-        <security:intercept-url pattern="/" access="permitAll"/>
-        <security:intercept-url pattern="/index.html" access="permitAll"/>
-
-        <!-- Default deny for protected resources -->
-        <security:intercept-url pattern="/protected/**" access="isAuthenticated()"/>
+        <!-- CSRF disabled -->
+        <security:csrf disabled="true"/>
 
         <!-- CORS -->
         <security:cors configuration-source-ref="corsConfigurationSource"/>
 
-        <!-- CSRF disabled for REST API -->
-        <security:csrf disabled="true"/>
-
-        <!-- Headers -->
-        <security:headers>
-            <security:frame-options policy="DENY"/>
-            <security:content-type-options/>
-            <security:xss-protection/>
-        </security:headers>
-
-        <!-- Add JWT authentication filter -->
+        <!-- Add JWT filter -->
         <security:custom-filter ref="siteJwtAuthenticationFilter" before="BASIC_AUTH_FILTER"/>
-
     </security:http>
 
-    <!-- Authentication Manager for legacy/admin access -->
-    <security:authentication-manager id="authenticationManager">
-        <security:authentication-provider>
-            <security:user-service>
-                <security:user name="admin" password="{noop}admin" authorities="ROLE_ADMIN"/>
-                <security:user name="user" password="{noop}user" authorities="ROLE_USER"/>
-            </security:user-service>
-        </security:authentication-provider>
-    </security:authentication-manager>
+    <!-- NoOp Authentication Manager for JWT-based auth -->
+    <bean id="noOpAuthenticationManager" class="com.easyBase.security.NoOpAuthenticationManager"/>
 
-    <!-- Custom Authentication Entry Point -->
+    <!-- Rest of your beans remain the same -->
+    <bean id="siteJwtAuthenticationFilter"
+          class="com.easyBase.security.jwt.SiteJwtAuthenticationFilter"/>
+
     <bean id="customAuthenticationEntryPoint"
           class="com.easyBase.security.CustomAuthenticationEntryPoint"/>
 
-    <!-- CORS Configuration -->
     <bean id="corsConfigurationSource"
           class="org.springframework.web.cors.UrlBasedCorsConfigurationSource">
         <property name="corsConfigurations">
             <map>
                 <entry key="/**">
                     <bean class="org.springframework.web.cors.CorsConfiguration">
-                        <property name="allowedOriginPatterns">
-                            <list>
-                                <value>*</value>
-                            </list>
-                        </property>
-                        <property name="allowedMethods">
-                            <list>
-                                <value>GET</value>
-                                <value>POST</value>
-                                <value>PUT</value>
-                                <value>DELETE</value>
-                                <value>OPTIONS</value>
-                            </list>
-                        </property>
-                        <property name="allowedHeaders">
-                            <list>
-                                <value>*</value>
-                            </list>
-                        </property>
+                        <property name="allowedOriginPatterns" value="*"/>
+                        <property name="allowedMethods" value="*"/>
+                        <property name="allowedHeaders" value="*"/>
                         <property name="allowCredentials" value="true"/>
-                        <property name="maxAge" value="3600"/>
                     </bean>
                 </entry>
             </map>
         </property>
     </bean>
 
-    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
-        <constructor-arg value="12"/>
-    </bean>
-
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
 </beans>

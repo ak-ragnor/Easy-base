@@ -28,6 +28,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * JWT Authentication Filter for Site-specific authentication
@@ -200,10 +201,12 @@ public class SiteJwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
 
-        return path.endsWith("/login") ||
-                path.startsWith("/api/public/") ||
-                path.startsWith("/api/health/") ||
-                path.startsWith("/api/info/");
+        _log.debug("Path: {}", path);
+
+        return path.startsWith("/easy-base/api/auth") ||
+                path.startsWith("/easy-base/api/public/") ||
+                path.startsWith("/easy-base/api/health/") ||
+                path.startsWith("/easy-base/api/info/");
     }
 
     private static final Logger _log = LoggerFactory.getLogger(SiteJwtAuthenticationFilter.class);

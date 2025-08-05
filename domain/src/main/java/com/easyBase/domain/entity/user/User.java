@@ -146,7 +146,7 @@ public class User extends AuditableEntity {
     /**
      * User's password for security purposes
      */
-    @Column(name = "password", length = 20)
+    @Column(name = "password", nullable = false)
     @NotNull(message = "Password is required")
     private String password;
 

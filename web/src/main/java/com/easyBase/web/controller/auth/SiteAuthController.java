@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  * Handles site-specific user authentication and JWT token generation
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/auth")
 @Tag(name = "Site Authentication", description = "Site-specific authentication operations")
 public class SiteAuthController extends BaseController {
 
