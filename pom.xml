@@ -25,6 +25,7 @@
         <module>easy-base-core</module>
         <module>easy-base-api</module>
         <module>easy-base-application</module>
+        <module>easy-base-common</module>
     </modules>
     
     <dependencyManagement>

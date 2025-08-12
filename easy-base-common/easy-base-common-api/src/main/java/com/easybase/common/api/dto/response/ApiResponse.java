@@ -1,4 +1,4 @@
-package com.easybase.api.dto;
+package com.easybase.common.api.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

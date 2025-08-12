@@ -1,6 +1,6 @@
-package com.easybase.core.repository;
+package com.easybase.system.repository;
 
-import com.easybase.core.entity.SystemInfo;
+import com.easybase.system.entity.SystemInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

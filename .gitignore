@@ -21,20 +21,17 @@ target/
 ### VS Code ###
 .vscode/
 
-### Mac ###
+### Mac OS ###
 .DS_Store
 
 ### Logs ###
-*.log
 logs/
+*.log
 
-### React ###
-node_modules/
-build/
+### Database ###
+*.db
+*.sqlite
+
+### Environment ###
+.env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*

@@ -1,8 +1,8 @@
 package com.easybase.api.controller;
 
-import com.easybase.core.entity.SystemInfo;
-import com.easybase.core.repository.SystemInfoRepository;
-import com.easybase.api.dto.ApiResponse;
+import com.easybase.common.api.dto.response.ApiResponse;
+import com.easybase.system.entity.SystemInfo;
+import com.easybase.system.repository.SystemInfoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
