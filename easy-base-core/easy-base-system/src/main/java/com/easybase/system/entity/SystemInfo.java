@@ -1,7 +1,9 @@
 package com.easybase.system.entity;
 
-import com.easybase.common.data.entity.base.BaseEntity;
 import jakarta.persistence.*;
+
+import com.easybase.common.data.entity.base.BaseEntity;
+
 import lombok.*;
 
 @EqualsAndHashCode(callSuper = true)
@@ -13,13 +15,13 @@ import lombok.*;
 @AllArgsConstructor
 public class SystemInfo extends BaseEntity {
 
-    @Column(name = "app_version", nullable = false)
-    private String appVersion;
+	@Column(name = "app_version", nullable = false)
+	private String appVersion;
 
-    @Column(name = "db_version", nullable = false)
-    private String dbVersion;
+	@Column(name = "db_version", nullable = false)
+	private String dbVersion;
 
-    @Column(name = "status", nullable = false)
-    private String status;
+	@Column(name = "status", nullable = false)
+	private String status;
 
 }

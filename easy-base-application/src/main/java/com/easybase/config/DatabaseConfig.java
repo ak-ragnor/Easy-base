@@ -7,14 +7,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@EnableJpaRepositories(basePackages = {
-        "com.easybase"
-})
-@EntityScan(basePackages = {
-        "com.easybase"
-})
+@EnableJpaRepositories(basePackages = {"com.easybase"})
+@EntityScan(basePackages = {"com.easybase"})
 @EnableJpaAuditing
 @EnableTransactionManagement
 public class DatabaseConfig {
-    // Additional database configuration if needed
+	// Additional database configuration if needed
 }
