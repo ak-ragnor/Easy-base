@@ -1,16 +1,18 @@
 package com.easybase.system.repository;
 
-import com.easybase.system.entity.SystemInfo;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import java.util.Optional;
+
+import com.easybase.system.entity.SystemInfo;
 
 @Repository
 public interface SystemInfoRepository extends JpaRepository<SystemInfo, Long> {
 
-    @Query("SELECT s FROM SystemInfo s WHERE s.status = 'ACTIVE' ORDER BY s.createdAt DESC")
-    Optional<SystemInfo> findLatestActive();
+	@Query("SELECT s FROM SystemInfo s WHERE s.status = 'ACTIVE' ORDER BY s.createdAt DESC")
+	Optional<SystemInfo> findLatestActive();
 
-    Optional<SystemInfo> findTopByOrderByCreatedAtDesc();
+	Optional<SystemInfo> findTopByOrderByCreatedAtDesc();
 }
