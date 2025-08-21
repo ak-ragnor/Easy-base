@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.easybase.common.exception.ResourceNotFoundException;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
@@ -59,10 +60,15 @@ public class DataRecordRepository {
 
 	public DataRecord update(UUID tenantId, String table, UUID id,
 			Map<String, Object> data) {
-		dsl.update(DSL.table(TenantSchemaUtil.tableName(tenantId, table)))
+
+		int affected = dsl.update(DSL.table(TenantSchemaUtil.tableName(tenantId, table)))
 				.set(DSL.field("data"), DSL.val(data, SQLDataType.JSONB))
 				.set(DSL.field("updated_at"), DSL.currentTimestamp())
 				.where(DSL.field("id").eq(id)).execute();
+
+		if (affected == 0) {
+			throw new ResourceNotFoundException("Record", "id", id);
+		}
 
 		return findById(tenantId, table, id)
 				.orElseThrow(() -> new IllegalStateException(

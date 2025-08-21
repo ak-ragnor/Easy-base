@@ -41,10 +41,10 @@ public class CollectionController {
 	@PostMapping
 	public ResponseEntity<ApiResponse<CollectionDto>> createCollection(
 			@Valid @RequestBody CollectionDto request) {
-		Tenant deafultTenant = _tenantService.getDeafultTenant();
+		Tenant defaultTenant = _tenantService.getDefaultTenant();
 
 		Collection collection = _collectionService.createCollection(
-				deafultTenant.getId(), request.getName(),
+				defaultTenant.getId(), request.getName(),
 				_attributeMapper.toEntity(request.getAttributes()));
 
 		return ResponseEntity.status(HttpStatus.CREATED)
@@ -54,10 +54,10 @@ public class CollectionController {
 	@GetMapping
 	public ResponseEntity<ApiPageResponse<CollectionDto>> listCollections(
 			@PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-		Tenant deafultTenant = _tenantService.getDeafultTenant();
+		Tenant defaultTenant = _tenantService.getDefaultTenant();
 
 		Page<Collection> collections = _collectionService
-				.findAll(deafultTenant.getId(), pageable);
+				.findAll(defaultTenant.getId(), pageable);
 
 		List<CollectionDto> collectionDtoList = collections.stream()
 				.map(_collectionMapper::toDto).toList();
@@ -69,10 +69,10 @@ public class CollectionController {
 	@GetMapping("/{collectionName}")
 	public ResponseEntity<ApiResponse<CollectionDto>> getCollection(
 			@PathVariable String collectionName) {
-		Tenant deafultTenant = _tenantService.getDeafultTenant();
+		Tenant defaultTenant = _tenantService.getDefaultTenant();
 
 		Collection collection = _collectionService
-				.findByName(deafultTenant.getId(), collectionName);
+				.findByName(defaultTenant.getId(), collectionName);
 
 		return ResponseEntity
 				.ok(ApiResponse.success(_collectionMapper.toDto(collection)));

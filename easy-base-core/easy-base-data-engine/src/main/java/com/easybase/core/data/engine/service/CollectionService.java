@@ -50,8 +50,10 @@ public class CollectionService {
 		Collection collection = Collection.builder().tenant(tenant)
 				.name(collectionName).build();
 
-		for (Attribute attribute : attributes) {
-			collection.addAttribute(attribute);
+		if (attributes != null) {
+			for (Attribute attribute : attributes) {
+				collection.addAttribute(attribute);
+			}
 		}
 
 		collection = _collectionRepository.save(collection);
@@ -63,10 +65,12 @@ public class CollectionService {
 		_tableManager.createTableIfNotExists(schema, tableName);
 		_indexManager.createGinIndexIfNotExists(schema, tableName);
 
-		for (Attribute attribute : attributes) {
-			if (Boolean.TRUE.equals(attribute.getIsIndexed())) {
-				_indexManager.createAttributeIndexIfNotExists(schema, tableName,
-						attribute.getName(), attribute.getDataType());
+		if (attributes != null) {
+			for (Attribute attribute : attributes) {
+				if (Boolean.TRUE.equals(attribute.getIsIndexed())) {
+					_indexManager.createAttributeIndexIfNotExists(schema, tableName,
+							attribute.getName(), attribute.getDataType());
+				}
 			}
 		}
 
@@ -117,6 +121,11 @@ public class CollectionService {
 	@Transactional
 	public Collection updateCollection(UUID collectionId,
 			List<Attribute> newAttributes) {
+
+		if (newAttributes == null) {
+			throw new IllegalArgumentException("newAttributes cannot be null");
+		}
+
 		Collection collection = findById(collectionId);
 
 		Tenant tenant = collection.getTenant();
@@ -128,10 +137,10 @@ public class CollectionService {
 		List<Attribute> currentAttributes = collection.getAttributes();
 
 		Map<String, Attribute> currentAttributeMap = currentAttributes.stream()
-				.collect(Collectors.toMap(Attribute::getName, attr -> attr));
-
+				.collect(Collectors.toMap(Attribute::getName, attr -> attr, (existing, replacement) -> existing));
 		Map<String, Attribute> newAttributeMap = newAttributes.stream()
-				.collect(Collectors.toMap(Attribute::getName, attr -> attr));
+				.filter(Objects::nonNull)
+				.collect(Collectors.toMap(Attribute::getName, attr -> attr, (existing, replacement) -> replacement));
 
 		Set<String> removedAttributes = new HashSet<>(
 				currentAttributeMap.keySet());

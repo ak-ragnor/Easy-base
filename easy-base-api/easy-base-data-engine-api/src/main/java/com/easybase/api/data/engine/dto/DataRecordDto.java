@@ -37,6 +37,10 @@ public class DataRecordDto {
 
 	@JsonAnySetter
 	public void addData(String key, Object value) {
+		if (key == null) {
+			return;
+		}
+
 		data.put(key, value);
 	}
 }

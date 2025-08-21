@@ -37,9 +37,9 @@ public class RecordController {
 
 		log.debug("Creating record in collection: {}", collectionName);
 
-		Tenant deafultTenant = _tenantService.getDeafultTenant();
+		Tenant defaultTenant = _tenantService.getDefaultTenant();
 
-		DataRecord dataRecord = _dataRecordService.insert(deafultTenant.getId(),
+		DataRecord dataRecord = _dataRecordService.insert(defaultTenant.getId(),
 				collectionName, request.getData());
 
 		return ResponseEntity.status(HttpStatus.CREATED)
@@ -53,7 +53,7 @@ public class RecordController {
 
 		log.debug("Getting record {} from collection: {}", id, collectionName);
 
-		Tenant defaultTenant = _tenantService.getDeafultTenant();
+		Tenant defaultTenant = _tenantService.getDefaultTenant();
 		UUID recordId = UUID.fromString(id);
 
 		DataRecord dataRecord = _dataRecordService
@@ -69,7 +69,7 @@ public class RecordController {
 
 		log.debug("Getting all records from collection: {}", collectionName);
 
-		Tenant defaultTenant = _tenantService.getDeafultTenant();
+		Tenant defaultTenant = _tenantService.getDefaultTenant();
 
 		List<DataRecord> dataRecordList = _dataRecordService
 				.findAll(defaultTenant.getId(), collectionName);
@@ -86,7 +86,7 @@ public class RecordController {
 
 		log.debug("Updating record {} in collection: {}", id, collectionName);
 
-		Tenant defaultTenant = _tenantService.getDeafultTenant();
+		Tenant defaultTenant = _tenantService.getDefaultTenant();
 
 		DataRecord dataRecord = _dataRecordService.update(defaultTenant.getId(),
 				collectionName, UUID.fromString(id), request.getData());
@@ -102,7 +102,7 @@ public class RecordController {
 
 		log.debug("Deleting record {} from collection: {}", id, collectionName);
 
-		Tenant defaultTenant = _tenantService.getDeafultTenant();
+		Tenant defaultTenant = _tenantService.getDefaultTenant();
 
 		_dataRecordService.delete(defaultTenant.getId(), collectionName,
 				UUID.fromString(id));

@@ -33,12 +33,17 @@ public class Collection extends BaseEntity {
 	private List<Attribute> attributes = new ArrayList<>();
 
 	public void addAttribute(Attribute attribute) {
+		if (attribute == null) {
+			throw new IllegalArgumentException("Attribute cannot be null");
+		}
 		attribute.setCollection(this);
+
 		this.attributes.add(attribute);
 	}
 
 	public void removeAttribute(Attribute attribute) {
 		this.attributes.remove(attribute);
+
 		attribute.setCollection(null);
 	}
 }

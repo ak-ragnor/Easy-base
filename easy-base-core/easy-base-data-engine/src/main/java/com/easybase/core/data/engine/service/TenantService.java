@@ -24,11 +24,19 @@ public class TenantService {
 	private final SchemaManager _schemaManager;
 
 	@Transactional
-	public Tenant getDeafultTenant() {
+	public Tenant getDefaultTenant() {
 		Tenant tenant = findByName("default");
 
 		if (tenant == null) {
-			tenant = createTenant("default");
+			try {
+				tenant = createTenant("default");
+			} catch (ConflictException e) {
+				tenant = findByName("default");
+
+				if (tenant == null) {
+					throw e;
+				}
+			}
 		}
 
 		return tenant;
