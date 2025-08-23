@@ -19,9 +19,9 @@ import com.easybase.api.data.engine.dto.mapper.CollectionMapper;
 import com.easybase.common.api.dto.response.ApiPageResponse;
 import com.easybase.common.api.dto.response.ApiResponse;
 import com.easybase.core.data.engine.entity.Collection;
-import com.easybase.core.data.engine.entity.Tenant;
 import com.easybase.core.data.engine.service.CollectionService;
-import com.easybase.core.data.engine.service.TenantService;
+import com.easybase.core.tenant.entity.Tenant;
+import com.easybase.core.tenant.service.TenantService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +57,7 @@ public class CollectionController {
 		Tenant defaultTenant = _tenantService.getDefaultTenant();
 
 		Page<Collection> collections = _collectionService
-				.findAll(defaultTenant.getId(), pageable);
+				.getCollections(defaultTenant.getId(), pageable);
 
 		List<CollectionDto> collectionDtoList = collections.stream()
 				.map(_collectionMapper::toDto).toList();
@@ -72,7 +72,7 @@ public class CollectionController {
 		Tenant defaultTenant = _tenantService.getDefaultTenant();
 
 		Collection collection = _collectionService
-				.findByName(defaultTenant.getId(), collectionName);
+				.getCollection(defaultTenant.getId(), collectionName);
 
 		return ResponseEntity
 				.ok(ApiResponse.success(_collectionMapper.toDto(collection)));
@@ -96,7 +96,7 @@ public class CollectionController {
 	@DeleteMapping("/{collectionId}")
 	public ResponseEntity<ApiResponse<Void>> deleteCollection(
 			@PathVariable UUID collectionId) {
-		_collectionService.dropCollection(collectionId);
+		_collectionService.deleteCollection(collectionId);
 
 		return ResponseEntity.ok(ApiResponse.success(null));
 	}

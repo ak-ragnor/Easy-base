@@ -1,4 +1,4 @@
-package com.easybase.core.data.engine.repository;
+package com.easybase.core.tenant.repository;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.easybase.core.data.engine.entity.Tenant;
+import com.easybase.core.tenant.entity.Tenant;
 
 @Repository
 public interface TenantRepository extends JpaRepository<Tenant, UUID> {

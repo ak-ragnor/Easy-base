@@ -41,20 +41,20 @@ public abstract class BaseEntity {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o){
+		if (this == o) {
 			return true;
 		}
 
-		if (!(o instanceof BaseEntity that)){
+		if (!(o instanceof BaseEntity that)) {
 			return false;
 		}
 
-        return id != null && id.equals(that.id);
+		return id != null && id.equals(that.id);
 	}
 
 	@Override
 	public int hashCode() {
-		if (id == null){
+		if (id == null) {
 			return 0;
 		}
 

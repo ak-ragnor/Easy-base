@@ -8,27 +8,26 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>easy-base-data-engine</artifactId>
+  <artifactId>easy-base-tenant</artifactId>
   <packaging>jar</packaging>
 
-  <name>EasyBase Data Engine</name>
-  <description>Data processing and management engine for EasyBase Platform</description>
+  <name>EasyBase Tenant</name>
+  <description>Tenant management for EasyBase Platform</description>
 
   <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <scope>runtime</scope>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq</artifactId>
     </dependency>
 
     <dependency>
@@ -38,15 +37,14 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.jooq</groupId>
-      <artifactId>jooq</artifactId>
-      <version>3.19.8</version>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -55,15 +53,12 @@
       <version>1.0.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
+
     <dependency>
       <groupId>com.easybase</groupId>
       <artifactId>easy-base-common-exception</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>com.easybase</groupId>
-      <artifactId>easy-base-tenant</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>

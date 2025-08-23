@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.easybase.common.exception.ResourceNotFoundException;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.springframework.stereotype.Repository;
 
+import com.easybase.common.exception.ResourceNotFoundException;
 import com.easybase.core.data.engine.entity.DataRecord;
 import com.easybase.core.data.engine.util.TenantSchemaUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -41,27 +41,28 @@ public class DataRecordRepository {
 				.set(DSL.field("data"), DSL.val(data, SQLDataType.JSONB))
 				.returning(DSL.field("id"), DSL.field("data"),
 						DSL.field("created_at"), DSL.field("updated_at"))
-				.fetchOne(this::toCollectionRecord);
+				.fetchOne(this::toDataRecord);
 	}
 
 	public Optional<DataRecord> findById(UUID tenantId, String table, UUID id) {
 		return dsl.select()
 				.from(DSL.table(TenantSchemaUtil.tableName(tenantId, table)))
 				.where(DSL.field("id").eq(id))
-				.fetchOptional(this::toCollectionRecord);
+				.fetchOptional(this::toDataRecord);
 	}
 
 	public List<DataRecord> findAll(UUID tenantId, String table) {
 		return dsl.select()
 				.from(DSL.table(TenantSchemaUtil.tableName(tenantId, table)))
 				.orderBy(DSL.field("created_at").desc())
-				.fetch(this::toCollectionRecord);
+				.fetch(this::toDataRecord);
 	}
 
 	public DataRecord update(UUID tenantId, String table, UUID id,
 			Map<String, Object> data) {
 
-		int affected = dsl.update(DSL.table(TenantSchemaUtil.tableName(tenantId, table)))
+		int affected = dsl
+				.update(DSL.table(TenantSchemaUtil.tableName(tenantId, table)))
 				.set(DSL.field("data"), DSL.val(data, SQLDataType.JSONB))
 				.set(DSL.field("updated_at"), DSL.currentTimestamp())
 				.where(DSL.field("id").eq(id)).execute();
@@ -86,7 +87,7 @@ public class DataRecordRepository {
 				.where(DSL.field("id").eq(id)));
 	}
 
-	private DataRecord toCollectionRecord(Record record) {
+	private DataRecord toDataRecord(Record record) {
 		if (record == null) {
 			return null;
 		}
