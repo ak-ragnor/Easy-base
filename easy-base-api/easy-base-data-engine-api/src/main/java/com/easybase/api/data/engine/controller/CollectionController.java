@@ -32,50 +32,52 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CollectionController {
 
-	private final CollectionService _collectionService;
-	private final TenantService _tenantService;
-
-	private final CollectionMapper _collectionMapper;
-	private final AttributeMapper _attributeMapper;
-
 	@PostMapping
 	public ResponseEntity<ApiResponse<CollectionDto>> createCollection(
 			@Valid @RequestBody CollectionDto request) {
-		Tenant defaultTenant = _tenantService.getDefaultTenant();
+		Tenant tenant = _tenantService.getDefaultTenant();
 
 		Collection collection = _collectionService.createCollection(
-				defaultTenant.getId(), request.getName(),
+				tenant.getId(), request.getName(),
 				_attributeMapper.toEntity(request.getAttributes()));
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(ApiResponse.success(_collectionMapper.toDto(collection)));
 	}
 
+	@DeleteMapping("/{collectionId}")
+	public ResponseEntity<ApiResponse<Void>> deleteCollection(
+			@PathVariable UUID collectionId) {
+		_collectionService.deleteCollection(collectionId);
+
+		return ResponseEntity.ok(ApiResponse.success(null));
+	}
+
+	@GetMapping("/{collectionName}")
+	public ResponseEntity<ApiResponse<CollectionDto>> getCollection(
+			@PathVariable String collectionName) {
+		Tenant tenant = _tenantService.getDefaultTenant();
+
+		Collection collection = _collectionService
+				.getCollection(tenant.getId(), collectionName);
+
+		return ResponseEntity
+				.ok(ApiResponse.success(_collectionMapper.toDto(collection)));
+	}
+
 	@GetMapping
 	public ResponseEntity<ApiPageResponse<CollectionDto>> listCollections(
 			@PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-		Tenant defaultTenant = _tenantService.getDefaultTenant();
+		Tenant tenant = _tenantService.getDefaultTenant();
 
 		Page<Collection> collections = _collectionService
-				.getCollections(defaultTenant.getId(), pageable);
+				.getCollections(tenant.getId(), pageable);
 
 		List<CollectionDto> collectionDtoList = collections.stream()
 				.map(_collectionMapper::toDto).toList();
 
 		return ResponseEntity
 				.ok(ApiPageResponse.success(collectionDtoList, collections));
-	}
-
-	@GetMapping("/{collectionName}")
-	public ResponseEntity<ApiResponse<CollectionDto>> getCollection(
-			@PathVariable String collectionName) {
-		Tenant defaultTenant = _tenantService.getDefaultTenant();
-
-		Collection collection = _collectionService
-				.getCollection(defaultTenant.getId(), collectionName);
-
-		return ResponseEntity
-				.ok(ApiResponse.success(_collectionMapper.toDto(collection)));
 	}
 
 	@PutMapping("/{collectionId}")
@@ -93,11 +95,11 @@ public class CollectionController {
 				.ok(ApiResponse.success(_collectionMapper.toDto(collection)));
 	}
 
-	@DeleteMapping("/{collectionId}")
-	public ResponseEntity<ApiResponse<Void>> deleteCollection(
-			@PathVariable UUID collectionId) {
-		_collectionService.deleteCollection(collectionId);
+	private final AttributeMapper _attributeMapper;
 
-		return ResponseEntity.ok(ApiResponse.success(null));
-	}
+	private final CollectionMapper _collectionMapper;
+
+	private final CollectionService _collectionService;
+
+	private final TenantService _tenantService;
 }

@@ -26,10 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RecordController {
 
-	private final DataRecordService _dataRecordService;
-	private final TenantService _tenantService;
-	private final DataRecordMapper _dataRecordMapper;
-
 	@PostMapping
 	public ResponseEntity<ApiResponse<DataRecordDto>> createRecord(
 			@PathVariable("collectionName") String collectionName,
@@ -37,13 +33,43 @@ public class RecordController {
 
 		log.debug("Creating record in collection: {}", collectionName);
 
-		Tenant defaultTenant = _tenantService.getDefaultTenant();
+		Tenant tenant = _tenantService.getDefaultTenant();
 
-		DataRecord dataRecord = _dataRecordService.createRecord(
-				defaultTenant.getId(), collectionName, request.getData());
+		DataRecord dataRecord = _dataRecordService.createRecord(tenant.getId(),
+				collectionName, request.getData());
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(ApiResponse.success(_dataRecordMapper.toDto(dataRecord)));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<ApiResponse<Void>> deleteRecord(
+			@PathVariable("collectionName") String collectionName,
+			@PathVariable("id") String id) {
+
+		log.debug("Deleting record {} from collection: {}", id, collectionName);
+
+		Tenant tenant = _tenantService.getDefaultTenant();
+
+		_dataRecordService.deleteRecord(tenant.getId(), collectionName,
+				UUID.fromString(id));
+
+		return ResponseEntity.ok(ApiResponse.success(null));
+	}
+
+	@GetMapping
+	public ResponseEntity<ApiResponse<List<DataRecordDto>>> getAllRecords(
+			@PathVariable("collectionName") String collectionName) {
+
+		log.debug("Getting all records from collection: {}", collectionName);
+
+		Tenant tenant = _tenantService.getDefaultTenant();
+
+		List<DataRecord> dataRecordList = _dataRecordService
+				.getRecords(tenant.getId(), collectionName);
+
+		return ResponseEntity.ok(
+				ApiResponse.success(_dataRecordMapper.toDto(dataRecordList)));
 	}
 
 	@GetMapping("/{id}")
@@ -53,29 +79,13 @@ public class RecordController {
 
 		log.debug("Getting record {} from collection: {}", id, collectionName);
 
-		Tenant defaultTenant = _tenantService.getDefaultTenant();
-		UUID recordId = UUID.fromString(id);
+		Tenant tenant = _tenantService.getDefaultTenant();
 
-		DataRecord dataRecord = _dataRecordService
-				.getRecord(defaultTenant.getId(), collectionName, recordId);
+		DataRecord dataRecord = _dataRecordService.getRecord(tenant.getId(),
+				collectionName, UUID.fromString(id));
 
 		return ResponseEntity
 				.ok(ApiResponse.success(_dataRecordMapper.toDto(dataRecord)));
-	}
-
-	@GetMapping
-	public ResponseEntity<ApiResponse<List<DataRecordDto>>> getAllRecords(
-			@PathVariable("collectionName") String collectionName) {
-
-		log.debug("Getting all records from collection: {}", collectionName);
-
-		Tenant defaultTenant = _tenantService.getDefaultTenant();
-
-		List<DataRecord> dataRecordList = _dataRecordService
-				.getRecords(defaultTenant.getId(), collectionName);
-
-		return ResponseEntity.ok(
-				ApiResponse.success(_dataRecordMapper.toDto(dataRecordList)));
 	}
 
 	@PutMapping("/{id}")
@@ -86,28 +96,18 @@ public class RecordController {
 
 		log.debug("Updating record {} in collection: {}", id, collectionName);
 
-		Tenant defaultTenant = _tenantService.getDefaultTenant();
+		Tenant tenant = _tenantService.getDefaultTenant();
 
-		DataRecord dataRecord = _dataRecordService.updateRecord(
-				defaultTenant.getId(), collectionName, UUID.fromString(id),
-				request.getData());
+		DataRecord dataRecord = _dataRecordService.updateRecord(tenant.getId(),
+				collectionName, UUID.fromString(id), request.getData());
 
 		return ResponseEntity
 				.ok(ApiResponse.success(_dataRecordMapper.toDto(dataRecord)));
 	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<ApiResponse<Void>> deleteRecord(
-			@PathVariable("collectionName") String collectionName,
-			@PathVariable("id") String id) {
+	private final DataRecordService _dataRecordService;
 
-		log.debug("Deleting record {} from collection: {}", id, collectionName);
+	private final TenantService _tenantService;
 
-		Tenant defaultTenant = _tenantService.getDefaultTenant();
-
-		_dataRecordService.deleteRecord(defaultTenant.getId(), collectionName,
-				UUID.fromString(id));
-
-		return ResponseEntity.ok(ApiResponse.success(null));
-	}
+	private final DataRecordMapper _dataRecordMapper;
 }

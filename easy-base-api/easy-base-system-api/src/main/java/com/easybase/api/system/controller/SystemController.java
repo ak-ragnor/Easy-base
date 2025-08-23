@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,29 +11,31 @@ import com.easybase.common.api.dto.response.ApiResponse;
 import com.easybase.system.entity.SystemInfo;
 import com.easybase.system.repository.SystemInfoRepository;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/easy-base/api/system")
+@RequiredArgsConstructor
 @Slf4j
 @CrossOrigin(origins = "*")
 public class SystemController {
 
-	private final SystemInfoRepository systemInfoRepository;
+	private static final String _APP_VERSION = "1.0.0-SNAPSHOT";
 
-	public SystemController(SystemInfoRepository systemInfoRepository) {
-		this.systemInfoRepository = systemInfoRepository;
-	}
+	private static final String _DB_VERSION = "1.0";
+
+	private static final String _SERVICE_NAME = "Easy Base Platform";
 
 	@GetMapping("/health")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> health() {
 		Map<String, Object> data = new HashMap<>();
 		data.put("status", "UP");
 		data.put("timestamp", LocalDateTime.now());
-		data.put("version", "1.0.0-SNAPSHOT");
-		data.put("service", "EasyBase Platform");
+		data.put("version", _APP_VERSION);
+		data.put("service", _SERVICE_NAME);
 
-		log.info("Health check requested at {}", LocalDateTime.now());
+		log.info("Health check requested");
 
 		return ResponseEntity
 				.ok(ApiResponse.success(data, "System is healthy"));
@@ -42,32 +43,28 @@ public class SystemController {
 
 	@GetMapping("/info")
 	public ResponseEntity<ApiResponse<SystemInfo>> getSystemInfo() {
-		try {
-			SystemInfo info = systemInfoRepository.findLatestActive()
-					.orElseGet(() -> {
-						SystemInfo newInfo = SystemInfo.builder()
-								.appVersion("1.0.0-SNAPSHOT").dbVersion("1.0")
-								.status("ACTIVE").build();
-						return systemInfoRepository.save(newInfo);
-					});
+		SystemInfo info = _systemInfoRepository.findLatestActive()
+				.orElseGet(this::_createDefaultSystemInfo);
 
-			log.info("System info retrieved: {}", info);
+		log.info("System info retrieved: {}", info);
 
-			return ResponseEntity.ok(ApiResponse.success(info,
-					"System information retrieved successfully"));
-		} catch (Exception e) {
-			log.error("Error retrieving system info", e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-					ApiResponse.failure("Error retrieving system information",
-							null, 500));
-		}
+		return ResponseEntity.ok(ApiResponse.success(info,
+				"System information retrieved successfully"));
 	}
 
 	@PostMapping("/ping")
 	public ResponseEntity<ApiResponse<String>> ping() {
 		log.debug("Ping received");
-
 		return ResponseEntity
 				.ok(ApiResponse.success("Server is responding", "Pong"));
 	}
+
+	private SystemInfo _createDefaultSystemInfo() {
+		SystemInfo newInfo = SystemInfo.builder().appVersion(_APP_VERSION)
+				.dbVersion(_DB_VERSION).status("ACTIVE").build();
+
+		return _systemInfoRepository.save(newInfo);
+	}
+
+	private final SystemInfoRepository _systemInfoRepository;
 }
