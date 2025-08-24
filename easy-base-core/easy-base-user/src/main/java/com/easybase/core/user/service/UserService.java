@@ -30,6 +30,11 @@ public class UserService {
 
 		User user = _getUser(userId);
 
+		_userCredentialRepository.findByUserIdAndType(userId, type)
+				.ifPresent(existing -> {
+					throw new ConflictException("UserCredential", "type", type);
+				});
+
 		UserCredential credential = UserCredential.builder().user(user)
 				.passwordType(type).credentialData(credentialData).build();
 

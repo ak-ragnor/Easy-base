@@ -58,8 +58,8 @@ public class CollectionController {
 			@PathVariable String collectionName) {
 		Tenant tenant = _tenantService.getDefaultTenant();
 
-		Collection collection = _collectionService
-				.getCollection(tenant.getId(), collectionName);
+		Collection collection = _collectionService.getCollection(tenant.getId(),
+				collectionName);
 
 		return ResponseEntity
 				.ok(ApiResponse.success(_collectionMapper.toDto(collection)));
