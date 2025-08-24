@@ -12,13 +12,13 @@ import com.easybase.common.exception.ConflictException;
 import com.easybase.common.exception.ResourceNotFoundException;
 import com.easybase.core.data.engine.entity.Attribute;
 import com.easybase.core.data.engine.entity.Collection;
-import com.easybase.core.data.engine.entity.Tenant;
 import com.easybase.core.data.engine.repository.CollectionRepository;
-import com.easybase.core.data.engine.repository.TenantRepository;
 import com.easybase.core.data.engine.service.ddl.IndexManager;
 import com.easybase.core.data.engine.service.ddl.TableManager;
 import com.easybase.core.data.engine.util.NamingUtils;
 import com.easybase.core.data.engine.util.TenantSchemaUtil;
+import com.easybase.core.tenant.entity.Tenant;
+import com.easybase.core.tenant.repository.TenantRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,17 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CollectionService {
 
-	private final TenantRepository _tenantRepository;
-	private final CollectionRepository _collectionRepository;
-
-	private final TableManager _tableManager;
-	private final IndexManager _indexManager;
-
 	@Transactional
 	public Collection createCollection(UUID tenantId, String collectionName,
 			List<Attribute> attributes) {
-		Tenant tenant = _tenantRepository.findById(tenantId).orElseThrow(
-				() -> new ResourceNotFoundException("Tenant", "id", tenantId));
 
 		collectionName = NamingUtils.sanitizeCollectionName(collectionName);
 
@@ -47,13 +39,13 @@ public class CollectionService {
 			throw new ConflictException("Collection", "name", collectionName);
 		}
 
+		Tenant tenant = _getTenant(tenantId);
+
 		Collection collection = Collection.builder().tenant(tenant)
 				.name(collectionName).build();
 
 		if (attributes != null) {
-			for (Attribute attribute : attributes) {
-				collection.addAttribute(attribute);
-			}
+			attributes.forEach(collection::addAttribute);
 		}
 
 		collection = _collectionRepository.save(collection);
@@ -66,44 +58,21 @@ public class CollectionService {
 		_indexManager.createGinIndexIfNotExists(schema, tableName);
 
 		if (attributes != null) {
-			for (Attribute attribute : attributes) {
-				if (Boolean.TRUE.equals(attribute.getIsIndexed())) {
-					_indexManager.createAttributeIndexIfNotExists(schema, tableName,
-							attribute.getName(), attribute.getDataType());
-				}
-			}
+			attributes.stream()
+					.filter(attr -> Boolean.TRUE.equals(attr.getIsIndexed()))
+					.forEach(attr -> _indexManager
+							.createAttributeIndexIfNotExists(schema, tableName,
+									attr.getName(), attr.getDataType()));
 		}
 
-		log.info("Created collection '{}' for tenant {}", collectionName,
+		log.info("Created collection name={} tenant={}", collectionName,
 				tenantId);
 		return collection;
 	}
 
-	@Transactional(readOnly = true)
-	public Collection findByName(UUID tenantId, String collectionName) {
-		return _collectionRepository
-				.findByTenantIdAndName(tenantId, collectionName)
-				.orElseThrow(() -> new ResourceNotFoundException("Collection",
-						"name", collectionName));
-	}
-
-	@Transactional(readOnly = true)
-	public Collection findById(UUID collectionId) {
-		return _collectionRepository.findById(collectionId)
-				.orElseThrow(() -> new ResourceNotFoundException("Collection",
-						"id", collectionId));
-	}
-
-	@Transactional(readOnly = true)
-	public Page<Collection> findAll(UUID tenantId, Pageable pageable) {
-		return _collectionRepository.findByTenantId(tenantId, pageable);
-	}
-
 	@Transactional
-	public void dropCollection(UUID collectionId) {
-		Collection collection = _collectionRepository.findById(collectionId)
-				.orElseThrow(() -> new ResourceNotFoundException("Collection",
-						"id", collectionId));
+	public void deleteCollection(UUID collectionId) {
+		Collection collection = _getCollection(collectionId);
 
 		Tenant tenant = collection.getTenant();
 
@@ -114,8 +83,26 @@ public class CollectionService {
 		_tableManager.dropTableIfExists(schema, table);
 		_collectionRepository.delete(collection);
 
-		log.info("Dropped collection '{}' (tenant {})", collection.getName(),
+		log.info("Dropped collection name={} tenant={}", collection.getName(),
 				tenant.getId());
+	}
+
+	@Transactional(readOnly = true)
+	public Collection getCollection(UUID collectionId) {
+		return _getCollection(collectionId);
+	}
+
+	@Transactional(readOnly = true)
+	public Collection getCollection(UUID tenantId, String collectionName) {
+		return _collectionRepository
+				.findByTenantIdAndName(tenantId, collectionName)
+				.orElseThrow(() -> new ResourceNotFoundException("Collection",
+						"name", collectionName));
+	}
+
+	@Transactional(readOnly = true)
+	public Page<Collection> getCollections(UUID tenantId, Pageable pageable) {
+		return _collectionRepository.findByTenantId(tenantId, pageable);
 	}
 
 	@Transactional
@@ -126,7 +113,7 @@ public class CollectionService {
 			throw new IllegalArgumentException("newAttributes cannot be null");
 		}
 
-		Collection collection = findById(collectionId);
+		Collection collection = _getCollection(collectionId);
 
 		Tenant tenant = collection.getTenant();
 
@@ -137,10 +124,12 @@ public class CollectionService {
 		List<Attribute> currentAttributes = collection.getAttributes();
 
 		Map<String, Attribute> currentAttributeMap = currentAttributes.stream()
-				.collect(Collectors.toMap(Attribute::getName, attr -> attr, (existing, replacement) -> existing));
+				.collect(Collectors.toMap(Attribute::getName, attr -> attr,
+						(existing, replacement) -> existing));
 		Map<String, Attribute> newAttributeMap = newAttributes.stream()
 				.filter(Objects::nonNull)
-				.collect(Collectors.toMap(Attribute::getName, attr -> attr, (existing, replacement) -> replacement));
+				.collect(Collectors.toMap(Attribute::getName, attr -> attr,
+						(existing, replacement) -> replacement));
 
 		Set<String> removedAttributes = new HashSet<>(
 				currentAttributeMap.keySet());
@@ -201,8 +190,27 @@ public class CollectionService {
 
 		collection = _collectionRepository.save(collection);
 
-		log.info("Updated collection '{}' for tenant {}", collection.getName(),
-				collection.getTenant().getId());
+		log.info("Updated collection name={} tenant={}", collection.getName(),
+				tenant.getId());
 		return collection;
 	}
+
+	private Collection _getCollection(UUID collectionId) {
+		return _collectionRepository.findById(collectionId)
+				.orElseThrow(() -> new ResourceNotFoundException("Collection",
+						"id", collectionId));
+	}
+
+	private Tenant _getTenant(UUID tenantId) {
+		return _tenantRepository.findById(tenantId).orElseThrow(
+				() -> new ResourceNotFoundException("Tenant", "id", tenantId));
+	}
+
+	private final TenantRepository _tenantRepository;
+
+	private final CollectionRepository _collectionRepository;
+
+	private final TableManager _tableManager;
+
+	private final IndexManager _indexManager;
 }

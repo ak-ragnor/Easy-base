@@ -10,10 +10,10 @@ public class TenantSchemaUtil {
 	}
 
 	public static Name tableName(UUID tenantId, String collectionName) {
-		String actualTableName = NamingUtils.generateTableName(tenantId,
+		String tableName = NamingUtils.generateTableName(tenantId,
 				collectionName);
 
-		return DSL.name(getSchema(tenantId), actualTableName);
+		return DSL.name(getSchema(tenantId), tableName);
 	}
 
 	public static String getSchema(UUID tenantId) {

@@ -16,6 +16,8 @@
 
   <modules>
     <module>easy-base-system</module>
+    <module>easy-base-tenant</module>
     <module>easy-base-data-engine</module>
+    <module>easy-base-user</module>
   </modules>
 </project>

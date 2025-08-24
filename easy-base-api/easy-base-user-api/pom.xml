@@ -8,14 +8,14 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>easy-base-data-engine-api</artifactId>
-  <name>EasyBase Data Engine API</name>
-  <description>REST API layer for EasyBase Data Engine</description>
+  <artifactId>easy-base-user-api</artifactId>
+  <name>EasyBase User API</name>
+  <description>REST API layer for EasyBase User Management</description>
 
   <dependencies>
     <dependency>
       <groupId>com.easybase</groupId>
-      <artifactId>easy-base-data-engine</artifactId>
+      <artifactId>easy-base-user</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

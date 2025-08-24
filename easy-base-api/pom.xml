@@ -16,5 +16,6 @@
   <modules>
     <module>easy-base-data-engine-api</module>
     <module>easy-base-system-api</module>
+    <module>easy-base-user-api</module>
   </modules>
 </project>

@@ -15,32 +15,33 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DataRecordService {
 
-	private final DataRecordRepository _dataRecordRepository;
-	private final DataRecordValidator _dataRecordValidator;
-
-	public DataRecord insert(UUID tenantId, String table,
+	public DataRecord createRecord(UUID tenantId, String table,
 			Map<String, Object> data) {
 		_dataRecordValidator.validate(tenantId, table, data);
 		return _dataRecordRepository.insert(tenantId, table, UUID.randomUUID(),
 				data);
 	}
 
-	public DataRecord findById(UUID tenantId, String table, UUID id) {
+	public void deleteRecord(UUID tenantId, String table, UUID id) {
+		_dataRecordRepository.delete(tenantId, table, id);
+	}
+
+	public DataRecord getRecord(UUID tenantId, String table, UUID id) {
 		return _dataRecordRepository.findById(tenantId, table, id).orElseThrow(
 				() -> new ResourceNotFoundException("Record", "id", id));
 	}
 
-	public List<DataRecord> findAll(UUID tenantId, String table) {
+	public List<DataRecord> getRecords(UUID tenantId, String table) {
 		return _dataRecordRepository.findAll(tenantId, table);
 	}
 
-	public DataRecord update(UUID tenantId, String table, UUID id,
+	public DataRecord updateRecord(UUID tenantId, String table, UUID id,
 			Map<String, Object> data) {
 		_dataRecordValidator.validate(tenantId, table, data);
 		return _dataRecordRepository.update(tenantId, table, id, data);
 	}
 
-	public void delete(UUID tenantId, String table, UUID id) {
-		_dataRecordRepository.delete(tenantId, table, id);
-	}
+	private final DataRecordRepository _dataRecordRepository;
+
+	private final DataRecordValidator _dataRecordValidator;
 }

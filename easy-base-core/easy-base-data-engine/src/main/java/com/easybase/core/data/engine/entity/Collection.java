@@ -6,6 +6,7 @@ import java.util.List;
 import jakarta.persistence.*;
 
 import com.easybase.common.data.entity.base.BaseEntity;
+import com.easybase.core.tenant.entity.Tenant;
 
 import lombok.*;
 

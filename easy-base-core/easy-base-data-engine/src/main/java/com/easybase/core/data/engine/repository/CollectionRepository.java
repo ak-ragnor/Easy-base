@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.easybase.core.data.engine.entity.Collection;
-import com.easybase.core.data.engine.entity.Tenant;
+import com.easybase.core.tenant.entity.Tenant;
 
 @Repository
 public interface CollectionRepository extends JpaRepository<Collection, UUID> {
