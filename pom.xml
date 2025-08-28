@@ -15,6 +15,7 @@
     <module>easy-base-api</module>
     <module>easy-base-application</module>
     <module>easy-base-common</module>
+    <module>easy-base-security</module>
   </modules>
 
   <properties>

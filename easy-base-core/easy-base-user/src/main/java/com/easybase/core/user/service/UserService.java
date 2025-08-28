@@ -1,9 +1,12 @@
 package com.easybase.core.user.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
+
+	@Value("${easy-base.user.default-password:backToDust}")
+	private String userDefaultPassword;
 
 	@Transactional
 	public UserCredential addUserCredential(UUID userId, String type,
@@ -46,6 +52,55 @@ public class UserService {
 	}
 
 	@Transactional
+	public void addPasswordCredential(UUID userId, String plainPassword) {
+		User user = _getUser(userId);
+
+		_userCredentialRepository.findByUserIdAndType(userId, "PASSWORD")
+				.ifPresent(existing -> {
+					throw new ConflictException("UserCredential", "type",
+							"PASSWORD");
+				});
+
+		String passwordHash = _passwordEncoder.encode(plainPassword);
+
+		UserCredential credential = UserCredential.builder().user(user)
+				.passwordType("PASSWORD").passwordHash(passwordHash)
+				.passwordAlgo("bcrypt").passwordChangedAt(LocalDateTime.now())
+				.build();
+
+		_userCredentialRepository.save(credential);
+
+		log.info("Added password credential userId={}", userId);
+
+	}
+
+	@Transactional
+	public void addDefaultPasswordCredential(UUID userId) {
+		addPasswordCredential(userId, userDefaultPassword);
+	}
+
+	@Transactional
+	public UserCredential updatePasswordCredential(UUID userId,
+			String plainPassword) {
+		UserCredential credential = _userCredentialRepository
+				.findByUserIdAndType(userId, "PASSWORD").orElseThrow(
+						() -> new ResourceNotFoundException("UserCredential",
+								"type", "PASSWORD"));
+
+		String passwordHash = _passwordEncoder.encode(plainPassword);
+
+		credential.setPasswordHash(passwordHash);
+		credential.setPasswordAlgo("bcrypt");
+		credential.setPasswordChangedAt(LocalDateTime.now());
+
+		credential = _userCredentialRepository.save(credential);
+
+		log.info("Updated password credential userId={}", userId);
+
+		return credential;
+	}
+
+	@Transactional
 	public User createUser(String email, String firstName, String lastName,
 			String displayName, UUID tenantId) {
 
@@ -58,6 +113,8 @@ public class UserService {
 				.build();
 
 		user = _userRepository.save(user);
+
+		addDefaultPasswordCredential(user.getId());
 
 		log.info("Created user with email={} id={} tenant={}", email,
 				user.getId(), tenantId);
@@ -159,4 +216,6 @@ public class UserService {
 	private final UserCredentialRepository _userCredentialRepository;
 
 	private final TenantRepository _tenantRepository;
+
+	private final PasswordEncoder _passwordEncoder;
 }
