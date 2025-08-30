@@ -10,14 +10,18 @@ public interface BaseMapper<E, D> {
 	E toEntity(D dto);
 
 	default List<D> toDto(List<E> entities) {
-		return entities == null ? List.of()
-				: entities.stream().map(this::toDto)
-						.collect(Collectors.toList());
+		if (entities == null) {
+			return List.of();
+		}
+
+		return entities.stream().map(this::toDto).collect(Collectors.toList());
 	}
 
 	default List<E> toEntity(List<D> dtos) {
-		return dtos == null ? List.of()
-				: dtos.stream().map(this::toEntity)
-						.collect(Collectors.toList());
+		if (dtos == null) {
+			return List.of();
+		}
+
+		return dtos.stream().map(this::toEntity).collect(Collectors.toList());
 	}
 }

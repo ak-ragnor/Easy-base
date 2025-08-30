@@ -10,7 +10,7 @@ import lombok.*;
 @Entity
 @Table(name = "eb_attributes", uniqueConstraints = {
 		@UniqueConstraint(name = "uq_collection_attribute_name", columnNames = {
-				"collection_id", "name"})})
+				"collection_id", "name" }) })
 @Getter
 @Setter
 @Builder

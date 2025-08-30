@@ -1,5 +1,6 @@
 package com.easybase.core.user.entity;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import jakarta.persistence.*;
@@ -32,6 +33,16 @@ public class UserCredential {
 	@Size(max = 50)
 	@Column(name = "password_type", nullable = false)
 	private String passwordType;
+
+	@Column(name = "password_hash", length = 255)
+	private String passwordHash;
+
+	@Size(max = 32)
+	@Column(name = "password_algo", length = 32)
+	private String passwordAlgo;
+
+	@Column(name = "password_changed_at")
+	private LocalDateTime passwordChangedAt;
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(name = "credential_data", columnDefinition = "jsonb")

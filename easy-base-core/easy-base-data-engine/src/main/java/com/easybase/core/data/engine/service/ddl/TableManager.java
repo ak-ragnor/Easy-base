@@ -12,11 +12,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TableManager {
 
-	private final DSLContext dsl;
-	private final TriggerManager triggerManager;
-
 	public void createTableIfNotExists(String schema, String table) {
-		dsl.createTableIfNotExists(name(schema, table))
+		_dslContext.createTableIfNotExists(name(schema, table))
 				.column("id",
 						SQLDataType.UUID.nullable(false).defaultValue(
 								function("gen_random_uuid", SQLDataType.UUID)))
@@ -29,10 +26,14 @@ public class TableManager {
 				.column("data", SQLDataType.JSONB).constraint(primaryKey("id"))
 				.execute();
 
-		triggerManager.createUpdatedAtTrigger(schema, table);
+		_triggerManager.createUpdatedAtTrigger(schema, table);
 	}
 
 	public void dropTableIfExists(String schema, String table) {
-		dsl.dropTableIfExists(name(schema, table)).cascade().execute();
+		_dslContext.dropTableIfExists(name(schema, table)).cascade().execute();
 	}
+
+	private final DSLContext _dslContext;
+
+	private final TriggerManager _triggerManager;
 }

@@ -13,13 +13,13 @@ import lombok.*;
 @Entity
 @Table(name = "eb_collections", uniqueConstraints = {
 		@UniqueConstraint(name = "uq_tenant_collection_name", columnNames = {
-				"tenant_id", "name"})})
+				"tenant_id", "name" }) })
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"tenant", "attributes"})
+@ToString(exclude = { "tenant", "attributes" })
 public class Collection extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)

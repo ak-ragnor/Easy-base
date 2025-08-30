@@ -25,11 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DataRecordValidator {
 
-	private final CollectionRepository collectionRepository;
-
 	public void validate(UUID tenantId, String collectionName,
 			Map<String, Object> data) {
-		Collection collection = collectionRepository
+		Collection collection = _collectionRepository
 				.findByTenantIdAndName(tenantId, collectionName).orElse(null);
 
 		if (collection == null) {
@@ -58,67 +56,70 @@ public class DataRecordValidator {
 
 		try {
 			switch (type) {
-			case TEXT:
-			case VARCHAR:
-				value.toString();
-				break;
+				case TEXT:
+				case VARCHAR:
+					value.toString();
+					break;
 
-			case INTEGER:
-				if (!(value instanceof Integer)) {
-					Integer.parseInt(value.toString());
-				}
-				break;
-
-			case BIGINT:
-				if (!(value instanceof Long)) {
-					Long.parseLong(value.toString());
-				}
-				break;
-
-			case DECIMAL:
-			case NUMERIC:
-				if (!(value instanceof BigDecimal)) {
-					new BigDecimal(value.toString());
-				}
-				break;
-
-			case BOOLEAN:
-				if (!(value instanceof Boolean)) {
-					String strValue = value.toString().toLowerCase();
-
-					if (!strValue.equals("true") && !strValue.equals("false")) {
-						throw new ValidationException(fieldName,
-								value.toString(),
-								"must be a valid boolean value");
+				case INTEGER:
+					if (!(value instanceof Integer)) {
+						Integer.parseInt(value.toString());
 					}
-				}
-				break;
+					break;
 
-			case DATE:
-				if (!(value instanceof LocalDate)) {
-					LocalDate.parse(value.toString());
-				}
-				break;
+				case BIGINT:
+					if (!(value instanceof Long)) {
+						Long.parseLong(value.toString());
+					}
+					break;
 
-			case TIMESTAMP:
-			case DATETIME:
-				if (!(value instanceof LocalDateTime)) {
-					LocalDateTime.parse(value.toString());
-				}
-				break;
+				case DECIMAL:
+				case NUMERIC:
+					if (!(value instanceof BigDecimal)) {
+						new BigDecimal(value.toString());
+					}
+					break;
 
-			case UUID:
-				if (!(value instanceof UUID)) {
-					UUID.fromString(value.toString());
-				}
-				break;
+				case BOOLEAN:
+					if (!(value instanceof Boolean)) {
+						String strValue = value.toString().toLowerCase();
 
-			default:
-				break;
+						if (!strValue.equals("true")
+								&& !strValue.equals("false")) {
+							throw new ValidationException(fieldName,
+									value.toString(),
+									"must be a valid boolean value");
+						}
+					}
+					break;
+
+				case DATE:
+					if (!(value instanceof LocalDate)) {
+						LocalDate.parse(value.toString());
+					}
+					break;
+
+				case TIMESTAMP:
+				case DATETIME:
+					if (!(value instanceof LocalDateTime)) {
+						LocalDateTime.parse(value.toString());
+					}
+					break;
+
+				case UUID:
+					if (!(value instanceof UUID)) {
+						UUID.fromString(value.toString());
+					}
+					break;
+
+				default:
+					break;
 			}
 		} catch (Exception e) {
 			throw new ValidationException(fieldName, value.toString(),
 					String.format("expected type %s", type));
 		}
 	}
+
+	private final CollectionRepository _collectionRepository;
 }
