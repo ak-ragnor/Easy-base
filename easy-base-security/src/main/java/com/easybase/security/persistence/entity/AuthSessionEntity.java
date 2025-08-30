@@ -14,7 +14,7 @@ import lombok.*;
 @Table(name = "eb_auth_sessions", indexes = {
 		@Index(name = "idx_session_token", columnList = "session_token"),
 		@Index(name = "idx_user_tenant", columnList = "user_id, tenant_id"),
-		@Index(name = "idx_expires_at", columnList = "expires_at")})
+		@Index(name = "idx_expires_at", columnList = "expires_at") })
 @Data
 @Builder
 @NoArgsConstructor

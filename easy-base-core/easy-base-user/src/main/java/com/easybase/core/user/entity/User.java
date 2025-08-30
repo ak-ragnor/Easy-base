@@ -15,7 +15,7 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "eb_users", uniqueConstraints = {
-		@UniqueConstraint(columnNames = "email")})
+		@UniqueConstraint(columnNames = "email") })
 @Data
 @Builder
 @NoArgsConstructor

@@ -10,11 +10,18 @@ import lombok.Data;
 @Builder(toBuilder = true)
 public class RefreshToken {
 	private UUID id;
+
 	private UUID userId;
+
 	private UUID tenantId;
+
 	private UUID sessionId;
+
 	private Instant issuedAt;
+
 	private Instant expiresAt;
+
 	private boolean revoked;
+
 	private String rotationParentId;
 }

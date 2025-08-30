@@ -19,11 +19,11 @@ public interface AuthSessionRepository
 
 	Optional<AuthSessionEntity> findBySessionToken(String sessionToken);
 
-	@Query("SELECT s FROM AuthSessionEntity s WHERE s.userId = :userId AND s.revoked = false AND s.expiresAt > :now")
+	@Query("SELECT s FROM AuthSessionEntity s WHERE s.userId = :userId AND s.revoked = false AND s.expiresAt > :now ORDER BY s.updatedAt DESC")
 	List<AuthSessionEntity> findActiveByUserId(@Param("userId") UUID userId,
 			@Param("now") Instant now);
 
-	@Query("SELECT s FROM AuthSessionEntity s WHERE s.userId = :userId AND s.tenantId = :tenantId AND s.revoked = false AND s.expiresAt > :now")
+	@Query("SELECT s FROM AuthSessionEntity s WHERE s.userId = :userId AND s.tenantId = :tenantId AND s.revoked = false AND s.expiresAt > :now ORDER BY s.updatedAt DESC")
 	List<AuthSessionEntity> findActiveByUserIdAndTenantId(
 			@Param("userId") UUID userId, @Param("tenantId") UUID tenantId,
 			@Param("now") Instant now);

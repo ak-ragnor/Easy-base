@@ -24,6 +24,7 @@ public class DataRecordDto {
 	private UUID id;
 
 	@NotNull(message = "Data is required") private Map<String, Object> data = new HashMap<>();
+
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private LocalDateTime createdAt;
 

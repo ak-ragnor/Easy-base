@@ -13,10 +13,15 @@ import lombok.Getter;
 public class ApiPageResponse<T> extends ApiResponse<List<T>> {
 
 	private final int page;
+
 	private final int size;
+
 	private final long totalElements;
+
 	private final int totalPages;
+
 	private final boolean first;
+
 	private final boolean last;
 
 	private ApiPageResponse(List<T> data, Page<?> page) {

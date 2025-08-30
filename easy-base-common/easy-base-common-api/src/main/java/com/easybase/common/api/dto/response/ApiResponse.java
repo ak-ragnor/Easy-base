@@ -14,11 +14,17 @@ import lombok.Getter;
 public class ApiResponse<T> {
 
 	private final boolean success;
+
 	private final String message;
+
 	private final T data;
+
 	private final Object errors;
+
 	private final LocalDateTime timestamp;
+
 	private final Integer statusCode;
+
 	private final String path;
 
 	ApiResponse(boolean success, String message, T data, Object errors,

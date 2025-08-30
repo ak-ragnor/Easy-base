@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 public abstract class BaseApiException extends RuntimeException {
 
 	private final HttpStatus status;
+
 	private final String errorCode;
 
 	public BaseApiException(String message, HttpStatus status,

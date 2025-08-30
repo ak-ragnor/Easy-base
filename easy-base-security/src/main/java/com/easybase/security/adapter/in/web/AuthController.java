@@ -28,12 +28,11 @@ public class AuthController {
 	public ResponseEntity<ApiResponse<TokenResponse>> login(
 			@Valid @RequestBody LoginRequest request,
 			HttpServletRequest httpRequest) {
-
 		String userAgent = httpRequest.getHeader("User-Agent");
-		String ipAddress = _getClientIpAddress(httpRequest);
 
-		TokenResponse response = _authUseCase.login(request, userAgent,
-				ipAddress);
+		TokenResponse response = _authUseCase.login(request.getTenantId(),
+				request.getEmail(), request.getPassword(), userAgent,
+				_getClientIpAddress(httpRequest));
 
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
@@ -42,12 +41,10 @@ public class AuthController {
 	public ResponseEntity<ApiResponse<TokenResponse>> refresh(
 			@Valid @RequestBody RefreshTokenRequest request,
 			HttpServletRequest httpRequest) {
-
 		String userAgent = httpRequest.getHeader("User-Agent");
-		String ipAddress = _getClientIpAddress(httpRequest);
 
-		TokenResponse response = _authUseCase.refresh(request, userAgent,
-				ipAddress);
+		TokenResponse response = _authUseCase.refresh(request.getRefreshToken(),
+				userAgent, _getClientIpAddress(httpRequest));
 
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
@@ -55,10 +52,7 @@ public class AuthController {
 	@PostMapping("/revoke")
 	public ResponseEntity<ApiResponse<Void>> revoke(
 			@RequestHeader("Authorization") String authHeader) {
-
-		String sessionToken = _extractHeader(authHeader);
-
-		_authUseCase.revoke(sessionToken);
+		_authUseCase.revoke(_extractHeader(authHeader));
 
 		return ResponseEntity.ok(ApiResponse.success(null));
 	}
@@ -69,10 +63,8 @@ public class AuthController {
 
 		String sessionToken = _extractHeader(authHeader);
 
-		UUID userId = _authUseCase.getCurrentUserId(sessionToken);
-		UUID tenantId = _authUseCase.getCurrentTenantId(sessionToken);
-
-		_authUseCase.revokeAll(userId, tenantId);
+		_authUseCase.revokeAll(_authUseCase.getCurrentUserId(sessionToken),
+				_authUseCase.getCurrentTenantId(sessionToken));
 
 		return ResponseEntity.ok(ApiResponse.success(null));
 	}
@@ -80,13 +72,10 @@ public class AuthController {
 	@GetMapping("/validate")
 	public ResponseEntity<ApiResponse<Map<String, Boolean>>> validate(
 			@RequestHeader("Authorization") String authHeader) {
+		boolean isValid = _authUseCase
+				.validateToken(_extractHeader(authHeader));
 
-		String sessionToken = _extractHeader(authHeader);
-		boolean isValid = _authUseCase.validateToken(sessionToken);
-
-		Map<String, Boolean> response = Map.of("valid", isValid);
-
-		return ResponseEntity.ok(ApiResponse.success(response));
+		return ResponseEntity.ok(ApiResponse.success(Map.of("valid", isValid)));
 	}
 
 	@GetMapping("/me")
@@ -95,13 +84,9 @@ public class AuthController {
 
 		String sessionToken = _extractHeader(authHeader);
 
-		UUID userId = _authUseCase.getCurrentUserId(sessionToken);
-		UUID tenantId = _authUseCase.getCurrentTenantId(sessionToken);
-
-		Map<String, UUID> response = Map.of("userId", userId, "tenantId",
-				tenantId);
-
-		return ResponseEntity.ok(ApiResponse.success(response));
+		return ResponseEntity.ok(ApiResponse.success(Map.of("userId",
+				_authUseCase.getCurrentUserId(sessionToken), "tenantId",
+				_authUseCase.getCurrentTenantId(sessionToken))));
 	}
 
 	private String _extractHeader(String authHeader) {

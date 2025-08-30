@@ -20,27 +20,39 @@ public class JwtTokenService {
 			String email) {
 
 		return Jwts.builder().subject(userId.toString())
-				.claim("tenantId", tenantId.toString()).claim("email", email)
+				.claim("tenantId", tenantId.toString())
+				.claim("email", email.trim().toLowerCase())
 				.claim("type", "access").issuedAt(new Date())
 				.expiration(_getExpiry(_jwtExpirationSeconds))
 				.signWith(_getSigningKey(), Jwts.SIG.HS256).compact();
 	}
 
 	public Claims getClaimsFromToken(String token) {
+		if (token == null || token.trim().isEmpty()) {
+			throw new IllegalArgumentException("Token cannot be null or empty");
+		}
 
-		return Jwts.parser().verifyWith(_getSigningKey()).build()
-				.parseSignedClaims(token).getPayload();
+		try {
+			return Jwts.parser().verifyWith(_getSigningKey()).build()
+					.parseSignedClaims(token.trim()).getPayload();
+		} catch (JwtException | IllegalArgumentException e) {
+			log.warn("Failed to parse JWT claims: {}", e.getMessage());
+			throw e;
+		}
 	}
 
 	public boolean validateToken(String token) {
+		if (token == null || token.trim().isEmpty()) {
+			return false;
+		}
+
 		try {
 			Jwts.parser().verifyWith(_getSigningKey()).build()
-					.parseSignedClaims(token);
+					.parseSignedClaims(token.trim());
 
 			return true;
 		} catch (JwtException | IllegalArgumentException e) {
-			log.warn("JWT validation failed: {}", e.getMessage());
-
+			log.debug("JWT validation failed: {}", e.getMessage());
 			return false;
 		}
 	}
@@ -92,6 +104,6 @@ public class JwtTokenService {
 	@Value("${easy-base.security.jwt.secret:mysecretmysecretmysecretmysecret}")
 	private String _jwtSecret;
 
-	@Value("${easy-base.security.jwt.expiration:3600}")
+	@Value("${easy-base.security.jwt.expiration:900}")
 	private long _jwtExpirationSeconds;
 }
