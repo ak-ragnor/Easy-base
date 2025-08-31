@@ -2,29 +2,6 @@
 
 Backend server module for the EasyBase platform.
 
-## Structure
-
-```
-src/
-├── main/
-│ ├── java/
-│ │ └── com/easybase/easybaseserver/
-│ │ ├── config/ # Configuration classes
-│ │ ├── controllers/ # REST controllers
-│ │ ├── dto/ # Data Transfer Objects
-│ │ ├── entities/ # JPA entities
-│ │ ├── exceptions/ # Custom exceptions
-│ │ ├── filters/ # Security filters
-│ │ ├── repositories/ # Data repositories
-│ │ ├── security/ # Security configuration
-│ │ ├── services/ # Business logic
-│ │ └── utils/ # Utility classes
-│ └── resources/
-│ ├── db/migration/ # Flyway migrations
-│ └── application.yml # Application configuration
-└── test/ # Test files
-```
-
 ## Running the Server
 
 ```bash
@@ -38,7 +15,6 @@ mvn spring-boot:run
 mvn spring-boot:run -Dspring.profiles.active=dev
 ```
 
-## API Documentation
+## License
 
-Once running, access Swagger UI at:
-http://localhost:8080/api/swagger-ui.html
+This project is licensed under the GNU Lesser General Public License v2.1 or later. See the `LICENSE` file for details.
