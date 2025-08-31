@@ -1,17 +1,23 @@
+/**
+ * EasyBase Platform
+ * Copyright (C) 2024 EasyBase
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 package com.easybase.api.data.engine.controller;
-
-import java.util.List;
-import java.util.UUID;
-
-import jakarta.validation.Valid;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 import com.easybase.api.data.engine.dto.CollectionDto;
 import com.easybase.api.data.engine.dto.mapper.AttributeMapper;
@@ -23,31 +29,62 @@ import com.easybase.core.data.engine.service.CollectionService;
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.service.TenantService;
 
+import jakarta.validation.Valid;
+
+import java.util.UUID;
+import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
 
-@RestController
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * REST controller for collection management operations.
+ *
+ * @author Akhash R
+ */
 @RequestMapping("/easy-base/api/collections")
 @RequiredArgsConstructor
+@RestController
 @Slf4j
 public class CollectionController {
 
 	@PostMapping
 	public ResponseEntity<ApiResponse<CollectionDto>> createCollection(
-			@Valid @RequestBody CollectionDto request) {
+		@RequestBody @Valid CollectionDto request) {
+
 		Tenant tenant = _tenantService.getDefaultTenant();
 
 		Collection collection = _collectionService.createCollection(
-				tenant.getId(), request.getName(),
-				_attributeMapper.toEntity(request.getAttributes()));
+			tenant.getId(), request.getName(),
+			_attributeMapper.toEntity(request.getAttributes()));
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(ApiResponse.success(_collectionMapper.toDto(collection)));
+		ResponseEntity.BodyBuilder responseEntity = ResponseEntity.status(
+			HttpStatus.CREATED);
+
+		return responseEntity.body(
+			ApiResponse.success(_collectionMapper.toDto(collection)));
 	}
 
 	@DeleteMapping("/{collectionId}")
 	public ResponseEntity<ApiResponse<Void>> deleteCollection(
-			@PathVariable UUID collectionId) {
+		@PathVariable UUID collectionId) {
+
 		_collectionService.deleteCollection(collectionId);
 
 		return ResponseEntity.ok(ApiResponse.success(null));
@@ -55,51 +92,56 @@ public class CollectionController {
 
 	@GetMapping("/{collectionName}")
 	public ResponseEntity<ApiResponse<CollectionDto>> getCollection(
-			@PathVariable String collectionName) {
+		@PathVariable String collectionName) {
+
 		Tenant tenant = _tenantService.getDefaultTenant();
 
-		Collection collection = _collectionService.getCollection(tenant.getId(),
-				collectionName);
+		Collection collection = _collectionService.getCollection(
+			tenant.getId(), collectionName);
 
-		return ResponseEntity
-				.ok(ApiResponse.success(_collectionMapper.toDto(collection)));
+		return ResponseEntity.ok(
+			ApiResponse.success(_collectionMapper.toDto(collection)));
 	}
 
 	@GetMapping
 	public ResponseEntity<ApiPageResponse<CollectionDto>> listCollections(
-			@PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+		@PageableDefault(
+			direction = Sort.Direction.DESC, size = 20, sort = "createdAt"
+		)
+		Pageable pageable) {
+
 		Tenant tenant = _tenantService.getDefaultTenant();
 
-		Page<Collection> collections = _collectionService
-				.getCollections(tenant.getId(), pageable);
+		Page<Collection> collections = _collectionService.getCollections(
+			tenant.getId(), pageable);
 
-		List<CollectionDto> collectionDtoList = collections.stream()
-				.map(_collectionMapper::toDto).toList();
+		Stream<Collection> collectionsStream = collections.stream();
 
-		return ResponseEntity
-				.ok(ApiPageResponse.success(collectionDtoList, collections));
+		return ResponseEntity.ok(
+			ApiPageResponse.success(
+				collectionsStream.map(
+					_collectionMapper::toDto
+				).toList(),
+				collections));
 	}
 
 	@PutMapping("/{collectionId}")
 	public ResponseEntity<ApiResponse<CollectionDto>> updateCollection(
-			@PathVariable("collectionId") UUID collectionId,
-			@Valid @RequestBody CollectionDto request) {
+		@PathVariable("collectionId") UUID collectionId,
+		@RequestBody @Valid CollectionDto request) {
 
 		log.debug("Updating collection: {}", collectionId);
 
 		Collection collection = _collectionService.updateCollection(
-				collectionId,
-				_attributeMapper.toEntity(request.getAttributes()));
+			collectionId, _attributeMapper.toEntity(request.getAttributes()));
 
-		return ResponseEntity
-				.ok(ApiResponse.success(_collectionMapper.toDto(collection)));
+		return ResponseEntity.ok(
+			ApiResponse.success(_collectionMapper.toDto(collection)));
 	}
 
 	private final AttributeMapper _attributeMapper;
-
 	private final CollectionMapper _collectionMapper;
-
 	private final CollectionService _collectionService;
-
 	private final TenantService _tenantService;
+
 }

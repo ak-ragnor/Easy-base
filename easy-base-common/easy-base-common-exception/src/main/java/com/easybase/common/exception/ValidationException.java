@@ -1,8 +1,27 @@
+/**
+ * EasyBase Platform
+ * Copyright (C) 2024 EasyBase
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 package com.easybase.common.exception;
 
-import org.springframework.http.HttpStatus;
-
 import com.easybase.common.exception.base.BaseApiException;
+
+import org.springframework.http.HttpStatus;
 
 public class ValidationException extends BaseApiException {
 
@@ -10,13 +29,16 @@ public class ValidationException extends BaseApiException {
 		super(message, HttpStatus.BAD_REQUEST, "VALIDATION_ERROR");
 	}
 
+	public ValidationException(String field, String value, String reason) {
+		super(
+			String.format(
+				"Validation failed for field '%s' with value '%s': %s", field,
+				value, reason),
+			HttpStatus.BAD_REQUEST, "VALIDATION_ERROR");
+	}
+
 	public ValidationException(String message, Throwable cause) {
 		super(message, cause, HttpStatus.BAD_REQUEST, "VALIDATION_ERROR");
 	}
 
-	public ValidationException(String field, String value, String reason) {
-		super(String.format(
-				"Validation failed for field '%s' with value '%s': %s", field,
-				value, reason), HttpStatus.BAD_REQUEST, "VALIDATION_ERROR");
-	}
 }

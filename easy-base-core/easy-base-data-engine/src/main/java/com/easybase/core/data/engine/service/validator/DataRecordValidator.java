@@ -1,12 +1,23 @@
+/**
+ * EasyBase Platform
+ * Copyright (C) 2024 EasyBase
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 package com.easybase.core.data.engine.service.validator;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.UUID;
-
-import org.springframework.stereotype.Component;
 
 import com.easybase.common.exception.ValidationException;
 import com.easybase.core.data.engine.entity.Attribute;
@@ -14,8 +25,20 @@ import com.easybase.core.data.engine.entity.Collection;
 import com.easybase.core.data.engine.enums.AttributeType;
 import com.easybase.core.data.engine.repository.CollectionRepository;
 
+import java.math.BigDecimal;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.stereotype.Component;
 
 /**
  * Validator for record data
@@ -25,13 +48,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DataRecordValidator {
 
-	public void validate(UUID tenantId, String collectionName,
-			Map<String, Object> data) {
-		Collection collection = _collectionRepository
-				.findByTenantIdAndName(tenantId, collectionName).orElse(null);
+	public void validate(
+		UUID tenantId, String collectionName, Map<String, Object> data) {
+
+		Optional<Collection> optionalCollection =
+			_collectionRepository.findByTenantIdAndName(
+				tenantId, collectionName);
+
+		Collection collection = optionalCollection.orElse(null);
 
 		if (collection == null) {
 			log.warn("Collection not found for validation: {}", collectionName);
+
 			return;
 		}
 
@@ -41,16 +69,16 @@ public class DataRecordValidator {
 
 		for (Attribute attribute : collection.getAttributes()) {
 			String fieldName = attribute.getName();
+
 			Object value = data.get(fieldName);
 
 			if (value != null) {
-				validateType(attribute, value);
+				_validateType(attribute, value);
 			}
-
 		}
 	}
 
-	private void validateType(Attribute attribute, Object value) {
+	private void _validateType(Attribute attribute, Object value) {
 		AttributeType type = attribute.getDataType();
 		String fieldName = attribute.getName();
 
@@ -59,18 +87,23 @@ public class DataRecordValidator {
 				case TEXT:
 				case VARCHAR:
 					value.toString();
+
 					break;
 
 				case INTEGER:
 					if (!(value instanceof Integer)) {
-						Integer.parseInt(value.toString());
+						String strValue = value.toString();
+
+						Integer.parseInt(strValue);
 					}
+
 					break;
 
 				case BIGINT:
 					if (!(value instanceof Long)) {
 						Long.parseLong(value.toString());
 					}
+
 					break;
 
 				case DECIMAL:
@@ -78,25 +111,31 @@ public class DataRecordValidator {
 					if (!(value instanceof BigDecimal)) {
 						new BigDecimal(value.toString());
 					}
+
 					break;
 
 				case BOOLEAN:
 					if (!(value instanceof Boolean)) {
-						String strValue = value.toString().toLowerCase();
+						String strValue = value.toString();
 
-						if (!strValue.equals("true")
-								&& !strValue.equals("false")) {
-							throw new ValidationException(fieldName,
-									value.toString(),
-									"must be a valid boolean value");
+						strValue = strValue.toLowerCase();
+
+						if (!strValue.equals("true") &&
+							!strValue.equals("false")) {
+
+							throw new ValidationException(
+								fieldName, value.toString(),
+								"must be a valid boolean value");
 						}
 					}
+
 					break;
 
 				case DATE:
 					if (!(value instanceof LocalDate)) {
 						LocalDate.parse(value.toString());
 					}
+
 					break;
 
 				case TIMESTAMP:
@@ -104,22 +143,32 @@ public class DataRecordValidator {
 					if (!(value instanceof LocalDateTime)) {
 						LocalDateTime.parse(value.toString());
 					}
+
 					break;
 
 				case UUID:
 					if (!(value instanceof UUID)) {
 						UUID.fromString(value.toString());
 					}
+
 					break;
 
 				default:
+
 					break;
 			}
-		} catch (Exception e) {
-			throw new ValidationException(fieldName, value.toString(),
-					String.format("expected type %s", type));
+		}
+		catch (Exception exception) {
+			log.debug(
+				"Validation failed for field {} with value {}: {}", fieldName,
+				value, exception.getMessage());
+
+			throw new ValidationException(
+				fieldName, value.toString(),
+				String.format("expected type %s", type));
 		}
 	}
 
 	private final CollectionRepository _collectionRepository;
+
 }

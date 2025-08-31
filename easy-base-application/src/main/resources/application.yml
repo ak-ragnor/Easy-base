@@ -1,40 +1,34 @@
-spring:
-  application:
-    name: easy-base
-  
-  datasource:
-    url: jdbc:postgresql://localhost:5432/easybase
-    username: root
-    password: root
-    driver-class-name: org.postgresql.Driver
-  
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-  
-  profiles:
-    active: development
-
-server:
-  port: 8080
-  servlet:
-    context-path: /
-
 logging:
-  level:
-    com.easybase: DEBUG
-    org.springframework.web: INFO
-    org.hibernate: INFO
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-
+    level:
+        com.easybase: DEBUG
+        org.hibernate: INFO
+        org.springframework.web: INFO
+    pattern:
+        console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
+    endpoints:
+        web:
+            exposure:
+                include: health,info,metrics
+server:
+    port: 8080
+    servlet:
+        context-path: /
+spring:
+    application:
+        name: easy-base
+    datasource:
+        driver-class-name: org.postgresql.Driver
+        password: root
+        url: jdbc:postgresql://localhost:5432/easybase
+        username: root
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+                format_sql: true
+        show-sql: true
+    profiles:
+        active: development
