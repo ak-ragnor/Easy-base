@@ -1,11 +1,22 @@
-package com.easybase.api.user.dto.mapper;
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
 
-import org.springframework.stereotype.Component;
+package com.easybase.api.user.dto.mapper;
 
 import com.easybase.api.user.dto.UserDto;
 import com.easybase.common.api.dto.mapper.BaseMapper;
+import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.user.entity.User;
 
+import java.util.UUID;
+
+import org.springframework.stereotype.Component;
+
+/**
+ * @author Akhash R
+ */
 @Component
 public class UserMapper implements BaseMapper<User, UserDto> {
 
@@ -22,8 +33,15 @@ public class UserMapper implements BaseMapper<User, UserDto> {
 				setFirstName(user.getFirstName());
 				setLastName(user.getLastName());
 				setDisplayName(user.getDisplayName());
-				setTenantId(user.getTenant() != null ? user.getTenant().getId()
-						: null);
+
+				Tenant tenant = user.getTenant();
+				UUID tenantId = null;
+
+				if (tenant != null) {
+					tenantId = tenant.getId();
+				}
+
+				setTenantId(tenantId);
 				setCreatedAt(user.getCreatedAt());
 				setUpdatedAt(user.getUpdatedAt());
 			}
@@ -45,4 +63,5 @@ public class UserMapper implements BaseMapper<User, UserDto> {
 			}
 		};
 	}
+
 }

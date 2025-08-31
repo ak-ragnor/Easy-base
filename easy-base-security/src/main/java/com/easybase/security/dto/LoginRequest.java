@@ -1,22 +1,32 @@
-package com.easybase.security.dto;
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
 
-import java.util.UUID;
+package com.easybase.security.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.UUID;
+
 import lombok.Data;
 
+/**
+ * @author Akhash R
+ */
 @Data
 public class LoginRequest {
 
-	@NotNull private UUID tenantId;
-
-	@NotBlank
 	@Email
+	@NotBlank
 	private String email;
 
 	@NotBlank
 	private String password;
+
+	@NotNull
+	private UUID tenantId;
+
 }

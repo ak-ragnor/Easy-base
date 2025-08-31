@@ -1,13 +1,9 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 package com.easybase.api.user.controller;
-
-import java.util.List;
-import java.util.UUID;
-
-import jakarta.validation.Valid;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 import com.easybase.api.user.dto.UserDto;
 import com.easybase.api.user.dto.mapper.UserMapper;
@@ -17,45 +13,86 @@ import com.easybase.core.tenant.service.TenantService;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.service.UserService;
 
+import jakarta.validation.Valid;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
 
-@RestController
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @author Akhash R
+ */
+@CrossOrigin(origins = "*")
 @RequestMapping("/easy-base/api/users")
 @RequiredArgsConstructor
+@RestController
 @Slf4j
-@CrossOrigin(origins = "*")
 public class UserController {
 
 	@PostMapping
 	public ResponseEntity<ApiResponse<UserDto>> createUser(
-			@Valid @RequestBody UserDto request) {
+		@RequestBody @Valid UserDto request) {
+
 		Tenant tenant = _tenantService.getDefaultTenant();
 
-		User user = _userService.createUser(request.getEmail(),
-				request.getFirstName(), request.getLastName(),
-				request.getDisplayName(), tenant.getId());
+		User user = _userService.createUser(
+			request.getEmail(), request.getFirstName(), request.getLastName(),
+			request.getDisplayName(), tenant.getId());
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(ApiResponse.success(_userMapper.toDto(user)));
+		ApiResponse<UserDto> response = ApiResponse.success(
+			_userMapper.toDto(user));
+
+		ResponseEntity.BodyBuilder responseEntity = ResponseEntity.status(
+			HttpStatus.CREATED);
+
+		return responseEntity.body(response);
+	}
+
+	@DeleteMapping("/{userId}")
+	public ResponseEntity<ApiResponse<Void>> deleteUser(
+		@PathVariable("userId") UUID userId) {
+
+		_userService.deleteUser(userId);
+
+		return ResponseEntity.ok(ApiResponse.success(null));
 	}
 
 	@GetMapping("/{userId}")
 	public ResponseEntity<ApiResponse<UserDto>> getUser(
-			@PathVariable("userId") UUID userId) {
-		User user = _userService.getUser(userId);
+		@PathVariable("userId") UUID userId) {
 
-		return ResponseEntity.ok(ApiResponse.success(_userMapper.toDto(user)));
+		return ResponseEntity.ok(
+			ApiResponse.success(
+				_userMapper.toDto(_userService.getUser(userId))));
 	}
 
 	@GetMapping("/by-email")
 	public ResponseEntity<ApiResponse<UserDto>> getUserByEmail(
-			@RequestParam("email") String email) {
+		@RequestParam("email") String email) {
+
 		Tenant tenant = _tenantService.getDefaultTenant();
 
-		User user = _userService.getUser(email, tenant.getId());
-
-		return ResponseEntity.ok(ApiResponse.success(_userMapper.toDto(user)));
+		return ResponseEntity.ok(
+			ApiResponse.success(
+				_userMapper.toDto(
+					_userService.getUser(email, tenant.getId()))));
 	}
 
 	@GetMapping
@@ -64,36 +101,33 @@ public class UserController {
 
 		List<User> users = _userService.getUsers(tenant.getId());
 
-		List<UserDto> userDtos = users.stream().map(_userMapper::toDto)
-				.toList();
+		List<UserDto> userDtos = new ArrayList<>();
 
-		return ResponseEntity.ok(ApiResponse.success(userDtos));
+		for (User user : users) {
+			userDtos.add(_userMapper.toDto(user));
+		}
+
+		ApiResponse<List<UserDto>> response = ApiResponse.success(userDtos);
+
+		return ResponseEntity.ok(response);
 	}
 
 	@PutMapping("/{userId}")
 	public ResponseEntity<ApiResponse<UserDto>> updateUser(
-			@PathVariable("userId") UUID userId,
-			@Valid @RequestBody UserDto request) {
+		@PathVariable("userId") UUID userId,
+		@RequestBody @Valid UserDto request) {
 
 		log.debug("Updating user: {}", userId);
 
-		User user = _userService.updateUser(userId, request.getFirstName(),
-				request.getLastName(), request.getDisplayName());
+		User user = _userService.updateUser(
+			userId, request.getFirstName(), request.getLastName(),
+			request.getDisplayName());
 
 		return ResponseEntity.ok(ApiResponse.success(_userMapper.toDto(user)));
 	}
 
-	@DeleteMapping("/{userId}")
-	public ResponseEntity<ApiResponse<Void>> deleteUser(
-			@PathVariable("userId") UUID userId) {
-		_userService.deleteUser(userId);
-
-		return ResponseEntity.ok(ApiResponse.success(null));
-	}
-
+	private final TenantService _tenantService;
 	private final UserMapper _userMapper;
-
 	private final UserService _userService;
 
-	private final TenantService _tenantService;
 }

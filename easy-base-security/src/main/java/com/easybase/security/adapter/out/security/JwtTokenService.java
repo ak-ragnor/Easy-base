@@ -1,109 +1,187 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 package com.easybase.security.adapter.out.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.JwtParserBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
 import java.nio.charset.StandardCharsets;
+
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
+
 import javax.crypto.SecretKey;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
-
+/**
+ * @author Akhash R
+ */
 @Service
 @Slf4j
 public class JwtTokenService {
 
-	public String generateAccessToken(UUID userId, UUID tenantId,
-			String email) {
+	public String generateAccessToken(
+		UUID userId, UUID tenantId, String email) {
 
-		return Jwts.builder().subject(userId.toString())
-				.claim("tenantId", tenantId.toString())
-				.claim("email", email.trim().toLowerCase())
-				.claim("type", "access").issuedAt(new Date())
-				.expiration(_getExpiry(_jwtExpirationSeconds))
-				.signWith(_getSigningKey(), Jwts.SIG.HS256).compact();
+		String sanitizedEmail = email.trim();
+
+		return Jwts.builder(
+		).subject(
+			userId.toString()
+		).claim(
+			"tenantId", tenantId.toString()
+		).claim(
+			"email", sanitizedEmail.toLowerCase()
+		).claim(
+			"type", "access"
+		).issuedAt(
+			new Date()
+		).expiration(
+			_getExpiry(_jwtExpirationSeconds)
+		).signWith(
+			_getSigningKey(), Jwts.SIG.HS256
+		).compact();
 	}
 
 	public Claims getClaimsFromToken(String token) {
-		if (token == null || token.trim().isEmpty()) {
+		if (token == null) {
+			throw new IllegalArgumentException("Token cannot be null or empty");
+		}
+
+		String trimmedToken = token.trim();
+
+		if (trimmedToken.isEmpty()) {
 			throw new IllegalArgumentException("Token cannot be null or empty");
 		}
 
 		try {
-			return Jwts.parser().verifyWith(_getSigningKey()).build()
-					.parseSignedClaims(token.trim()).getPayload();
-		} catch (JwtException | IllegalArgumentException e) {
-			log.warn("Failed to parse JWT claims: {}", e.getMessage());
-			throw e;
+			JwtParserBuilder parserBuilder = Jwts.parser();
+
+			parserBuilder = parserBuilder.verifyWith(_getSigningKey());
+
+			JwtParser parser = parserBuilder.build();
+
+			Jws<Claims> jws = parser.parseSignedClaims(trimmedToken);
+
+			return jws.getPayload();
 		}
-	}
+		catch (IllegalArgumentException | JwtException exception) {
+			log.warn("Failed to parse JWT claims: {}", exception.getMessage());
 
-	public boolean validateToken(String token) {
-		if (token == null || token.trim().isEmpty()) {
-			return false;
+			throw exception;
 		}
-
-		try {
-			Jwts.parser().verifyWith(_getSigningKey()).build()
-					.parseSignedClaims(token.trim());
-
-			return true;
-		} catch (JwtException | IllegalArgumentException e) {
-			log.debug("JWT validation failed: {}", e.getMessage());
-			return false;
-		}
-	}
-
-	public UUID getUserIdFromToken(String token) {
-
-		return UUID.fromString(getClaimsFromToken(token).getSubject());
-	}
-
-	public UUID getTenantIdFromToken(String token) {
-
-		return UUID.fromString(
-				getClaimsFromToken(token).get("tenantId", String.class));
 	}
 
 	public String getEmailFromToken(String token) {
-		return getClaimsFromToken(token).get("email", String.class);
+		Claims claims = getClaimsFromToken(token);
+
+		return claims.get("email", String.class);
+	}
+
+	public UUID getTenantIdFromToken(String token) {
+		Claims claims = getClaimsFromToken(token);
+
+		String tenantIdString = claims.get("tenantId", String.class);
+
+		return UUID.fromString(tenantIdString);
+	}
+
+	public UUID getUserIdFromToken(String token) {
+		Claims claims = getClaimsFromToken(token);
+
+		String userIdString = claims.getSubject();
+
+		return UUID.fromString(userIdString);
+	}
+
+	public boolean isAccessToken(String token) {
+		Claims claims = getClaimsFromToken(token);
+
+		String type = claims.get("type", String.class);
+
+		return Objects.equals(type, "access");
 	}
 
 	public boolean isTokenExpired(String token) {
 		try {
-			return getClaimsFromToken(token).getExpiration().before(new Date());
-		} catch (ExpiredJwtException e) {
+			Claims claims = getClaimsFromToken(token);
+
+			Date expiration = claims.getExpiration();
+
+			return expiration.before(new Date());
+		}
+		catch (ExpiredJwtException expiredJwtException) {
 			return true;
-		} catch (JwtException e) {
-			log.debug("Invalid token while checking expiration: {}",
-					e.getMessage());
+		}
+		catch (JwtException jwtException) {
+			log.debug(
+				"Invalid token while checking expiration: {}",
+				jwtException.getMessage());
 
 			return true;
 		}
 	}
 
-	public boolean isAccessToken(String token) {
+	public boolean validateToken(String token) {
+		if (token == null) {
+			return false;
+		}
 
-		return "access"
-				.equals(getClaimsFromToken(token).get("type", String.class));
+		String trimmedToken = token.trim();
+
+		if (trimmedToken.isEmpty()) {
+			return false;
+		}
+
+		try {
+			JwtParserBuilder parserBuilder = Jwts.parser();
+
+			parserBuilder = parserBuilder.verifyWith(_getSigningKey());
+
+			JwtParser parser = parserBuilder.build();
+
+			parser.parseSignedClaims(trimmedToken);
+
+			return true;
+		}
+		catch (IllegalArgumentException | JwtException exception) {
+			log.debug("JWT validation failed: {}", exception.getMessage());
+
+			return false;
+		}
 	}
 
 	private Date _getExpiry(long seconds) {
+		long millis = seconds * 1000;
+		long now = System.currentTimeMillis();
 
-		return new Date(System.currentTimeMillis() + seconds * 1000);
+		return new Date(now + millis);
 	}
 
 	private SecretKey _getSigningKey() {
+		byte[] secretBytes = _jwtSecret.getBytes(StandardCharsets.UTF_8);
 
-		return Keys.hmacShaKeyFor(_jwtSecret.getBytes(StandardCharsets.UTF_8));
+		return Keys.hmacShaKeyFor(secretBytes);
 	}
+
+	@Value("${easy-base.security.jwt.expiration:900}")
+	private long _jwtExpirationSeconds;
 
 	@Value("${easy-base.security.jwt.secret:mysecretmysecretmysecretmysecret}")
 	private String _jwtSecret;
 
-	@Value("${easy-base.security.jwt.expiration:900}")
-	private long _jwtExpirationSeconds;
 }

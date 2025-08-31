@@ -1,26 +1,36 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 package com.easybase.security.domain.port.out;
+
+import com.easybase.security.domain.model.AuthSession;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.easybase.security.domain.model.AuthSession;
-
+/**
+ * @author Akhash R
+ */
 public interface SaveSessionPort {
 
-	AuthSession save(AuthSession session);
+	public void deleteExpiredSessions();
 
-	Optional<AuthSession> findById(UUID sessionId);
+	public List<AuthSession> findActiveByUserId(UUID userId);
 
-	Optional<AuthSession> findBySessionToken(String sessionToken);
+	public List<AuthSession> findActiveByUserIdAndTenantId(
+		UUID userId, UUID tenantId);
 
-	List<AuthSession> findActiveByUserId(UUID userId);
+	public Optional<AuthSession> findById(UUID sessionId);
 
-	List<AuthSession> findActiveByUserIdAndTenantId(UUID userId, UUID tenantId);
+	public Optional<AuthSession> findBySessionToken(String sessionToken);
 
-	void revokeAllByUserId(UUID userId);
+	public void revokeAllByUserId(UUID userId);
 
-	void revokeAllByUserIdAndTenantId(UUID userId, UUID tenantId);
+	public void revokeAllByUserIdAndTenantId(UUID userId, UUID tenantId);
 
-	void deleteExpiredSessions();
+	public AuthSession save(AuthSession session);
+
 }

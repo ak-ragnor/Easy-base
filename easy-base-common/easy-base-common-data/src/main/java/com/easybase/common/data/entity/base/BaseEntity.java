@@ -1,43 +1,33 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 package com.easybase.common.data.entity.base;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+
 import java.time.LocalDateTime;
+
 import java.util.UUID;
-
-import jakarta.persistence.*;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@MappedSuperclass
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+/**
+ * @author Akhash R
+ */
 @Getter
+@MappedSuperclass
 @Setter
 @ToString
 public abstract class BaseEntity {
-
-	@Id
-	@Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
-	private UUID id = UUID.randomUUID();
-
-	@CreationTimestamp
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
-	@UpdateTimestamp
-	@Column(name = "updated_at", nullable = false)
-	private LocalDateTime updatedAt;
-
-	@Column(name = "created_by", updatable = false)
-	protected String createdBy;
-
-	@Column(name = "updated_by")
-	protected String updatedBy;
-
-	@Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
-	private Boolean isDeleted = false;
 
 	@Override
 	public boolean equals(Object o) {
@@ -45,11 +35,17 @@ public abstract class BaseEntity {
 			return true;
 		}
 
-		if (!(o instanceof BaseEntity that)) {
+		if (!(o instanceof BaseEntity)) {
 			return false;
 		}
 
-		return id != null && id.equals(that.id);
+		BaseEntity that = (BaseEntity)o;
+
+		if ((id != null) && id.equals(that.id)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -60,4 +56,32 @@ public abstract class BaseEntity {
 
 		return id.hashCode();
 	}
+
+	@Column(name = "created_by", updatable = false)
+	protected String createdBy;
+
+	@Column(name = "updated_by")
+	protected String updatedBy;
+
+	@Column(name = "created_at", nullable = false, updatable = false)
+	@CreationTimestamp
+	private LocalDateTime createdAt;
+
+	@Column(
+		columnDefinition = "boolean default false", name = "is_deleted",
+		nullable = false
+	)
+	private Boolean deleted = false;
+
+	@Column(
+		columnDefinition = "uuid", name = "id", nullable = false,
+		updatable = false
+	)
+	@Id
+	private UUID id = UUID.randomUUID();
+
+	@Column(name = "updated_at", nullable = false)
+	@UpdateTimestamp
+	private LocalDateTime updatedAt;
+
 }

@@ -1,6 +1,12 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 package com.easybase.security.dto;
 
 import java.time.Instant;
+
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -8,27 +14,40 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@Builder
-@NoArgsConstructor
+/**
+ * @author Akhash R
+ */
 @AllArgsConstructor
+@Builder
+@Data
+@NoArgsConstructor
 public class TokenResponse {
 
+	@SuppressWarnings("unused")
 	private String accessToken;
 
-	private String refreshToken;
-
-	private String tokenType;
-
-	private Long expiresIn;
-
+	@SuppressWarnings("unused")
 	private Instant expiresAt;
 
-	private UUID userId;
+	@SuppressWarnings("unused")
+	private Long expiresIn;
 
+	@SuppressWarnings("unused")
+	private String refreshToken;
+
+	@SuppressWarnings("unused")
 	private UUID tenantId;
 
+	@SuppressWarnings("unused")
+	private String tokenType;
+
+	@SuppressWarnings("unused")
+	private String userDisplayName;
+
+	@SuppressWarnings("unused")
 	private String userEmail;
 
-	private String userDisplayName;
+	@SuppressWarnings("unused")
+	private UUID userId;
+
 }

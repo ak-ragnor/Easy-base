@@ -1,25 +1,38 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 package com.easybase.core.data.engine.service;
-
-import java.util.*;
-
-import org.springframework.stereotype.Service;
 
 import com.easybase.common.exception.ResourceNotFoundException;
 import com.easybase.core.data.engine.entity.DataRecord;
 import com.easybase.core.data.engine.repository.DataRecordRepository;
 import com.easybase.core.data.engine.service.validator.DataRecordValidator;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 
-@Service
+import org.springframework.stereotype.Service;
+
+/**
+ * @author Akhash R
+ */
 @RequiredArgsConstructor
+@Service
 public class DataRecordService {
 
-	public DataRecord createRecord(UUID tenantId, String table,
-			Map<String, Object> data) {
+	public DataRecord createRecord(
+		UUID tenantId, String table, Map<String, Object> data) {
+
 		_dataRecordValidator.validate(tenantId, table, data);
-		return _dataRecordRepository.insert(tenantId, table, UUID.randomUUID(),
-				data);
+
+		return _dataRecordRepository.insert(
+			tenantId, table, UUID.randomUUID(), data);
 	}
 
 	public void deleteRecord(UUID tenantId, String table, UUID id) {
@@ -27,21 +40,29 @@ public class DataRecordService {
 	}
 
 	public DataRecord getRecord(UUID tenantId, String table, UUID id) {
-		return _dataRecordRepository.findById(tenantId, table, id).orElseThrow(
-				() -> new ResourceNotFoundException("Record", "id", id));
+		Optional<DataRecord> recordOptional = _dataRecordRepository.findById(
+			tenantId, table, id);
+
+		if (recordOptional.isEmpty()) {
+			throw new ResourceNotFoundException("Record", "id", id);
+		}
+
+		return recordOptional.get();
 	}
 
 	public List<DataRecord> getRecords(UUID tenantId, String table) {
 		return _dataRecordRepository.findAll(tenantId, table);
 	}
 
-	public DataRecord updateRecord(UUID tenantId, String table, UUID id,
-			Map<String, Object> data) {
+	public DataRecord updateRecord(
+		UUID tenantId, String table, UUID id, Map<String, Object> data) {
+
 		_dataRecordValidator.validate(tenantId, table, data);
+
 		return _dataRecordRepository.update(tenantId, table, id, data);
 	}
 
 	private final DataRecordRepository _dataRecordRepository;
-
 	private final DataRecordValidator _dataRecordValidator;
+
 }

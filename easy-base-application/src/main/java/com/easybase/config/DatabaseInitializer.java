@@ -1,20 +1,30 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 package com.easybase.config;
 
 import jakarta.annotation.PostConstruct;
 
-import org.jooq.DSLContext;
-import org.springframework.context.annotation.Configuration;
-
 import lombok.RequiredArgsConstructor;
 
+import org.jooq.DSLContext;
+
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * @author Akhash R
+ */
 @Configuration
 @RequiredArgsConstructor
 public class DatabaseInitializer {
 
-	private final DSLContext dsl;
-
 	@PostConstruct
 	public void initializeDatabaseExtensions() {
-		dsl.execute("CREATE EXTENSION IF NOT EXISTS \"pgcrypto\";");
+		_dslContext.execute("CREATE EXTENSION IF NOT EXISTS \"pgcrypto\";");
 	}
+
+	private final DSLContext _dslContext;
+
 }

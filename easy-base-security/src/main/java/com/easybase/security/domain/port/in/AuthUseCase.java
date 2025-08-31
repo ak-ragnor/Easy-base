@@ -1,24 +1,34 @@
-package com.easybase.security.domain.port.in;
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
 
-import java.util.UUID;
+package com.easybase.security.domain.port.in;
 
 import com.easybase.security.dto.TokenResponse;
 
+import java.util.UUID;
+
+/**
+ * @author Akhash R
+ */
 public interface AuthUseCase {
 
-	TokenResponse login(UUID tenantId, String email, String password,
-			String userAgent, String ipAddress);
+	public UUID getCurrentTenantId(String sessionToken);
 
-	TokenResponse refresh(String refreshToken, String userAgent,
-			String ipAddress);
+	public UUID getCurrentUserId(String sessionToken);
 
-	void revoke(String sessionToken);
+	public TokenResponse login(
+		UUID tenantId, String email, String password, String userAgent,
+		String ipAddress);
 
-	void revokeAll(UUID userId, UUID tenantId);
+	public TokenResponse refresh(
+		String refreshToken, String userAgent, String ipAddress);
 
-	boolean validateToken(String sessionToken);
+	public void revoke(String sessionToken);
 
-	UUID getCurrentUserId(String sessionToken);
+	public void revokeAll(UUID userId, UUID tenantId);
 
-	UUID getCurrentTenantId(String sessionToken);
+	public boolean validateToken(String sessionToken);
+
 }

@@ -1,9 +1,17 @@
-package com.easybase.common.exception;
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
 
-import org.springframework.http.HttpStatus;
+package com.easybase.common.exception;
 
 import com.easybase.common.exception.base.BaseApiException;
 
+import org.springframework.http.HttpStatus;
+
+/**
+ * @author Akhash R
+ */
 public class ServiceUnavailableException extends BaseApiException {
 
 	public ServiceUnavailableException(String message) {
@@ -11,7 +19,9 @@ public class ServiceUnavailableException extends BaseApiException {
 	}
 
 	public ServiceUnavailableException(String message, Throwable cause) {
-		super(message, cause, HttpStatus.SERVICE_UNAVAILABLE,
-				"SERVICE_UNAVAILABLE");
+		super(
+			message, cause, HttpStatus.SERVICE_UNAVAILABLE,
+			"SERVICE_UNAVAILABLE");
 	}
+
 }

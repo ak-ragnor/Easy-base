@@ -1,27 +1,48 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 package com.easybase.common.api.dto.mapper;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * @author Akhash R
+ */
 public interface BaseMapper<E, D> {
 
-	D toDto(E entity);
+	public D toDto(E entity);
 
-	E toEntity(D dto);
-
-	default List<D> toDto(List<E> entities) {
+	public default List<D> toDto(List<E> entities) {
 		if (entities == null) {
 			return List.of();
 		}
 
-		return entities.stream().map(this::toDto).collect(Collectors.toList());
+		List<D> dtos = new ArrayList<>(entities.size());
+
+		for (E entity : entities) {
+			dtos.add(toDto(entity));
+		}
+
+		return dtos;
 	}
 
-	default List<E> toEntity(List<D> dtos) {
+	public E toEntity(D dto);
+
+	public default List<E> toEntity(List<D> dtos) {
 		if (dtos == null) {
 			return List.of();
 		}
 
-		return dtos.stream().map(this::toEntity).collect(Collectors.toList());
+		List<E> entities = new ArrayList<>(dtos.size());
+
+		for (D dto : dtos) {
+			entities.add(toEntity(dto));
+		}
+
+		return entities;
 	}
+
 }

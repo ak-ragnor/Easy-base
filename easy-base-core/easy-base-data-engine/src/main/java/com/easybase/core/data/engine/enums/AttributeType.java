@@ -1,27 +1,25 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 package com.easybase.core.data.engine.enums;
 
 import lombok.Getter;
 
 /**
  * Supported attribute types for dynamic collections
+ *
+ * @author Akhash R
  */
 @Getter
 public enum AttributeType {
 
-	TEXT("text"), VARCHAR("varchar"), CHAR("char"),
-
-	INTEGER("integer"), BIGINT("bigint"), DECIMAL("decimal"), NUMERIC(
-			"numeric"), REAL("real"), DOUBLE("double precision"),
-
-	BOOLEAN("boolean"),
-
-	DATE("date"), TIME("time"), TIMESTAMP("timestamp"), DATETIME("timestamp"),
-
-	UUID("uuid"),
-
-	JSON("json"), JSONB("jsonb"),
-
-	BYTEA("bytea");
+	BIGINT("bigint"), BOOLEAN("boolean"), BYTEA("bytea"), CHAR("char"),
+	DATE("date"), DATETIME("timestamp"), DECIMAL("decimal"),
+	DOUBLE("double precision"), INTEGER("integer"), JSON("json"),
+	JSONB("jsonb"), NUMERIC("numeric"), REAL("real"), TEXT("text"),
+	TIME("time"), TIMESTAMP("timestamp"), UUID("uuid"), VARCHAR("varchar");
 
 	private final String postgresType;
 

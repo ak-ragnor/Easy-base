@@ -1,18 +1,32 @@
-package com.easybase.system.entity;
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
 
-import jakarta.persistence.*;
+package com.easybase.system.entity;
 
 import com.easybase.common.data.entity.base.BaseEntity;
 
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
-@EqualsAndHashCode(callSuper = true)
-@Entity
-@Table(name = "eb_system_info")
-@Data
-@Builder
-@NoArgsConstructor
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+/**
+ * @author Akhash R
+ */
 @AllArgsConstructor
+@Builder
+@Data
+@Entity
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@Table(name = "eb_system_info")
 public class SystemInfo extends BaseEntity {
 
 	@Column(name = "app_version", nullable = false)
