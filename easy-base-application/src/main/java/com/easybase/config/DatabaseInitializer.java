@@ -13,6 +13,9 @@ import org.jooq.DSLContext;
 
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * @author Akhash R
+ */
 @Configuration
 @RequiredArgsConstructor
 public class DatabaseInitializer {

@@ -11,6 +11,9 @@ import com.easybase.core.user.entity.UserCredential;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * @author Akhash R
+ */
 public interface LoadUserPort {
 
 	public Optional<User> findByEmailAndTenantId(String email, UUID tenantId);

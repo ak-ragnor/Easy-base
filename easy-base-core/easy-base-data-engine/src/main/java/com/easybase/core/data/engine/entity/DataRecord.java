@@ -15,6 +15,8 @@ import lombok.Data;
 
 /**
  * Data record entity representing dynamic data
+ *
+ * @author Akhash R
  */
 @AllArgsConstructor
 @Data

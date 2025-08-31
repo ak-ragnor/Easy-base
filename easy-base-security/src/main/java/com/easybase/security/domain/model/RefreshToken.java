@@ -12,6 +12,9 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * @author Akhash R
+ */
 @Builder(toBuilder = true)
 @Data
 public class RefreshToken {

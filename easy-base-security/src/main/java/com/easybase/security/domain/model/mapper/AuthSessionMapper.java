@@ -15,6 +15,9 @@ import java.time.ZonedDateTime;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Akhash R
+ */
 @Component
 public class AuthSessionMapper {
 

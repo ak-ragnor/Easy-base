@@ -9,6 +9,9 @@ import jakarta.validation.constraints.NotBlank;
 
 import lombok.Data;
 
+/**
+ * @author Akhash R
+ */
 @Data
 public class RefreshTokenRequest {
 

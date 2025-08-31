@@ -49,6 +49,8 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Repository for dynamic record operations
+ *
+ * @author Akhash R
  */
 @Repository
 @RequiredArgsConstructor

@@ -19,6 +19,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
+/**
+ * @author Akhash R
+ */
 @RequiredArgsConstructor
 @Service
 public class DataRecordService {

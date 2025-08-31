@@ -19,6 +19,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+/**
+ * @author Akhash R
+ */
 @Repository
 public interface AuthSessionRepository
 	extends JpaRepository<AuthSessionEntity, UUID> {

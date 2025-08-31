@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 
 /**
  * API response wrapper for paginated data.
+ *
+ * @author Akhash R
  */
 @Getter
 public class ApiPageResponse<T> extends ApiResponse<List<T>> {

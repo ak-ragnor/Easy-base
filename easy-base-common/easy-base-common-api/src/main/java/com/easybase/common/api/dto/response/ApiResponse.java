@@ -13,6 +13,8 @@ import lombok.Getter;
 
 /**
  * Generic API response wrapper.
+ *
+ * @author Akhash R
  */
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)

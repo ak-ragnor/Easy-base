@@ -11,6 +11,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+/**
+ * @author Akhash R
+ */
 @Configuration
 @EnableJpaAuditing
 @EnableJpaRepositories(basePackages = "com.easybase")

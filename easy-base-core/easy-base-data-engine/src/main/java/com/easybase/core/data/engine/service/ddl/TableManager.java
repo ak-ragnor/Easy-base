@@ -14,6 +14,9 @@ import org.jooq.impl.SQLDataType;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Akhash R
+ */
 @Component
 @RequiredArgsConstructor
 public class TableManager {

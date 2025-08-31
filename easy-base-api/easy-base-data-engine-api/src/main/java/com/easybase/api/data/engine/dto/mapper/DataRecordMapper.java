@@ -11,6 +11,9 @@ import com.easybase.core.data.engine.entity.DataRecord;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Akhash R
+ */
 @Component
 public class DataRecordMapper implements BaseMapper<DataRecord, DataRecordDto> {
 

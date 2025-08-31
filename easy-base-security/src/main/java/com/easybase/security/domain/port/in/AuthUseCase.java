@@ -9,6 +9,9 @@ import com.easybase.security.dto.TokenResponse;
 
 import java.util.UUID;
 
+/**
+ * @author Akhash R
+ */
 public interface AuthUseCase {
 
 	public UUID getCurrentTenantId(String sessionToken);

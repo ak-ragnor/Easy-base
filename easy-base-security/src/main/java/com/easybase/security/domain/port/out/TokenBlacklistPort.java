@@ -7,6 +7,9 @@ package com.easybase.security.domain.port.out;
 
 import java.time.Instant;
 
+/**
+ * @author Akhash R
+ */
 public interface TokenBlacklistPort {
 
 	public void blacklistToken(String token, Instant expiration);

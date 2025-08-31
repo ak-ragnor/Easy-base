@@ -9,6 +9,9 @@ import com.easybase.common.exception.base.BaseApiException;
 
 import org.springframework.http.HttpStatus;
 
+/**
+ * @author Akhash R
+ */
 public class ServiceUnavailableException extends BaseApiException {
 
 	public ServiceUnavailableException(String message) {

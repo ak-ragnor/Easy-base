@@ -30,6 +30,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * @author Akhash R
+ */
 @AllArgsConstructor
 @Builder
 @Data
@@ -38,7 +41,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(
 	name = "eb_users",
-	uniqueConstraints = {@UniqueConstraint(columnNames = "email")}
+	uniqueConstraints = @UniqueConstraint(columnNames = "email")
 )
 public class User extends BaseEntity {
 

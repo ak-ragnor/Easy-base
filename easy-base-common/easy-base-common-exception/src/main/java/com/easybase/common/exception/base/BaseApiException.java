@@ -7,6 +7,9 @@ package com.easybase.common.exception.base;
 
 import org.springframework.http.HttpStatus;
 
+/**
+ * @author Akhash R
+ */
 public abstract class BaseApiException extends RuntimeException {
 
 	public BaseApiException(

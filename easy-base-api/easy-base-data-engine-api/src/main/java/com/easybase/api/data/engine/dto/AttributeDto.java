@@ -20,6 +20,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * DTO for attribute information
+ *
+ * @author Akhash R
  */
 @AllArgsConstructor
 @Data

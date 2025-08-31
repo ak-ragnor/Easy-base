@@ -14,6 +14,9 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * @author Akhash R
+ */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {

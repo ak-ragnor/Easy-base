@@ -16,6 +16,9 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * @author Akhash R
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor

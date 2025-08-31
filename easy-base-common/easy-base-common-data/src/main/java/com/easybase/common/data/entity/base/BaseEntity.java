@@ -20,6 +20,9 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+/**
+ * @author Akhash R
+ */
 @Getter
 @MappedSuperclass
 @Setter

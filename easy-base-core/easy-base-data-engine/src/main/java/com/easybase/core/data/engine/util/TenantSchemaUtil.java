@@ -10,6 +10,9 @@ import java.util.UUID;
 import org.jooq.Name;
 import org.jooq.impl.DSL;
 
+/**
+ * @author Akhash R
+ */
 public class TenantSchemaUtil {
 
 	public static String getSchema(UUID tenantId) {

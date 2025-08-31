@@ -13,6 +13,9 @@ import java.util.UUID;
 
 import lombok.Data;
 
+/**
+ * @author Akhash R
+ */
 @Data
 public class LoginRequest {
 

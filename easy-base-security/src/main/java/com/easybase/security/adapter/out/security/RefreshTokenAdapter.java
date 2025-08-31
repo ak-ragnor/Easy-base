@@ -24,6 +24,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author Akhash R
+ */
 @Component
 @RequiredArgsConstructor
 public class RefreshTokenAdapter implements RefreshTokenPort {

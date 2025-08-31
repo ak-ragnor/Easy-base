@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Validator for record data
+ * @author Akhash R
  */
 @Component
 @RequiredArgsConstructor

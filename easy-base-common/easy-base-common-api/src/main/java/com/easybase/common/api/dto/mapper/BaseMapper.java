@@ -8,6 +8,9 @@ package com.easybase.common.api.dto.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Akhash R
+ */
 public interface BaseMapper<E, D> {
 
 	public D toDto(E entity);

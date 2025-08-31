@@ -9,6 +9,8 @@ import lombok.Getter;
 
 /**
  * Supported attribute types for dynamic collections
+ *
+ * @author Akhash R
  */
 @Getter
 public enum AttributeType {

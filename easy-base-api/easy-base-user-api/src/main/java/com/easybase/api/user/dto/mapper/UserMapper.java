@@ -14,6 +14,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Akhash R
+ */
 @Component
 public class UserMapper implements BaseMapper<User, UserDto> {
 

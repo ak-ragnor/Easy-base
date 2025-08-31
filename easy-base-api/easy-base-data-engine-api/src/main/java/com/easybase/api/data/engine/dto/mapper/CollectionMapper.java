@@ -19,6 +19,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Akhash R
+ */
 @Component
 @RequiredArgsConstructor
 public class CollectionMapper implements BaseMapper<Collection, CollectionDto> {

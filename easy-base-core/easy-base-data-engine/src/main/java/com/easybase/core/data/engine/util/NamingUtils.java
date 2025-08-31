@@ -9,6 +9,8 @@ import java.util.UUID;
 
 /**
  * Utility class for naming conventions and sanitization
+ *
+ * @author Akhash R
  */
 public class NamingUtils {
 

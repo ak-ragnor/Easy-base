@@ -11,6 +11,9 @@ import com.easybase.core.data.engine.entity.Attribute;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Akhash R
+ */
 @Component
 public class AttributeMapper implements BaseMapper<Attribute, AttributeDto> {
 

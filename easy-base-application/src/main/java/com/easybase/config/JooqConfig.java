@@ -14,6 +14,9 @@ import org.jooq.impl.DSL;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * @author Akhash R
+ */
 @Configuration
 public class JooqConfig {
 

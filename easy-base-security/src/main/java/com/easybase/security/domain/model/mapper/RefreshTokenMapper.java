@@ -10,6 +10,9 @@ import com.easybase.security.persistence.entity.RefreshTokenEntity;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Akhash R
+ */
 @Component
 public class RefreshTokenMapper {
 

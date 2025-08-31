@@ -30,6 +30,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * @author Akhash R
+ */
 @RequestMapping("/easy-base/api/auth")
 @RequiredArgsConstructor
 @RestController
