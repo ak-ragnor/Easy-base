@@ -5,8 +5,17 @@
 
 package com.easybase.infrastructure.data.config;
 
+import jakarta.annotation.PostConstruct;
+
+import javax.sql.DataSource;
+
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -70,6 +79,40 @@ public class DataInfrastructureConfig {
 	@Configuration
 	@EnableTransactionManagement
 	static class TransactionConfig {
+	}
+
+	/**
+	 * Configuration for JOOQ DSL context.
+	 * Provides DSL context bean for type-safe SQL query building.
+	 */
+	@Configuration
+	static class JooqConfig {
+
+		@Bean
+		public DSLContext dslContext(DataSource dataSource) {
+			return DSL.using(dataSource, SQLDialect.POSTGRES);
+		}
+
+	}
+
+	/**
+	 * Configuration for database initialization.
+	 * Handles database setup and extension installation.
+	 */
+	@Configuration
+	static class DatabaseInitializerConfig {
+
+		@PostConstruct
+		public void initializeDatabaseExtensions() {
+			_dslContext.execute("CREATE EXTENSION IF NOT EXISTS \"pgcrypto\";");
+		}
+
+		private final DSLContext _dslContext;
+
+		DatabaseInitializerConfig(DSLContext dslContext) {
+			_dslContext = dslContext;
+		}
+
 	}
 
 }

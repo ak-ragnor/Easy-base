@@ -51,6 +51,11 @@
 			<artifactId>easy-base-infrastructure-data</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-infrastructure-web</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.jooq</groupId>

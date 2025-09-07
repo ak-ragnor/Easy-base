@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.config;
+package com.easybase.infrastructure.web.config;
 
 import com.easybase.common.exception.ExpiredTokenException;
 import com.easybase.common.exception.HttpErrorHandler;
