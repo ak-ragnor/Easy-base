@@ -5,11 +5,11 @@
 
 package com.easybase.security.adapter.in.auth;
 
-import com.easybase.common.api.auth.AuthResult;
-import com.easybase.common.api.auth.AuthenticationService;
-import com.easybase.common.api.auth.TokenValidator;
 import com.easybase.common.exception.ExpiredTokenException;
 import com.easybase.common.exception.InvalidTokenException;
+import com.easybase.security.domain.model.AuthResult;
+import com.easybase.security.domain.port.in.AuthenticationService;
+import com.easybase.security.domain.port.in.TokenValidator;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -41,7 +41,7 @@ public class AuthenticationFacade implements AuthenticationService {
 	 * @throws ExpiredTokenException if token is expired
 	 */
 	@Override
-	public AuthResult _authenticate(HttpServletRequest request)
+	public AuthResult authenticate(HttpServletRequest request)
 		throws ExpiredTokenException, InvalidTokenException {
 
 		for (TokenValidator validator : _validators) {

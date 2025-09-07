@@ -33,6 +33,25 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- New context modules -->
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-context-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-context-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Infrastructure modules -->
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-infrastructure-data</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.jooq</groupId>
 			<artifactId>jooq</artifactId>

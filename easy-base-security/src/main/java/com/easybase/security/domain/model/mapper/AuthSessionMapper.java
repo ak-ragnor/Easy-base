@@ -5,8 +5,8 @@
 
 package com.easybase.security.domain.model.mapper;
 
+import com.easybase.security.adapter.out.persistence.entity.AuthSessionEntity;
 import com.easybase.security.domain.model.AuthSession;
-import com.easybase.security.persistence.entity.AuthSessionEntity;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

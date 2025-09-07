@@ -15,8 +15,6 @@
 	<description>Common components for EasyBase Platform</description>
 
 	<modules>
-		<module>easy-base-common-api</module>
-		<module>easy-base-common-data</module>
 		<module>easy-base-common-exception</module>
 	</modules>
 </project>

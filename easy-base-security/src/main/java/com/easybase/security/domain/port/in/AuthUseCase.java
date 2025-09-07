@@ -5,7 +5,7 @@
 
 package com.easybase.security.domain.port.in;
 
-import com.easybase.security.dto.TokenResponse;
+import com.easybase.security.domain.model.AuthToken;
 
 import java.util.UUID;
 
@@ -18,11 +18,11 @@ public interface AuthUseCase {
 
 	public UUID getCurrentUserId(String sessionToken);
 
-	public TokenResponse login(
+	public AuthToken login(
 		UUID tenantId, String email, String password, String userAgent,
 		String ipAddress);
 
-	public TokenResponse refresh(
+	public AuthToken refresh(
 		String refreshToken, String userAgent, String ipAddress);
 
 	public void revoke(String sessionToken);

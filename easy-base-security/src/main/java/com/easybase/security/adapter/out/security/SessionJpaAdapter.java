@@ -5,11 +5,11 @@
 
 package com.easybase.security.adapter.out.security;
 
+import com.easybase.security.adapter.out.persistence.entity.AuthSessionEntity;
+import com.easybase.security.adapter.out.persistence.repository.AuthSessionRepository;
 import com.easybase.security.domain.model.AuthSession;
 import com.easybase.security.domain.model.mapper.AuthSessionMapper;
 import com.easybase.security.domain.port.out.SaveSessionPort;
-import com.easybase.security.persistence.entity.AuthSessionEntity;
-import com.easybase.security.persistence.repository.AuthSessionRepository;
 
 import java.time.Instant;
 

@@ -7,11 +7,10 @@ package com.easybase.api.user.controller;
 
 import com.easybase.api.user.dto.UserDto;
 import com.easybase.api.user.dto.mapper.UserMapper;
-import com.easybase.common.api.dto.response.ApiResponse;
-import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.core.tenant.service.TenantService;
+import com.easybase.context.api.domain.ServiceContext;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.service.UserService;
+import com.easybase.infrastructure.api.dto.response.ApiResponse;
 
 import jakarta.validation.Valid;
 
@@ -50,11 +49,9 @@ public class UserController {
 	public ResponseEntity<ApiResponse<UserDto>> createUser(
 		@RequestBody @Valid UserDto request) {
 
-		Tenant tenant = _tenantService.getDefaultTenant();
-
 		User user = _userService.createUser(
 			request.getEmail(), request.getFirstName(), request.getLastName(),
-			request.getDisplayName(), tenant.getId());
+			request.getDisplayName(), _serviceContext.tenantId());
 
 		ApiResponse<UserDto> response = ApiResponse.success(
 			_userMapper.toDto(user));
@@ -87,19 +84,15 @@ public class UserController {
 	public ResponseEntity<ApiResponse<UserDto>> getUserByEmail(
 		@RequestParam("email") String email) {
 
-		Tenant tenant = _tenantService.getDefaultTenant();
-
 		return ResponseEntity.ok(
 			ApiResponse.success(
 				_userMapper.toDto(
-					_userService.getUser(email, tenant.getId()))));
+					_userService.getUser(email, _serviceContext.tenantId()))));
 	}
 
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<UserDto>>> getUsers() {
-		Tenant tenant = _tenantService.getDefaultTenant();
-
-		List<User> users = _userService.getUsers(tenant.getId());
+		List<User> users = _userService.getUsers(_serviceContext.tenantId());
 
 		List<UserDto> userDtos = new ArrayList<>();
 
@@ -126,7 +119,7 @@ public class UserController {
 		return ResponseEntity.ok(ApiResponse.success(_userMapper.toDto(user)));
 	}
 
-	private final TenantService _tenantService;
+	private final ServiceContext _serviceContext;
 	private final UserMapper _userMapper;
 	private final UserService _userService;
 

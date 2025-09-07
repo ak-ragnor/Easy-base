@@ -5,9 +5,9 @@
 
 package com.easybase.security.adapter.in.auth;
 
-import com.easybase.common.api.auth.AuthResult;
-import com.easybase.common.api.auth.TokenValidator;
 import com.easybase.common.exception.InvalidTokenException;
+import com.easybase.security.domain.model.AuthResult;
+import com.easybase.security.domain.port.in.TokenValidator;
 
 import jakarta.servlet.http.HttpServletRequest;
 

@@ -11,6 +11,7 @@ import com.easybase.core.user.entity.User;
 import com.easybase.core.user.entity.UserCredential;
 import com.easybase.security.adapter.out.security.JwtTokenService;
 import com.easybase.security.domain.model.AuthSession;
+import com.easybase.security.domain.model.AuthToken;
 import com.easybase.security.domain.model.RefreshToken;
 import com.easybase.security.domain.port.in.AuthUseCase;
 import com.easybase.security.domain.port.out.LoadUserPort;
@@ -18,7 +19,6 @@ import com.easybase.security.domain.port.out.RefreshTokenPort;
 import com.easybase.security.domain.port.out.SaveSessionPort;
 import com.easybase.security.domain.port.out.TokenBlacklistPort;
 import com.easybase.security.domain.service.AuthDomainService;
-import com.easybase.security.dto.TokenResponse;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -63,7 +63,7 @@ public class AuthApplicationService implements AuthUseCase {
 
 	@Override
 	@Transactional
-	public TokenResponse login(
+	public AuthToken login(
 			UUID tenantId, String email, String password, String userAgent,
 			String ipAddress)
 		throws UnauthorizedException {
@@ -87,7 +87,7 @@ public class AuthApplicationService implements AuthUseCase {
 
 	@Override
 	@Transactional
-	public TokenResponse refresh(
+	public AuthToken refresh(
 			String refreshTokenId, String userAgent, String ipAddress)
 		throws UnauthorizedException {
 
@@ -197,7 +197,7 @@ public class AuthApplicationService implements AuthUseCase {
 		);
 	}
 
-	private TokenResponse _buildTokenResponse(
+	private AuthToken _buildTokenResponse(
 		AuthSession session, RefreshToken refreshToken, User user) {
 
 		Instant now = Instant.now();
@@ -209,19 +209,26 @@ public class AuthApplicationService implements AuthUseCase {
 
 		String refreshIdString = String.valueOf(refreshToken.getId());
 
-		TokenResponse tokenResponse = new TokenResponse();
-
-		tokenResponse.setAccessToken(session.getSessionToken());
-		tokenResponse.setRefreshToken(refreshIdString);
-		tokenResponse.setTokenType("Bearer");
-		tokenResponse.setExpiresIn(expiresInSeconds);
-		tokenResponse.setExpiresAt(sessionExpiry);
-		tokenResponse.setUserId(session.getUserId());
-		tokenResponse.setTenantId(session.getTenantId());
-		tokenResponse.setUserEmail(user.getEmail());
-		tokenResponse.setUserDisplayName(user.getDisplayName());
-
-		return tokenResponse;
+		return AuthToken.builder(
+		).accessToken(
+			session.getSessionToken()
+		).refreshToken(
+			refreshIdString
+		).tokenType(
+			"Bearer"
+		).expiresIn(
+			expiresInSeconds
+		).expiresAt(
+			sessionExpiry
+		).userId(
+			session.getUserId()
+		).tenantId(
+			session.getTenantId()
+		).userEmail(
+			user.getEmail()
+		).userDisplayName(
+			user.getDisplayName()
+		).build();
 	}
 
 	private RefreshToken _createAndSaveRefreshToken(

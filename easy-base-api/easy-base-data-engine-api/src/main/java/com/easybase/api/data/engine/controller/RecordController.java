@@ -7,11 +7,10 @@ package com.easybase.api.data.engine.controller;
 
 import com.easybase.api.data.engine.dto.DataRecordDto;
 import com.easybase.api.data.engine.dto.mapper.DataRecordMapper;
-import com.easybase.common.api.dto.response.ApiResponse;
+import com.easybase.context.api.domain.ServiceContext;
 import com.easybase.core.data.engine.entity.DataRecord;
 import com.easybase.core.data.engine.service.DataRecordService;
-import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.core.tenant.service.TenantService;
+import com.easybase.infrastructure.api.dto.response.ApiResponse;
 
 import jakarta.validation.Valid;
 
@@ -49,10 +48,8 @@ public class RecordController {
 
 		log.debug("Creating record in collection: {}", collectionName);
 
-		Tenant tenant = _tenantService.getDefaultTenant();
-
 		DataRecord dataRecord = _dataRecordService.createRecord(
-			tenant.getId(), collectionName, request.getData());
+			_serviceContext.tenantId(), collectionName, request.getData());
 
 		ResponseEntity.BodyBuilder responseEntity = ResponseEntity.status(
 			HttpStatus.CREATED);
@@ -68,10 +65,8 @@ public class RecordController {
 
 		log.debug("Deleting record {} from collection: {}", id, collectionName);
 
-		Tenant tenant = _tenantService.getDefaultTenant();
-
 		_dataRecordService.deleteRecord(
-			tenant.getId(), collectionName, UUID.fromString(id));
+			_serviceContext.tenantId(), collectionName, UUID.fromString(id));
 
 		return ResponseEntity.ok(ApiResponse.success(null));
 	}
@@ -82,10 +77,8 @@ public class RecordController {
 
 		log.debug("Getting all records from collection: {}", collectionName);
 
-		Tenant tenant = _tenantService.getDefaultTenant();
-
 		List<DataRecord> dataRecordList = _dataRecordService.getRecords(
-			tenant.getId(), collectionName);
+			_serviceContext.tenantId(), collectionName);
 
 		return ResponseEntity.ok(
 			ApiResponse.success(_dataRecordMapper.toDto(dataRecordList)));
@@ -98,10 +91,8 @@ public class RecordController {
 
 		log.debug("Getting record {} from collection: {}", id, collectionName);
 
-		Tenant tenant = _tenantService.getDefaultTenant();
-
 		DataRecord dataRecord = _dataRecordService.getRecord(
-			tenant.getId(), collectionName, UUID.fromString(id));
+			_serviceContext.tenantId(), collectionName, UUID.fromString(id));
 
 		return ResponseEntity.ok(
 			ApiResponse.success(_dataRecordMapper.toDto(dataRecord)));
@@ -115,10 +106,8 @@ public class RecordController {
 
 		log.debug("Updating record {} in collection: {}", id, collectionName);
 
-		Tenant tenant = _tenantService.getDefaultTenant();
-
 		DataRecord dataRecord = _dataRecordService.updateRecord(
-			tenant.getId(), collectionName, UUID.fromString(id),
+			_serviceContext.tenantId(), collectionName, UUID.fromString(id),
 			request.getData());
 
 		return ResponseEntity.ok(
@@ -127,6 +116,6 @@ public class RecordController {
 
 	private final DataRecordMapper _dataRecordMapper;
 	private final DataRecordService _dataRecordService;
-	private final TenantService _tenantService;
+	private final ServiceContext _serviceContext;
 
 }

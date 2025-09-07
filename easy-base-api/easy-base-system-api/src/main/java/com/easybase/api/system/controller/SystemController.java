@@ -5,7 +5,7 @@
 
 package com.easybase.api.system.controller;
 
-import com.easybase.common.api.dto.response.ApiResponse;
+import com.easybase.infrastructure.api.dto.response.ApiResponse;
 import com.easybase.system.entity.SystemInfo;
 import com.easybase.system.repository.SystemInfoRepository;
 

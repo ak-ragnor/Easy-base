@@ -5,11 +5,11 @@
 
 package com.easybase.security.adapter.out.security;
 
+import com.easybase.security.adapter.out.persistence.entity.RefreshTokenEntity;
+import com.easybase.security.adapter.out.persistence.repository.RefreshTokenRepository;
 import com.easybase.security.domain.model.RefreshToken;
 import com.easybase.security.domain.model.mapper.RefreshTokenMapper;
 import com.easybase.security.domain.port.out.RefreshTokenPort;
-import com.easybase.security.persistence.entity.RefreshTokenEntity;
-import com.easybase.security.persistence.repository.RefreshTokenRepository;
 
 import java.time.Instant;
 

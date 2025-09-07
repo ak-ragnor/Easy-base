@@ -5,11 +5,12 @@
 
 package com.easybase.security.adapter.in.web;
 
-import com.easybase.common.api.dto.response.ApiResponse;
+import com.easybase.infrastructure.api.dto.response.ApiResponse;
+import com.easybase.security.adapter.in.web.dto.LoginRequest;
+import com.easybase.security.adapter.in.web.dto.RefreshTokenRequest;
+import com.easybase.security.adapter.in.web.dto.TokenResponse;
+import com.easybase.security.domain.model.AuthToken;
 import com.easybase.security.domain.port.in.AuthUseCase;
-import com.easybase.security.dto.LoginRequest;
-import com.easybase.security.dto.RefreshTokenRequest;
-import com.easybase.security.dto.TokenResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -60,9 +61,11 @@ public class AuthController {
 
 		String userAgent = httpRequest.getHeader("User-Agent");
 
-		TokenResponse response = _authUseCase.login(
+		AuthToken authToken = _authUseCase.login(
 			request.getTenantId(), request.getEmail(), request.getPassword(),
 			userAgent, _getClientIpAddress(httpRequest));
+
+		TokenResponse response = _toTokenResponse(authToken);
 
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
@@ -74,9 +77,11 @@ public class AuthController {
 
 		String userAgent = httpRequest.getHeader("User-Agent");
 
-		TokenResponse response = _authUseCase.refresh(
+		AuthToken authToken = _authUseCase.refresh(
 			request.getRefreshToken(), userAgent,
 			_getClientIpAddress(httpRequest));
+
+		TokenResponse response = _toTokenResponse(authToken);
 
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
@@ -134,6 +139,22 @@ public class AuthController {
 		}
 
 		return request.getRemoteAddr();
+	}
+
+	private TokenResponse _toTokenResponse(AuthToken authToken) {
+		TokenResponse response = new TokenResponse();
+
+		response.setAccessToken(authToken.getAccessToken());
+		response.setRefreshToken(authToken.getRefreshToken());
+		response.setTokenType(authToken.getTokenType());
+		response.setExpiresIn(authToken.getExpiresIn());
+		response.setExpiresAt(authToken.getExpiresAt());
+		response.setUserId(authToken.getUserId());
+		response.setTenantId(authToken.getTenantId());
+		response.setUserEmail(authToken.getUserEmail());
+		response.setUserDisplayName(authToken.getUserDisplayName());
+
+		return response;
 	}
 
 	private final AuthUseCase _authUseCase;

@@ -5,7 +5,7 @@
 
 package com.easybase.system.entity;
 
-import com.easybase.common.data.entity.base.BaseEntity;
+import com.easybase.infrastructure.data.entity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

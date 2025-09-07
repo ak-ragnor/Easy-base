@@ -18,13 +18,19 @@
 
 		<dependency>
 			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-common-api</artifactId>
+			<artifactId>easy-base-common-data</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-common-data</artifactId>
+			<artifactId>easy-base-infrastructure-api</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-infrastructure-web</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 

@@ -5,8 +5,8 @@
 
 package com.easybase.security.domain.model.mapper;
 
+import com.easybase.security.adapter.out.persistence.entity.RefreshTokenEntity;
 import com.easybase.security.domain.model.RefreshToken;
-import com.easybase.security.persistence.entity.RefreshTokenEntity;
 
 import org.springframework.stereotype.Component;
 

@@ -5,7 +5,7 @@
 
 package com.easybase.config;
 
-import com.easybase.common.api.context.ServiceContext;
+import com.easybase.context.api.domain.ServiceContext;
 
 import jakarta.servlet.http.HttpServletRequest;
 

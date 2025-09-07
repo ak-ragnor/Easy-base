@@ -5,8 +5,8 @@
 
 package com.easybase.core.user.entity;
 
-import com.easybase.common.data.entity.base.BaseEntity;
 import com.easybase.core.tenant.entity.Tenant;
+import com.easybase.infrastructure.data.entity.BaseEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

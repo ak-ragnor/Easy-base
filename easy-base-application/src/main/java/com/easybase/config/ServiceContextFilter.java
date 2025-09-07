@@ -5,11 +5,11 @@
 
 package com.easybase.config;
 
-import com.easybase.common.api.context.ContextProvider;
-import com.easybase.common.api.context.HttpErrorHandler;
-import com.easybase.common.api.context.ServiceContext;
 import com.easybase.common.exception.ExpiredTokenException;
+import com.easybase.common.exception.HttpErrorHandler;
 import com.easybase.common.exception.InvalidTokenException;
+import com.easybase.context.api.domain.ServiceContext;
+import com.easybase.context.api.port.ContextProvider;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;

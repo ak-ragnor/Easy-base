@@ -6,8 +6,8 @@
 package com.easybase.api.data.engine.dto.mapper;
 
 import com.easybase.api.data.engine.dto.DataRecordDto;
-import com.easybase.common.api.dto.mapper.BaseMapper;
 import com.easybase.core.data.engine.entity.DataRecord;
+import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
 import org.springframework.stereotype.Component;
 
