@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,7 +32,6 @@ import lombok.ToString;
  * @author Akhash R
  */
 @AllArgsConstructor
-@Builder
 @Entity
 @Getter
 @NoArgsConstructor
@@ -66,7 +64,6 @@ public class Collection extends BaseEntity {
 		attribute.setCollection(null);
 	}
 
-	@Builder.Default
 	@OneToMany(
 		cascade = CascadeType.ALL, fetch = FetchType.LAZY,
 		mappedBy = "collection"

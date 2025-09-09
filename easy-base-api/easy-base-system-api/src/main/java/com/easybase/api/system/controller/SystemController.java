@@ -75,16 +75,13 @@ public class SystemController {
 	}
 
 	private SystemInfo _createDefaultSystemInfo() {
-		SystemInfo newInfo = SystemInfo.builder(
-		).appVersion(
-			_APP_VERSION
-		).dbVersion(
-			_DB_VERSION
-		).status(
-			"ACTIVE"
-		).build();
+		SystemInfo systemInfo = new SystemInfo();
 
-		return _systemInfoRepository.save(newInfo);
+		systemInfo.setAppVersion(_APP_VERSION);
+		systemInfo.setDbVersion(_DB_VERSION);
+		systemInfo.setStatus("ACTIVE");
+
+		return _systemInfoRepository.save(systemInfo);
 	}
 
 	private static final String _APP_VERSION = "1.0.0-SNAPSHOT";

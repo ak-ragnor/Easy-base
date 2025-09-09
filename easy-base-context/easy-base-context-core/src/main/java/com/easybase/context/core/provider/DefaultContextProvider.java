@@ -5,8 +5,6 @@
 
 package com.easybase.context.core.provider;
 
-import com.easybase.common.exception.ExpiredTokenException;
-import com.easybase.common.exception.InvalidTokenException;
 import com.easybase.context.api.domain.CorrelationIds;
 import com.easybase.context.api.domain.ServiceContext;
 import com.easybase.context.api.domain.TenantInfo;
@@ -15,8 +13,9 @@ import com.easybase.context.api.port.ContextProvider;
 import com.easybase.context.api.port.TenantInfoResolver;
 import com.easybase.context.api.port.UserInfoResolver;
 import com.easybase.context.core.impl.ServiceContextImpl;
-import com.easybase.security.domain.model.AuthResult;
-import com.easybase.security.domain.port.in.AuthenticationService;
+import com.easybase.security.api.dto.AuthenticatedPrincipalData;
+import com.easybase.security.api.exception.AuthenticationException;
+import com.easybase.security.api.service.AuthenticationFacade;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -39,17 +38,24 @@ public class DefaultContextProvider implements ContextProvider {
 
 	@Override
 	public ServiceContext build(HttpServletRequest request) {
-		AuthResult authResult = null;
+		AuthenticatedPrincipalData principalData = null;
 
 		try {
-			authResult = _authenticationService.authenticate(request);
+			String token = _extractTokenFromRequest(request);
+
+			if (token != null) {
+				principalData = _authenticationFacade.authenticateByToken(
+					token);
+			}
 		}
-		catch (ExpiredTokenException | InvalidTokenException exception) {
-			log.debug("Authentication failed: {}", exception.getMessage());
+		catch (AuthenticationException authenticationException) {
+			log.debug(
+				"Authentication failed: {}",
+				authenticationException.getMessage());
 		}
 
-		UserInfo user = _resolveUser(authResult);
-		TenantInfo tenant = _resolveTenant(authResult);
+		UserInfo user = _resolveUser(principalData);
+		TenantInfo tenant = _resolveTenant(principalData);
 		CorrelationIds correlation = _buildCorrelation(request);
 
 		return ServiceContextImpl.builder(
@@ -60,9 +66,9 @@ public class DefaultContextProvider implements ContextProvider {
 		).correlation(
 			correlation
 		).issuedAt(
-			(authResult != null) ? authResult.getIssuedAt() : null
+			(principalData != null) ? principalData.getIssuedAt() : null
 		).expiresAt(
-			(authResult != null) ? authResult.getExpiresAt() : null
+			(principalData != null) ? principalData.getExpiresAt() : null
 		).clientIp(
 			_getClientIpAddress(request)
 		).userAgent(
@@ -80,6 +86,16 @@ public class DefaultContextProvider implements ContextProvider {
 		}
 
 		return new CorrelationIds(requestId, sessionId, traceId);
+	}
+
+	private String _extractTokenFromRequest(HttpServletRequest request) {
+		String authHeader = request.getHeader("Authorization");
+
+		if ((authHeader != null) && authHeader.startsWith("Bearer ")) {
+			return authHeader.substring(7);
+		}
+
+		return null;
 	}
 
 	private String _getClientIpAddress(HttpServletRequest request) {
@@ -102,41 +118,43 @@ public class DefaultContextProvider implements ContextProvider {
 		return request.getRemoteAddr();
 	}
 
-	private TenantInfo _resolveTenant(AuthResult authResult) {
-		if (authResult == null) {
+	private TenantInfo _resolveTenant(
+		AuthenticatedPrincipalData principalData) {
+
+		if (principalData == null) {
 			return TenantInfo.publicTenant();
 		}
 
 		try {
-			return _tenantInfoResolver.resolve(authResult.getTenantId());
+			return _tenantInfoResolver.resolve(principalData.getTenantId());
 		}
 		catch (Exception exception) {
 			log.warn(
 				"Failed to resolve tenant {}, using public tenant",
-				authResult.getTenantId(), exception);
+				principalData.getTenantId(), exception);
 
 			return TenantInfo.publicTenant();
 		}
 	}
 
-	private UserInfo _resolveUser(AuthResult authResult) {
-		if (authResult == null) {
+	private UserInfo _resolveUser(AuthenticatedPrincipalData principalData) {
+		if (principalData == null) {
 			return UserInfo.anonymous();
 		}
 
 		try {
-			return _userInfoResolver.resolve(authResult.getUserId());
+			return _userInfoResolver.resolve(principalData.getUserId());
 		}
 		catch (Exception exception) {
 			log.warn(
 				"Failed to resolve user {}, using anonymous",
-				authResult.getUserId(), exception);
+				principalData.getUserId(), exception);
 
 			return UserInfo.anonymous();
 		}
 	}
 
-	private final AuthenticationService _authenticationService;
+	private final AuthenticationFacade _authenticationFacade;
 	private final TenantInfoResolver _tenantInfoResolver;
 	private final UserInfoResolver _userInfoResolver;
 

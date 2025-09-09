@@ -29,7 +29,7 @@
 
 		<dependency>
 			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-security</artifactId>
+			<artifactId>easy-base-security-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

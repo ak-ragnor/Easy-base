@@ -1,0 +1,53 @@
+easy:
+    base:
+        security:
+            enabled: true
+            jwt:
+                access-token-ttl: PT15M # 15 minutes
+                algorithm: RS256
+                audience: easy-base-platform
+                issuer: easy-base-auth
+                key-id: default
+                refresh-token-ttl: P7D # 7 days
+                rotate-refresh-tokens: true
+                # For development only - use proper keys in production
+                secret-key: "dev-secret-key-change-in-production"
+                # For production, use RSA keys:
+                # private-key: |
+                # -----BEGIN PRIVATE KEY-----
+                # ...your private key...
+                # -----END PRIVATE KEY-----
+                # public-key: |
+                # -----BEGIN PUBLIC KEY-----
+                # ...your public key...
+                # -----END PUBLIC KEY-----
+            session:
+                cleanup-grace-period: P7D # 7 days
+                cleanup-interval: PT1H # 1 hour
+                default-ttl: P30D # 30 days
+                max-sessions-per-user: 5
+                sliding-expiration: true
+# Logging configuration
+logging:
+    level:
+        com.easybase.security: DEBUG
+        org.springframework.security: DEBUG
+# Database configuration for sessions
+spring:
+    datasource:
+        driver-class-name: org.postgresql.Driver
+        password: your_password
+        url: jdbc:postgresql://localhost:5432/easybase
+        username: easybase_user
+    flyway:
+        baseline-on-migrate: true
+        enabled: true
+        locations: classpath:db/migration
+    jpa:
+        hibernate:
+            ddl-auto: validate # Let Flyway handle schema
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+                format_sql: true
+        show-sql: false
