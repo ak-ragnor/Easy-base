@@ -7,6 +7,9 @@ package com.easybase.infrastructure.web.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Central configuration for web infrastructure layer.
@@ -23,12 +26,17 @@ import org.springframework.context.annotation.Configuration;
 	name = "easybase.web.infrastructure.enabled"
 )
 @Configuration
-public class WebInfrastructureConfig {
+public class WebInfrastructureConfig implements WebMvcConfigurer {
 
 	/**
 	 * Configuration for service context and HTTP request processing.
 	 * This will be populated with specific web configurations as they are moved
 	 * from the application layer.
 	 */
+	@Override
+	public void configurePathMatch(PathMatchConfigurer configurer) {
+		configurer.addPathPrefix(
+			"/easy-base/api", c -> c.isAnnotationPresent(RestController.class));
+	}
 
 }

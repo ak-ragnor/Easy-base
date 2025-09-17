@@ -23,19 +23,16 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class PostgreSQLTestBase {
 
 	@Container
-	static final PostgreSQLContainer<?> _postgresContainer =
-		_createPostgresContainer();
-
-	private static PostgreSQLContainer<?> _createPostgresContainer() {
-		PostgreSQLContainer<?> container = new PostgreSQLContainer<>(
-			"postgres:15-alpine");
-
-		container.withDatabaseName("easybase_test");
-		container.withUsername("test");
-		container.withPassword("test");
-
-		return container;
-	}
+	private static final PostgreSQLContainer<?> _postgresContainer =
+		new PostgreSQLContainer<>(
+			"postgres:15-alpine"
+		).withDatabaseName(
+			"easybase_test"
+		).withUsername(
+			"test"
+		).withPassword(
+			"test"
+		);
 
 	@BeforeAll
 	static void _startContainer() {

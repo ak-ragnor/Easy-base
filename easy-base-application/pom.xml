@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0           http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -14,46 +18,49 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-data-engine-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-security-starter</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-system-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-user-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<!-- New context modules -->
-		<dependency>
-			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-context-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-context-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Infrastructure modules -->
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-data-engine-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-infrastructure-data</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-infrastructure-web</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-security-starter</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-system-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-user-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -62,11 +69,13 @@
 			<artifactId>jooq</artifactId>
 			<version>3.19.8</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -78,18 +87,22 @@
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>

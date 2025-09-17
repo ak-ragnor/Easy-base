@@ -26,16 +26,19 @@ import javax.crypto.spec.SecretKeySpec;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 
 /**
+ * Default implementation of {@link KeyManager} that handles JWT signing keys
+ * for both symmetric (HMAC) and asymmetric (RSA) algorithms.
+ *
+ * <p>This key manager supports automatic key generation for development
+ * and configuration-based keys for production environments.</p>
+ *
  * @author Akhash
  */
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class DefaultKeyManager implements KeyManager {
 
 	@Override
@@ -61,6 +64,12 @@ public class DefaultKeyManager implements KeyManager {
 		return keyPair.getPublic();
 	}
 
+	/**
+	 * Gets the signing key for JWT token operations.
+	 * Initializes keys if not already done.
+	 *
+	 * @return the signing key (SecretKey for HMAC, PrivateKey for RSA)
+	 */
 	public Key getSigningKey() {
 		if (signingKey == null) {
 			_initializeKeys();
@@ -70,9 +79,6 @@ public class DefaultKeyManager implements KeyManager {
 	}
 
 	private void _generateDefaultRsaKeys() throws Exception {
-		log.warn(
-			"No RSA keys configured. Generating default keys for development. Use proper keys in production!");
-
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 
 		keyGen.initialize(2048);
@@ -87,9 +93,6 @@ public class DefaultKeyManager implements KeyManager {
 
 		if ((secret == null) || _isEmptyAfterTrim(secret)) {
 			secret = "default-dev-secret-key-change-in-production";
-
-			log.warn(
-				"Using default HMAC secret key. Change this in production!");
 		}
 
 		signingKey = new SecretKeySpec(
@@ -106,8 +109,6 @@ public class DefaultKeyManager implements KeyManager {
 			}
 		}
 		catch (Exception exception) {
-			log.error("Failed to initialize JWT keys", exception);
-
 			throw new RuntimeException(
 				"Failed to initialize JWT keys", exception);
 		}

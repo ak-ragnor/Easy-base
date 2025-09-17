@@ -11,6 +11,7 @@ import com.easybase.context.api.port.UserInfoResolver;
 
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
@@ -32,7 +33,9 @@ public class CachingUserInfoResolver implements UserInfoResolver {
 	 *
 	 * @param delegate the underlying resolver to delegate cache misses to
 	 */
-	public CachingUserInfoResolver(UserInfoResolver delegate) {
+	public CachingUserInfoResolver(
+		@Qualifier("defaultUserInfoResolver") UserInfoResolver delegate) {
+
 		_cachingResolver = new CachingResolver<>(delegate::resolve);
 	}
 

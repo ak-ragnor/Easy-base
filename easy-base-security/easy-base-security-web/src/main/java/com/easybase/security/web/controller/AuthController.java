@@ -31,8 +31,6 @@ import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -47,12 +45,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * REST controller that handles authentication-related operations including
+ * login, logout, token refresh, and session management.
+ *
+ * <p>This controller provides endpoints for user authentication, session listing,
+ * and token operations with proper security validation.</p>
+ *
  * @author Akhash
  */
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 @RestController
-@Slf4j
 public class AuthController {
 
 	@GetMapping("/sessions")
@@ -78,12 +81,6 @@ public class AuthController {
 		@RequestBody @Valid LoginRequest loginRequest,
 		HttpServletRequest request) {
 
-		log.info(
-			"Login attempt for user: {} tenant: {}", loginRequest.getUserName(),
-			loginRequest.getTenantId());
-
-		// Enhance login request with client information
-
 		loginRequest.setClientIp(_getClientIp(request));
 		loginRequest.setUserAgent(request.getHeader("User-Agent"));
 
@@ -99,11 +96,6 @@ public class AuthController {
 
 		TokenResponse response = TokenResponse.of(
 			accessToken, refreshToken, ttlSeconds.toSeconds(),
-			principal.getSessionId());
-
-		log.info(
-			"Successfully authenticated user: {} for tenant: {} with session: {}",
-			loginRequest.getUserName(), loginRequest.getTenantId(),
 			principal.getSessionId());
 
 		return ResponseEntity.ok(response);
@@ -132,7 +124,6 @@ public class AuthController {
 
 		if (sessionId != null) {
 			_authenticationFacade.logout(sessionId);
-			log.info("Successfully logged out session: {}", sessionId);
 		}
 
 		SecurityContextHolder.clearContext();
@@ -144,8 +135,6 @@ public class AuthController {
 	@PostMapping("/refresh")
 	public ResponseEntity<TokenResponse> refresh(
 		@RequestBody @Valid RefreshTokenRequest refreshRequest) {
-
-		log.debug("Token refresh attempt");
 
 		try {
 			AuthenticatedPrincipalData principal =
@@ -173,17 +162,9 @@ public class AuthController {
 				accessToken, refreshToken, ttlSeconds.toSeconds(),
 				principal.getSessionId());
 
-			log.debug(
-				"Successfully refreshed token for session: {}",
-				principal.getSessionId());
-
 			return ResponseEntity.ok(response);
 		}
 		catch (AuthenticationException authenticationException) {
-			log.warn(
-				"Refresh token authentication failed: {}",
-				authenticationException.getMessage());
-
 			ResponseEntity.BodyBuilder responseEntityBuilder =
 				ResponseEntity.status(401);
 
@@ -205,8 +186,6 @@ public class AuthController {
 
 		_sessionService.revokeSessionsForUser(
 			principal.getUserId(), principal.getTenantId());
-
-		log.info("User {} revoked all sessions", principal.getUserId());
 
 		return ResponseEntity.ok(
 			Map.of("message", "All sessions revoked successfully"));
@@ -247,8 +226,6 @@ public class AuthController {
 		}
 
 		_authenticationFacade.logout(sessionId);
-		log.info(
-			"User {} revoked session: {}", principal.getUserId(), sessionId);
 
 		return ResponseEntity.ok(
 			Map.of("message", "Session revoked successfully"));

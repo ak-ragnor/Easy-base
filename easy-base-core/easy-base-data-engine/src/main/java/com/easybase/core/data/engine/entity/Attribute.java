@@ -5,8 +5,8 @@
 
 package com.easybase.core.data.engine.entity;
 
-import com.easybase.common.data.entity.base.BaseEntity;
 import com.easybase.core.data.engine.enums.AttributeType;
+import com.easybase.infrastructure.data.entity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
+
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -15,81 +20,73 @@
 	<description>Test fixtures and integration tests for EasyBase Security Module</description>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-infrastructure-data</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-security-api</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-security-core</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-security-jwt</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-security-session</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-tenant</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-
+		<!-- EasyBase Internal Modules -->
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-common-exception</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-infrastructure-data</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-security-api</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-security-core</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-security-jwt</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-security-session</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-tenant</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-user</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 
+		<!-- External Runtime Dependencies -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
 
+		<!-- Testing Dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
@@ -123,4 +120,5 @@
 			</plugin>
 		</plugins>
 	</build>
+
 </project>

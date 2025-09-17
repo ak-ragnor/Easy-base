@@ -14,44 +14,37 @@ import com.easybase.context.api.port.TenantInfoResolver;
 import com.easybase.context.api.port.UserInfoResolver;
 import com.easybase.context.core.impl.ServiceContextImpl;
 import com.easybase.security.api.dto.AuthenticatedPrincipalData;
-import com.easybase.security.api.exception.AuthenticationException;
 import com.easybase.security.api.service.AuthenticationFacade;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
 /**
- * Default implementation of ContextProvider that uses authentication facade
+ * Default implementation of {@link ContextProvider} that uses authentication facade
  * and resolvers to build complete ServiceContext from HTTP requests.
+ *
+ * <p>This provider handles token extraction, authentication, user resolution,
+ * and tenant resolution to create a comprehensive service context.</p>
  *
  * @author Akhash R
  */
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class DefaultContextProvider implements ContextProvider {
 
 	@Override
 	public ServiceContext build(HttpServletRequest request) {
 		AuthenticatedPrincipalData principalData = null;
 
-		try {
-			String token = _extractTokenFromRequest(request);
+		String token = _extractTokenFromRequest(request);
 
-			if (token != null) {
-				principalData = _authenticationFacade.authenticateByToken(
-					token);
-			}
-		}
-		catch (AuthenticationException authenticationException) {
-			log.debug(
-				"Authentication failed: {}",
-				authenticationException.getMessage());
+		if (token != null) {
+			principalData = _authenticationFacade.authenticateByToken(token);
 		}
 
 		UserInfo user = _resolveUser(principalData);
@@ -129,11 +122,9 @@ public class DefaultContextProvider implements ContextProvider {
 			return _tenantInfoResolver.resolve(principalData.getTenantId());
 		}
 		catch (Exception exception) {
-			log.warn(
-				"Failed to resolve tenant {}, using public tenant",
-				principalData.getTenantId(), exception);
-
-			return TenantInfo.publicTenant();
+			return new TenantInfo(
+				principalData.getTenantId(), true,
+				() -> "Tenant-" + principalData.getTenantId(), Map::of);
 		}
 	}
 
@@ -146,10 +137,6 @@ public class DefaultContextProvider implements ContextProvider {
 			return _userInfoResolver.resolve(principalData.getUserId());
 		}
 		catch (Exception exception) {
-			log.warn(
-				"Failed to resolve user {}, using anonymous",
-				principalData.getUserId(), exception);
-
 			return UserInfo.anonymous();
 		}
 	}

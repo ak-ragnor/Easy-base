@@ -31,8 +31,6 @@ import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -42,11 +40,16 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
+ * JWT authentication filter that validates JWT tokens and creates authentication
+ * context for each request.
+ *
+ * <p>This filter handles token extraction, validation, session verification,
+ * and principal binding for secure endpoints.</p>
+ *
  * @author Akhash R
  */
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class JwtSessionAuthenticationFilter extends OncePerRequestFilter {
 
 	@Override
@@ -72,9 +75,7 @@ public class JwtSessionAuthenticationFilter extends OncePerRequestFilter {
 
 				String reason = reasonOptional.orElse("Unknown");
 
-				log.debug("Invalid token: {}", reason);
-
-				_sendUnauthorizedResponse(response, "Invalid token");
+				_sendUnauthorizedResponse(response, reason);
 
 				return;
 			}
@@ -87,8 +88,6 @@ public class JwtSessionAuthenticationFilter extends OncePerRequestFilter {
 				claims.getSessionId());
 
 			if (session.isEmpty()) {
-				log.debug(
-					"Session not found or expired: {}", claims.getSessionId());
 				_sendUnauthorizedResponse(response, "Session expired");
 
 				return;
@@ -97,7 +96,6 @@ public class JwtSessionAuthenticationFilter extends OncePerRequestFilter {
 			Session activeSession = session.get();
 
 			if (activeSession.isRevoked()) {
-				log.debug("Session revoked: {}", claims.getSessionId());
 				_sendUnauthorizedResponse(response, "Session revoked");
 
 				return;
@@ -107,10 +105,6 @@ public class JwtSessionAuthenticationFilter extends OncePerRequestFilter {
 			UUID sessionTenantId = activeSession.getTenantId();
 
 			if (!tokenTenantId.equals(sessionTenantId)) {
-				log.warn(
-					"Tenant mismatch - token: {}, session: {}", tokenTenantId,
-					sessionTenantId);
-
 				_sendUnauthorizedResponse(response, "Tenant mismatch");
 
 				return;
@@ -131,7 +125,6 @@ public class JwtSessionAuthenticationFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 		}
 		catch (Exception exception) {
-			log.error("Authentication error", exception);
 			_sendUnauthorizedResponse(response, "Authentication failed");
 		}
 		finally {

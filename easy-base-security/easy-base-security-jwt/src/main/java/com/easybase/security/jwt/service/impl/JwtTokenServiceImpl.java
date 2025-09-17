@@ -42,16 +42,19 @@ import javax.crypto.SecretKey;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 
 /**
+ * Implementation of {@link TokenService} that provides JWT token operations
+ * including generation, parsing, and validation of access and refresh tokens.
+ *
+ * <p>This service handles both symmetric (HS256) and asymmetric (RS256/384/512)
+ * signing algorithms and integrates with the refresh token storage mechanism.</p>
+ *
  * @author Akhash
  */
 @RequiredArgsConstructor
 @Service
-@Slf4j
 public class JwtTokenServiceImpl implements TokenService {
 
 	@Override
@@ -190,8 +193,6 @@ public class JwtTokenServiceImpl implements TokenService {
 			return TokenValidationResult.invalid("Invalid token");
 		}
 		catch (Exception exception) {
-			log.error("Unexpected error during token validation", exception);
-
 			return TokenValidationResult.invalid("Token validation failed");
 		}
 	}
@@ -217,8 +218,6 @@ public class JwtTokenServiceImpl implements TokenService {
 			return false;
 		}
 		catch (Exception exception) {
-			log.debug("Refresh token validation failed", exception);
-
 			return false;
 		}
 	}

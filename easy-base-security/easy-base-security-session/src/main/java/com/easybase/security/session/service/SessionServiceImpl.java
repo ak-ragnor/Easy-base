@@ -32,6 +32,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * Implementation of {@link SessionService} that manages user sessions including
+ * creation, retrieval, revocation, and cleanup operations.
+ *
+ * <p>This service handles session lifecycle management with support for
+ * session limits, sliding expiration, and automatic cleanup of expired sessions.</p>
+ *
  * @author Akhash
  */
 @RequiredArgsConstructor
@@ -49,8 +55,6 @@ public class SessionServiceImpl implements SessionService {
 
 		_sessionRepository.deleteExpiredAndOldRevokedSessions(
 			now, revokedBefore);
-
-		log.debug("Cleaned up expired and old revoked sessions");
 	}
 
 	@Override
@@ -152,10 +156,6 @@ public class SessionServiceImpl implements SessionService {
 			Instant newExpiresAt = now.plus(_sessionProperties.getDefaultTtl());
 
 			_sessionRepository.updateSessionExpiration(sessionId, newExpiresAt);
-
-			log.debug(
-				"Extended session {} expiration to {} due to sliding expiration",
-				sessionId, newExpiresAt);
 		}
 	}
 
@@ -190,10 +190,6 @@ public class SessionServiceImpl implements SessionService {
 			for (SessionEntity sessionEntity : oldestSessions) {
 				_sessionRepository.revokeBySessionId(
 					sessionEntity.getSessionId(), Instant.now());
-
-				log.info(
-					"Revoked old session {} due to session limit for user {}",
-					sessionEntity.getSessionId(), userId);
 			}
 		}
 	}

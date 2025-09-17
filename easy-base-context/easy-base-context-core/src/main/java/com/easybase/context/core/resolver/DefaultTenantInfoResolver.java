@@ -10,34 +10,35 @@ import com.easybase.context.api.port.AbstractDefaultResolver;
 import com.easybase.context.api.port.TenantInfoResolver;
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.repository.TenantRepository;
+import com.easybase.core.tenant.service.TenantService;
 
 import java.util.Map;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
 /**
- * Default implementation of TenantInfoResolver that resolves tenant information
+ * Default implementation of {@link TenantInfoResolver} that resolves tenant information
  * from the database using TenantRepository. Uses AbstractDefaultResolver template
  * to eliminate code duplication.
+ *
+ * <p>This resolver provides access to tenant information with lazy loading
+ * of tenant settings and handles default tenant fallbacks.</p>
  *
  * @author Akhash R
  */
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class DefaultTenantInfoResolver
 	extends AbstractDefaultResolver<UUID, TenantInfo, Tenant>
 	implements TenantInfoResolver {
 
 	@Override
 	protected TenantInfo createAnonymousInstance() {
-		return TenantInfo.publicTenant();
+		return toInfo(_tenantService.getDefaultTenant());
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public class DefaultTenantInfoResolver
 	}
 
 	@Override
-	protected TenantInfo mapEntityToInfo(Tenant tenant) {
+	protected TenantInfo toInfo(Tenant tenant) {
 		UUID tenantId = tenant.getId();
 		boolean active = isEntityActive(tenant);
 
@@ -60,7 +61,6 @@ public class DefaultTenantInfoResolver
 	}
 
 	private Map<String, String> _extractSettings(Tenant tenant) {
-		log.debug("Extracting settings for tenant: {}", tenant.getId());
 
 		// TODO: Implement settings extraction
 
@@ -68,5 +68,6 @@ public class DefaultTenantInfoResolver
 	}
 
 	private final TenantRepository _tenantRepository;
+	private final TenantService _tenantService;
 
 }

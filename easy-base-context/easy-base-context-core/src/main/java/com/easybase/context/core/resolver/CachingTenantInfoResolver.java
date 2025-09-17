@@ -11,14 +11,18 @@ import com.easybase.context.api.port.TenantInfoResolver;
 
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * Request-scoped caching wrapper for TenantInfoResolver.
+ * Request-scoped caching wrapper for {@link TenantInfoResolver}.
  * Uses the generic CachingResolver to eliminate code duplication
  * and provide consistent caching behavior.
+ *
+ * <p>This resolver caches tenant information within the scope of a single
+ * request to avoid redundant database queries.</p>
  *
  * @author Akhash R
  */
@@ -32,7 +36,9 @@ public class CachingTenantInfoResolver implements TenantInfoResolver {
 	 *
 	 * @param delegate the underlying resolver to delegate cache misses to
 	 */
-	public CachingTenantInfoResolver(TenantInfoResolver delegate) {
+	public CachingTenantInfoResolver(
+		@Qualifier("defaultTenantInfoResolver") TenantInfoResolver delegate) {
+
 		_cachingResolver = new CachingResolver<>(delegate::resolve);
 	}
 

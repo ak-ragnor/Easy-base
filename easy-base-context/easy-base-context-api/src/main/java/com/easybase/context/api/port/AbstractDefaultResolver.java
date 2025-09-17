@@ -11,8 +11,6 @@ import java.lang.reflect.Method;
 
 import java.util.Optional;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.repository.CrudRepository;
 
 /**
@@ -21,12 +19,15 @@ import org.springframework.data.repository.CrudRepository;
  * provide common resolution logic while allowing subclasses to customize
  * specific behaviors.
  *
+ * <p>This class provides a structured approach to entity resolution with
+ * support for anonymous entities, active/inactive checking, and proper
+ * error handling.</p>
+ *
  * @param <K> the key type (typically UUID)
  * @param <V> the value type being resolved (UserInfo, TenantInfo, etc.)
  * @param <E> the entity type from database
  * @author Akhash R
  */
-@Slf4j
 public abstract class AbstractDefaultResolver<K, V, E> {
 
 	/**
@@ -50,7 +51,7 @@ public abstract class AbstractDefaultResolver<K, V, E> {
 
 			logEntityResolution(entity);
 
-			return mapEntityToInfo(entity);
+			return toInfo(entity);
 		}
 
 		throw new IllegalArgumentException(
@@ -118,9 +119,6 @@ public abstract class AbstractDefaultResolver<K, V, E> {
 
 			// If no getDeleted method or reflection fails, assume active
 
-			log.debug(
-				"Could not determine deleted status for entity: {}", entity);
-
 			return true;
 		}
 	}
@@ -133,7 +131,9 @@ public abstract class AbstractDefaultResolver<K, V, E> {
 	 * @param entity the resolved entity
 	 */
 	protected void logEntityResolution(E entity) {
-		log.debug("Resolved {} entity: {}", getEntityType(), entity);
+
+		// Override in subclasses if logging is needed
+
 	}
 
 	/**
@@ -143,7 +143,7 @@ public abstract class AbstractDefaultResolver<K, V, E> {
 	 * @param entity the database entity
 	 * @return the mapped info object
 	 */
-	protected abstract V mapEntityToInfo(E entity);
+	protected abstract V toInfo(E entity);
 
 	/**
 	 * Validates the input key.

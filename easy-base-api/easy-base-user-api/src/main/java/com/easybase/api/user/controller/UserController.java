@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Akhash R
  */
 @CrossOrigin(origins = "*")
-@RequestMapping("/easy-base/api/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 @RestController
 @Slf4j

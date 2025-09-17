@@ -28,16 +28,20 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 
 /**
+ * Implementation of {@link AuthenticationFacade} that handles authentication
+ * operations including token validation, credential authentication, session management,
+ * and refresh token operations.
+ *
+ * <p>This facade orchestrates between token services, session services, and user services
+ * to provide a unified authentication interface.</p>
+ *
  * @author Akhash
  */
 @RequiredArgsConstructor
 @Service
-@Slf4j
 public class AuthenticationFacadeImpl implements AuthenticationFacade {
 
 	@Override
@@ -100,22 +104,18 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 	public AuthenticatedPrincipalData authenticateCredentials(
 		LoginRequest loginRequest) {
 
-		log.info(
-			"Authenticating user: {} for tenant: {}",
-			loginRequest.getUserName(), loginRequest.getTenantId());
-
-		// 1. Validate credentials against user service
+		// Validate credentials against user service
 
 		User user = _userService.authenticateUser(
 			loginRequest.getUserName(), loginRequest.getPassword(),
 			loginRequest.getTenantId());
 
-		// 2. Get user authorities/roles
+		// Get user authorities/roles
 
 		List<String> authorities = _userService.getUserAuthorities(
 			user.getId());
 
-		// 3. Create session with proper user data
+		// Create session with proper user data
 
 		CreateSessionRequest sessionRequest = new CreateSessionRequest();
 
@@ -147,7 +147,6 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 
 	@Override
 	public void logout(String sessionId) {
-		log.info("Logging out session: {}", sessionId);
 		_sessionService.revokeSession(sessionId);
 		_refreshTokenService.revokeRefreshTokensForSession(sessionId);
 	}
@@ -156,7 +155,7 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 	public AuthenticatedPrincipalData refreshAuthentication(
 		String refreshToken) {
 
-		// 1. Validate refresh token
+		// Validate refresh token
 
 		Optional<RefreshTokenEntity> tokenEntityOptional =
 			_refreshTokenService.validateRefreshToken(refreshToken);
@@ -170,7 +169,7 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 
 		String sessionId = tokenEntity.getSessionId();
 
-		// 2. Get associated session
+		// Get associated session
 
 		Optional<Session> sessionOptional = _sessionService.getSession(
 			sessionId);
@@ -185,7 +184,7 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 			throw new AuthenticationException("Session revoked");
 		}
 
-		// 3. Create authenticated principal data
+		// Create authenticated principal data
 
 		AuthenticatedPrincipalData principalData =
 			new AuthenticatedPrincipalData();
@@ -211,7 +210,6 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 	@Override
 	public void revokeRefreshToken(String refreshToken) {
 		_refreshTokenService.revokeRefreshToken(refreshToken);
-		log.debug("Revoked refresh token");
 	}
 
 	private final RefreshTokenService _refreshTokenService;

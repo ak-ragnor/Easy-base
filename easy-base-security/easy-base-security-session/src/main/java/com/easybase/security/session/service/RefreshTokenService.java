@@ -21,17 +21,20 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * Service responsible for managing refresh tokens including storage,
+ * validation, revocation, and cleanup operations.
+ *
+ * <p>This service handles the secure storage of hashed refresh tokens
+ * and provides operations for token lifecycle management.</p>
+ *
  * @author Akhash
  */
 @RequiredArgsConstructor
 @Service
-@Slf4j
 public class RefreshTokenService {
 
 	@Transactional
@@ -43,8 +46,6 @@ public class RefreshTokenService {
 
 		_refreshTokenRepository.deleteExpiredAndOldRevokedTokens(
 			now, revokedBefore);
-
-		log.debug("Cleaned up expired and old revoked refresh tokens");
 	}
 
 	@Transactional

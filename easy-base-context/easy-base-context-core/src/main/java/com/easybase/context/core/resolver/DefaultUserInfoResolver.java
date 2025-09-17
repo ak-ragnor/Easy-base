@@ -16,21 +16,21 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
 /**
- * Default implementation of UserInfoResolver that resolves user information
+ * Default implementation of {@link UserInfoResolver} that resolves user information
  * from the database using UserRepository. Uses AbstractDefaultResolver template
  * to eliminate code duplication.
+ *
+ * <p>This resolver provides lazy loading of user roles and scopes and handles
+ * anonymous users when no user data is found.</p>
  *
  * @author Akhash R
  */
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class DefaultUserInfoResolver
 	extends AbstractDefaultResolver<UUID, UserInfo, User>
 	implements UserInfoResolver {
@@ -51,7 +51,7 @@ public class DefaultUserInfoResolver
 	}
 
 	@Override
-	protected UserInfo mapEntityToInfo(User user) {
+	protected UserInfo toInfo(User user) {
 		UUID id = user.getId();
 		String email = user.getEmail();
 		boolean active = isEntityActive(user);
@@ -62,7 +62,6 @@ public class DefaultUserInfoResolver
 	}
 
 	private List<String> _extractRoles(User user) {
-		log.debug("Extracting roles for user: {}", user.getId());
 
 		// TODO: Implement role extraction
 
@@ -70,7 +69,6 @@ public class DefaultUserInfoResolver
 	}
 
 	private List<String> _extractScopes(User user) {
-		log.debug("Extracting scopes for user: {}", user.getId());
 
 		// TODO: Implement scope extraction
 

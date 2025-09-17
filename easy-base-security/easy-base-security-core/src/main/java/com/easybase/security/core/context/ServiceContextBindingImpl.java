@@ -19,24 +19,23 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 
 /**
+ * Implementation of {@link ServiceContextBinding} that manages authentication
+ * principal data in thread-local storage and provides service context creation.
+ *
+ * <p>This binding implementation ensures thread-safe storage of authentication
+ * context and provides utilities for creating service contexts from principal data.</p>
+ *
  * @author Akhash
  */
 @Component
-@Slf4j
 public class ServiceContextBindingImpl implements ServiceContextBinding {
 
 	@Override
 	public void bind(AuthenticatedPrincipalData principal) {
 		principalHolder.set(principal);
-		log.debug(
-			"Bound principal to context: userId={}, tenantId={}, sessionId={}",
-			principal.getUserId(), principal.getTenantId(),
-			principal.getSessionId());
 	}
 
 	@Override
@@ -46,13 +45,7 @@ public class ServiceContextBindingImpl implements ServiceContextBinding {
 
 	@Override
 	public AuthenticatedPrincipalData fromCurrentContext() {
-		AuthenticatedPrincipalData principal = principalHolder.get();
-
-		if (principal == null) {
-			log.warn("No principal found in current context");
-		}
-
-		return principal;
+		return principalHolder.get();
 	}
 
 	@Override

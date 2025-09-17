@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Akhash R
  */
-@RequestMapping("/easy-base/api/collections")
+@RequestMapping("/collections")
 @RequiredArgsConstructor
 @RestController
 @Slf4j
