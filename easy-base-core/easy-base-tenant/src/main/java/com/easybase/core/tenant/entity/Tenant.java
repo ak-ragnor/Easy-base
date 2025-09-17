@@ -5,14 +5,13 @@
 
 package com.easybase.core.tenant.entity;
 
-import com.easybase.common.data.entity.base.BaseEntity;
+import com.easybase.infrastructure.data.entity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -21,7 +20,6 @@ import lombok.NoArgsConstructor;
  * @author Akhash R
  */
 @AllArgsConstructor
-@Builder
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = true)

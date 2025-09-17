@@ -14,9 +14,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-common-api</artifactId>
-			<version>${project.version}</version>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

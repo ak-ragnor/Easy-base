@@ -6,9 +6,9 @@
 package com.easybase.api.user.dto.mapper;
 
 import com.easybase.api.user.dto.UserDto;
-import com.easybase.common.api.dto.mapper.BaseMapper;
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.user.entity.User;
+import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
 import java.util.UUID;
 

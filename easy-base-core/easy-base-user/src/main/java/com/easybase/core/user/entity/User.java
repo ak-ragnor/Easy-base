@@ -5,8 +5,8 @@
 
 package com.easybase.core.user.entity;
 
-import com.easybase.common.data.entity.base.BaseEntity;
 import com.easybase.core.tenant.entity.Tenant;
+import com.easybase.infrastructure.data.entity.BaseEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -25,7 +25,6 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -34,7 +33,6 @@ import lombok.NoArgsConstructor;
  * @author Akhash R
  */
 @AllArgsConstructor
-@Builder
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = true)

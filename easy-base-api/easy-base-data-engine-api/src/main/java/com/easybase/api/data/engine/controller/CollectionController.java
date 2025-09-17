@@ -8,12 +8,11 @@ package com.easybase.api.data.engine.controller;
 import com.easybase.api.data.engine.dto.CollectionDto;
 import com.easybase.api.data.engine.dto.mapper.AttributeMapper;
 import com.easybase.api.data.engine.dto.mapper.CollectionMapper;
-import com.easybase.common.api.dto.response.ApiPageResponse;
-import com.easybase.common.api.dto.response.ApiResponse;
+import com.easybase.context.api.domain.ServiceContext;
 import com.easybase.core.data.engine.entity.Collection;
 import com.easybase.core.data.engine.service.CollectionService;
-import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.core.tenant.service.TenantService;
+import com.easybase.infrastructure.api.dto.response.ApiPageResponse;
+import com.easybase.infrastructure.api.dto.response.ApiResponse;
 
 import jakarta.validation.Valid;
 
@@ -44,7 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Akhash R
  */
-@RequestMapping("/easy-base/api/collections")
+@RequestMapping("/collections")
 @RequiredArgsConstructor
 @RestController
 @Slf4j
@@ -54,10 +53,8 @@ public class CollectionController {
 	public ResponseEntity<ApiResponse<CollectionDto>> createCollection(
 		@RequestBody @Valid CollectionDto request) {
 
-		Tenant tenant = _tenantService.getDefaultTenant();
-
 		Collection collection = _collectionService.createCollection(
-			tenant.getId(), request.getName(),
+			_serviceContext.tenantId(), request.getName(),
 			_attributeMapper.toEntity(request.getAttributes()));
 
 		ResponseEntity.BodyBuilder responseEntity = ResponseEntity.status(
@@ -80,10 +77,8 @@ public class CollectionController {
 	public ResponseEntity<ApiResponse<CollectionDto>> getCollection(
 		@PathVariable String collectionName) {
 
-		Tenant tenant = _tenantService.getDefaultTenant();
-
 		Collection collection = _collectionService.getCollection(
-			tenant.getId(), collectionName);
+			_serviceContext.tenantId(), collectionName);
 
 		return ResponseEntity.ok(
 			ApiResponse.success(_collectionMapper.toDto(collection)));
@@ -96,10 +91,8 @@ public class CollectionController {
 		)
 		Pageable pageable) {
 
-		Tenant tenant = _tenantService.getDefaultTenant();
-
 		Page<Collection> collections = _collectionService.getCollections(
-			tenant.getId(), pageable);
+			_serviceContext.tenantId(), pageable);
 
 		Stream<Collection> collectionsStream = collections.stream();
 
@@ -128,6 +121,6 @@ public class CollectionController {
 	private final AttributeMapper _attributeMapper;
 	private final CollectionMapper _collectionMapper;
 	private final CollectionService _collectionService;
-	private final TenantService _tenantService;
+	private final ServiceContext _serviceContext;
 
 }

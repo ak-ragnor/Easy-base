@@ -5,19 +5,22 @@
 
 package com.easybase.system.repository;
 
+import com.easybase.infrastructure.data.repository.BaseRepository;
 import com.easybase.system.entity.SystemInfo;
 
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
+ * Repository for SystemInfo entities with soft delete capabilities.
+ * Extends BaseRepository to inherit common data access patterns.
+ *
  * @author Akhash R
  */
 @Repository
-public interface SystemInfoRepository extends JpaRepository<SystemInfo, Long> {
+public interface SystemInfoRepository extends BaseRepository<SystemInfo> {
 
 	@Query(
 		"SELECT s FROM SystemInfo s WHERE s.status = 'ACTIVE' ORDER BY s.createdAt DESC"

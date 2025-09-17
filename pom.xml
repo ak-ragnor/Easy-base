@@ -16,6 +16,8 @@
 		<module>easy-base-application</module>
 		<module>easy-base-common</module>
 		<module>easy-base-security</module>
+		<module>easy-base-context</module>
+		<module>easy-base-infrastructure</module>
 	</modules>
 
 	<properties>

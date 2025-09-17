@@ -54,20 +54,15 @@ public class UserService {
 
 		String passwordHash = _passwordEncoder.encode(plainPassword);
 
-		UserCredential credential = UserCredential.builder(
-		).user(
-			_getUser(userId)
-		).passwordType(
-			"PASSWORD"
-		).passwordHash(
-			passwordHash
-		).passwordAlgo(
-			"bcrypt"
-		).passwordChangedAt(
-			LocalDateTime.now()
-		).build();
+		UserCredential userCredential = new UserCredential();
 
-		_userCredentialRepository.save(credential);
+		userCredential.setUser(_getUser(userId));
+		userCredential.setPasswordType("PASSWORD");
+		userCredential.setPasswordHash(passwordHash);
+		userCredential.setPasswordAlgo("bcrypt");
+		userCredential.setPasswordChangedAt(LocalDateTime.now());
+
+		_userCredentialRepository.save(userCredential);
 
 		log.info("Added password credential userId={}", userId);
 	}
@@ -83,20 +78,43 @@ public class UserService {
 			throw new ConflictException("UserCredential", "type", type);
 		}
 
-		UserCredential credential = UserCredential.builder(
-		).user(
-			_getUser(userId)
-		).passwordType(
-			type
-		).credentialData(
-			credentialData
-		).build();
+		UserCredential userCredential = new UserCredential();
 
-		credential = _userCredentialRepository.save(credential);
+		userCredential.setUser(_getUser(userId));
+		userCredential.setPasswordType(type);
+		userCredential.setCredentialData(credentialData);
+
+		userCredential = _userCredentialRepository.save(userCredential);
 
 		log.info("Added credential type={} userId={}", type, userId);
 
-		return credential;
+		return userCredential;
+	}
+
+	@Transactional(readOnly = true)
+	public User authenticateUser(String email, String password, UUID tenantId) {
+		User user;
+
+		try {
+			user = getUser(email, tenantId);
+		}
+		catch (ResourceNotFoundException resourceNotFoundException) {
+			throw new ResourceNotFoundException(
+				"Invalid credentials:" +
+					resourceNotFoundException.getMessage());
+		}
+
+		UserCredential credential = getUserCredential(user.getId(), "PASSWORD");
+
+		if (!_passwordEncoder.matches(password, credential.getPasswordHash())) {
+			throw new ResourceNotFoundException("Invalid credentials");
+		}
+
+		log.debug(
+			"Successfully authenticated user: {} for tenant: {}", email,
+			tenantId);
+
+		return user;
 	}
 
 	@Transactional
@@ -106,18 +124,13 @@ public class UserService {
 
 		_validateUserEmail(email, tenantId);
 
-		User user = User.builder(
-		).email(
-			email
-		).firstName(
-			firstName
-		).lastName(
-			lastName
-		).displayName(
-			displayName
-		).tenant(
-			_getTenant(tenantId)
-		).build();
+		User user = new User();
+
+		user.setEmail(email);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		user.setDisplayName(displayName);
+		user.setTenant(_getTenant(tenantId));
 
 		user = _userRepository.save(user);
 
@@ -156,6 +169,15 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public User getUser(UUID id) {
 		return _getUser(id);
+	}
+
+	@Transactional(readOnly = true)
+	public List<String> getUserAuthorities(UUID userId) {
+
+		// TODO: Implement proper role/authority system
+		// For now, return basic user role
+
+		return List.of("ROLE_USER");
 	}
 
 	@Transactional(readOnly = true)

@@ -5,7 +5,7 @@
 
 package com.easybase.api.system.controller;
 
-import com.easybase.common.api.dto.response.ApiResponse;
+import com.easybase.infrastructure.api.dto.response.ApiResponse;
 import com.easybase.system.entity.SystemInfo;
 import com.easybase.system.repository.SystemInfoRepository;
 
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Akhash R
  */
 @CrossOrigin(origins = "*")
-@RequestMapping("/easy-base/api/system")
+@RequestMapping("/system")
 @RequiredArgsConstructor
 @RestController
 @Slf4j
@@ -75,16 +75,13 @@ public class SystemController {
 	}
 
 	private SystemInfo _createDefaultSystemInfo() {
-		SystemInfo newInfo = SystemInfo.builder(
-		).appVersion(
-			_APP_VERSION
-		).dbVersion(
-			_DB_VERSION
-		).status(
-			"ACTIVE"
-		).build();
+		SystemInfo systemInfo = new SystemInfo();
 
-		return _systemInfoRepository.save(newInfo);
+		systemInfo.setAppVersion(_APP_VERSION);
+		systemInfo.setDbVersion(_DB_VERSION);
+		systemInfo.setStatus("ACTIVE");
+
+		return _systemInfoRepository.save(systemInfo);
 	}
 
 	private static final String _APP_VERSION = "1.0.0-SNAPSHOT";

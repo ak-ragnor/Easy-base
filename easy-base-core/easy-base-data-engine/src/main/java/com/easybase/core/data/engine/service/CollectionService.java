@@ -55,12 +55,10 @@ public class CollectionService {
 			throw new ConflictException("Collection", "name", collectionName);
 		}
 
-		Collection collection = Collection.builder(
-		).tenant(
-			_getTenant(tenantId)
-		).name(
-			collectionName
-		).build();
+		Collection collection = new Collection();
+
+		collection.setTenant(_getTenant(tenantId));
+		collection.setName(collectionName);
 
 		if (attributes != null) {
 			for (Attribute attribute : attributes) {

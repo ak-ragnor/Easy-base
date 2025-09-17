@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -35,7 +34,6 @@ import org.hibernate.type.SqlTypes;
  * @author Akhash R
  */
 @AllArgsConstructor
-@Builder
 @Data
 @Entity
 @NoArgsConstructor

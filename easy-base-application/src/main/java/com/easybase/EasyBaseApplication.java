@@ -5,18 +5,22 @@
 
 package com.easybase;
 
+import com.easybase.security.starter.EasyBaseSecurityAutoConfiguration;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * @author Akhash R
  */
 @EnableScheduling
+@Import(EasyBaseSecurityAutoConfiguration.class)
 @Slf4j
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.easybase")
 public class EasyBaseApplication {
 
 	public static void main(String[] args) {

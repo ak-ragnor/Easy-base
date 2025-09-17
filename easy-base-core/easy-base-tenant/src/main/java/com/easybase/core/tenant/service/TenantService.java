@@ -37,10 +37,9 @@ public class TenantService {
 			throw new ConflictException("Tenant", "name", name);
 		}
 
-		Tenant tenant = Tenant.builder(
-		).name(
-			name
-		).build();
+		Tenant tenant = new Tenant();
+
+		tenant.setName(name);
 
 		return _tenantRepository.save(tenant);
 	}

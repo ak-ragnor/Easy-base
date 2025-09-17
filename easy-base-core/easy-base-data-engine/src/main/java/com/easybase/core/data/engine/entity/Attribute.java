@@ -5,8 +5,8 @@
 
 package com.easybase.core.data.engine.entity;
 
-import com.easybase.common.data.entity.base.BaseEntity;
 import com.easybase.core.data.engine.enums.AttributeType;
+import com.easybase.infrastructure.data.entity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +20,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,7 +29,6 @@ import lombok.ToString;
  * @author Akhash R
  */
 @AllArgsConstructor
-@Builder
 @Entity
 @Getter
 @NoArgsConstructor
@@ -58,7 +56,6 @@ public class Attribute extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private AttributeType dataType;
 
-	@Builder.Default
 	@Column(name = "is_indexed", nullable = false)
 	private Boolean indexed = false;
 

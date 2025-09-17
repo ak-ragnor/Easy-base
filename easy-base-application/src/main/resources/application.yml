@@ -1,8 +1,18 @@
+easy-base:
+    initialization:
+        admin-user:
+            display-name: Administrator
+            email: admin@easybase.com
+            first-name: Admin
+            last-name: User
+            password: admin123
+        enabled: true
 logging:
     level:
         com.easybase: DEBUG
         org.hibernate: INFO
-        org.springframework.web: INFO
+        org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
+        org.springframework.web: DEBUG
     pattern:
         console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 management:
@@ -22,6 +32,13 @@ spring:
         password: root
         url: jdbc:postgresql://localhost:5432/easybase
         username: root
+    jackson:
+        deserialization:
+            fail-on-unknown-properties: false
+        modules:
+            - com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+        serialization:
+            write-dates-as-timestamps: false
     jpa:
         hibernate:
             ddl-auto: update
