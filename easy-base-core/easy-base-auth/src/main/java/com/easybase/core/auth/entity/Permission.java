@@ -34,43 +34,45 @@ import lombok.ToString;
 @AllArgsConstructor
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = true, exclude = {"rolePermissions"})
+@EqualsAndHashCode(callSuper = true, exclude = "rolePermissions")
 @NoArgsConstructor
 @Table(
-    name = "eb_permissions",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"resource_type", "action"})
-    }
+	name = "eb_permissions",
+	uniqueConstraints = {
+		@UniqueConstraint(columnNames = {"resource_type", "action"})
+	}
 )
-@ToString(exclude = {"rolePermissions"})
+@ToString(exclude = "rolePermissions")
 public class Permission extends BaseEntity {
 
-    @Column(name = "resource_type", nullable = false)
-    @NotBlank
-    @Size(max = 50)
-    private String resourceType;
+	public Permission(String resourceType, String action, String description) {
+		this.resourceType = resourceType;
+		this.action = action;
+		this.description = description;
 
-    @Column(name = "action", nullable = false)
-    @NotBlank
-    @Size(max = 50)
-    private String action;
+		this.permissionKey = resourceType + ":" + action;
+	}
 
-    @Column(name = "description")
-    @Size(max = 255)
-    private String description;
+	@Column(name = "action", nullable = false)
+	@NotBlank
+	@Size(max = 50)
+	private String action;
 
-    @Column(name = "permission_key", nullable = false, unique = true)
-    @NotBlank
-    @Size(max = 100)
-    private String permissionKey;
+	@Column(name = "description")
+	@Size(max = 255)
+	private String description;
 
-    @OneToMany(mappedBy = "permission")
-    private Set<RolePermission> rolePermissions = new HashSet<>();
+	@Column(name = "permission_key", nullable = false, unique = true)
+	@NotBlank
+	@Size(max = 100)
+	private String permissionKey;
 
-    public Permission(String resourceType, String action, String description) {
-        this.resourceType = resourceType;
-        this.action = action;
-        this.description = description;
-        this.permissionKey = resourceType + ":" + action;
-    }
+	@Column(name = "resource_type", nullable = false)
+	@NotBlank
+	@Size(max = 50)
+	private String resourceType;
+
+	@OneToMany(mappedBy = "permission")
+	private Set<RolePermission> rolePermissions = new HashSet<>();
+
 }

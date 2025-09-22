@@ -42,55 +42,55 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true, exclude = {"permissions", "userRoles"})
 @NoArgsConstructor
 @Table(
-    name = "eb_roles",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"name", "tenant_id"})
-    }
+	name = "eb_roles",
+	uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "tenant_id"})}
 )
 @ToString(exclude = {"permissions", "userRoles"})
 public class Role extends BaseEntity {
 
-    @Column(name = "name", nullable = false)
-    @NotBlank
-    @Size(max = 50)
-    private String name;
+	public void addPermission(Permission permission) {
+		RolePermission rolePermission = new RolePermission(this, permission);
 
-    @Column(name = "description")
-    @Size(max = 255)
-    private String description;
+		permissions.add(rolePermission);
+	}
 
-    @Column(name = "is_system", nullable = false)
-    private boolean isSystem = false;
+	public void removePermission(Permission permission) {
+		permissions.removeIf(
+			rp -> rp.getPermission(
+			).equals(
+				permission
+			));
+	}
 
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+	@Column(name = "description")
+	@Size(max = 255)
+	private String description;
 
-    @JoinColumn(name = "tenant_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Tenant tenant;
+	@Column(name = "is_active", nullable = false)
+	private boolean isActive = true;
 
-    @OneToMany(
-        mappedBy = "role",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true,
-        fetch = FetchType.LAZY
-    )
-    private Set<RolePermission> permissions = new HashSet<>();
+	@Column(name = "is_system", nullable = false)
+	private boolean isSystem = false;
 
-    @OneToMany(
-        mappedBy = "role",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true,
-        fetch = FetchType.LAZY
-    )
-    private Set<UserRole> userRoles = new HashSet<>();
+	@Column(name = "name", nullable = false)
+	@NotBlank
+	@Size(max = 50)
+	private String name;
 
-    public void addPermission(Permission permission) {
-        RolePermission rolePermission = new RolePermission(this, permission);
-        permissions.add(rolePermission);
-    }
+	@OneToMany(
+		cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "role",
+		orphanRemoval = true
+	)
+	private Set<RolePermission> permissions = new HashSet<>();
 
-    public void removePermission(Permission permission) {
-        permissions.removeIf(rp -> rp.getPermission().equals(permission));
-    }
+	@JoinColumn(name = "tenant_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Tenant tenant;
+
+	@OneToMany(
+		cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "role",
+		orphanRemoval = true
+	)
+	private Set<UserRole> userRoles = new HashSet<>();
+
 }

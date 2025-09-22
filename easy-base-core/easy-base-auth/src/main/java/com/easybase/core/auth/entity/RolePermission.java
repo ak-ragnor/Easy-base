@@ -15,7 +15,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.io.Serializable;
+
 import java.time.Instant;
+
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -35,33 +37,37 @@ import lombok.NoArgsConstructor;
 @Table(name = "eb_role_permissions")
 public class RolePermission {
 
-    @Id
-    @JoinColumn(name = "role_id", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Role role;
+	public RolePermission(Role role, Permission permission) {
+		this.role = role;
+		this.permission = permission;
 
-    @Id
-    @JoinColumn(name = "permission_id", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Permission permission;
+		this.grantedAt = Instant.now();
+	}
 
-    @Column(name = "granted_at", nullable = false)
-    private Instant grantedAt = Instant.now();
+	@AllArgsConstructor
+	@Data
+	@NoArgsConstructor
+	public static class RolePermissionId implements Serializable {
 
-    @Column(name = "granted_by")
-    private UUID grantedBy;
+		private UUID permission;
+		private UUID role;
 
-    public RolePermission(Role role, Permission permission) {
-        this.role = role;
-        this.permission = permission;
-        this.grantedAt = Instant.now();
-    }
+	}
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class RolePermissionId implements Serializable {
-        private UUID role;
-        private UUID permission;
-    }
+	@Column(name = "granted_at", nullable = false)
+	private Instant grantedAt = Instant.now();
+
+	@Column(name = "granted_by")
+	private UUID grantedBy;
+
+	@Id
+	@JoinColumn(name = "permission_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Permission permission;
+
+	@Id
+	@JoinColumn(name = "role_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Role role;
+
 }

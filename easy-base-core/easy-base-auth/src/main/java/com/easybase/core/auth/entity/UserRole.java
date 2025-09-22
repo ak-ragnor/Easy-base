@@ -18,7 +18,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.io.Serializable;
+
 import java.time.Instant;
+
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -39,44 +41,48 @@ import lombok.NoArgsConstructor;
 @Table(name = "eb_user_roles")
 public class UserRole {
 
-    @Id
-    @JoinColumn(name = "user_id", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+	public UserRole(User user, Role role, Tenant tenant) {
+		this.user = user;
+		this.role = role;
+		this.tenant = tenant;
 
-    @Id
-    @JoinColumn(name = "role_id", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Role role;
+		this.assignedAt = Instant.now();
+	}
 
-    @JoinColumn(name = "tenant_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Tenant tenant;
+	@AllArgsConstructor
+	@Data
+	@NoArgsConstructor
+	public static class UserRoleId implements Serializable {
 
-    @Column(name = "assigned_at", nullable = false)
-    private Instant assignedAt = Instant.now();
+		private UUID role;
+		private UUID user;
 
-    @Column(name = "assigned_by")
-    private UUID assignedBy;
+	}
 
-    @Column(name = "expires_at")
-    private Instant expiresAt;
+	@Column(name = "assigned_at", nullable = false)
+	private Instant assignedAt = Instant.now();
 
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+	@Column(name = "assigned_by")
+	private UUID assignedBy;
 
-    public UserRole(User user, Role role, Tenant tenant) {
-        this.user = user;
-        this.role = role;
-        this.tenant = tenant;
-        this.assignedAt = Instant.now();
-    }
+	@Column(name = "expires_at")
+	private Instant expiresAt;
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UserRoleId implements Serializable {
-        private UUID user;
-        private UUID role;
-    }
+	@Column(name = "is_active", nullable = false)
+	private boolean isActive = true;
+
+	@Id
+	@JoinColumn(name = "role_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Role role;
+
+	@JoinColumn(name = "tenant_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Tenant tenant;
+
+	@Id
+	@JoinColumn(name = "user_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	private User user;
+
 }

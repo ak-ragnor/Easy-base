@@ -22,12 +22,15 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * @author Akhash R
@@ -35,12 +38,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = "userRoles")
 @NoArgsConstructor
 @Table(
 	name = "eb_users",
 	uniqueConstraints = @UniqueConstraint(columnNames = "email")
 )
+@ToString(exclude = "userRoles")
 public class User extends BaseEntity {
 
 	@OneToMany(
@@ -69,5 +73,11 @@ public class User extends BaseEntity {
 	@JoinColumn(name = "tenant_id")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Tenant tenant;
+
+	@OneToMany(
+		cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user",
+		orphanRemoval = true
+	)
+	private Set<UserRole> userRoles = new HashSet<>();
 
 }

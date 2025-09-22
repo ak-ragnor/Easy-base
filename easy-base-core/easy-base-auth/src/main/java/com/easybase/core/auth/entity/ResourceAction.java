@@ -32,32 +32,33 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Table(
-    name = "eb_resource_actions",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"resource_type", "action_key"})
-    }
+	name = "eb_resource_actions",
+	uniqueConstraints = {
+		@UniqueConstraint(columnNames = {"resource_type", "action_key"})
+	}
 )
 public class ResourceAction extends BaseEntity {
 
-    @Column(name = "resource_type", nullable = false)
-    @NotBlank
-    @Size(max = 50)
-    private String resourceType;
+	@Column(name = "action_key", nullable = false)
+	@NotBlank
+	@Size(max = 50)
+	private String actionKey;
 
-    @Column(name = "action_key", nullable = false)
-    @NotBlank
-    @Size(max = 50)
-    private String actionKey;
+	@Column(name = "action_name", nullable = false)
+	@NotBlank
+	@Size(max = 100)
+	private String actionName;
 
-    @Column(name = "action_name", nullable = false)
-    @NotBlank
-    @Size(max = 100)
-    private String actionName;
+	@Column(name = "description")
+	@Size(max = 255)
+	private String description;
 
-    @Column(name = "description")
-    @Size(max = 255)
-    private String description;
+	@Column(name = "is_active", nullable = false)
+	private boolean isActive = true;
 
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+	@Column(name = "resource_type", nullable = false)
+	@NotBlank
+	@Size(max = 50)
+	private String resourceType;
+
 }
