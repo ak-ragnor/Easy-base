@@ -38,13 +38,13 @@ import lombok.ToString;
 @AllArgsConstructor
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = true, exclude = "userRoles")
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Table(
 	name = "eb_users",
 	uniqueConstraints = @UniqueConstraint(columnNames = "email")
 )
-@ToString(exclude = "userRoles")
+@ToString
 public class User extends BaseEntity {
 
 	@OneToMany(
@@ -74,10 +74,5 @@ public class User extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Tenant tenant;
 
-	@OneToMany(
-		cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user",
-		orphanRemoval = true
-	)
-	private Set<UserRole> userRoles = new HashSet<>();
 
 }

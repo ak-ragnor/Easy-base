@@ -26,6 +26,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * Join entity for many-to-many relationship between Role and Permission.
+ * Stores the relationship with role ID as UUID rather than entity reference
+ * to avoid circular dependency between auth and role modules.
  *
  * @author Akhash R
  */
@@ -37,8 +39,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "eb_role_permissions")
 public class RolePermission {
 
-	public RolePermission(Role role, Permission permission) {
-		this.role = role;
+	public RolePermission(UUID roleId, Permission permission) {
+		this.roleId = roleId;
 		this.permission = permission;
 
 		this.grantedAt = Instant.now();
@@ -50,7 +52,7 @@ public class RolePermission {
 	public static class RolePermissionId implements Serializable {
 
 		private UUID permission;
-		private UUID role;
+		private UUID roleId;
 
 	}
 
@@ -65,9 +67,8 @@ public class RolePermission {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Permission permission;
 
+	@Column(name = "role_id", nullable = false)
 	@Id
-	@JoinColumn(name = "role_id", nullable = false)
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Role role;
+	private UUID roleId;
 
 }

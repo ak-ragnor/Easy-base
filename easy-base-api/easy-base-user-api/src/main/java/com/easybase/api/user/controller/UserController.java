@@ -5,9 +5,11 @@
 
 package com.easybase.api.user.controller;
 
+import com.easybase.context.core.util.PermissionChecker;
 import com.easybase.api.user.dto.UserDto;
 import com.easybase.api.user.dto.mapper.UserMapper;
 import com.easybase.context.api.domain.ServiceContext;
+import com.easybase.core.user.action.UserActions;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.service.UserService;
 import com.easybase.infrastructure.api.dto.response.ApiResponse;
@@ -49,6 +51,8 @@ public class UserController {
 	public ResponseEntity<ApiResponse<UserDto>> createUser(
 		@RequestBody @Valid UserDto request) {
 
+		_permissionChecker.check(UserActions.CREATE);
+
 		User user = _userService.createUser(
 			request.getEmail(), request.getFirstName(), request.getLastName(),
 			request.getDisplayName(), _serviceContext.tenantId());
@@ -66,6 +70,8 @@ public class UserController {
 	public ResponseEntity<ApiResponse<Void>> deleteUser(
 		@PathVariable("userId") UUID userId) {
 
+		_permissionChecker.check(UserActions.DELETE);
+
 		_userService.deleteUser(userId);
 
 		return ResponseEntity.ok(ApiResponse.success(null));
@@ -74,6 +80,8 @@ public class UserController {
 	@GetMapping("/{userId}")
 	public ResponseEntity<ApiResponse<UserDto>> getUser(
 		@PathVariable("userId") UUID userId) {
+
+		_permissionChecker.check(UserActions.VIEW);
 
 		return ResponseEntity.ok(
 			ApiResponse.success(
@@ -84,6 +92,8 @@ public class UserController {
 	public ResponseEntity<ApiResponse<UserDto>> getUserByEmail(
 		@RequestParam("email") String email) {
 
+		_permissionChecker.check(UserActions.VIEW);
+
 		return ResponseEntity.ok(
 			ApiResponse.success(
 				_userMapper.toDto(
@@ -92,6 +102,8 @@ public class UserController {
 
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<UserDto>>> getUsers() {
+		_permissionChecker.check(UserActions.LIST);
+
 		List<User> users = _userService.getUsers(_serviceContext.tenantId());
 
 		List<UserDto> userDtos = new ArrayList<>();
@@ -119,6 +131,7 @@ public class UserController {
 		return ResponseEntity.ok(ApiResponse.success(_userMapper.toDto(user)));
 	}
 
+	private final PermissionChecker _permissionChecker;
 	private final ServiceContext _serviceContext;
 	private final UserMapper _userMapper;
 	private final UserService _userService;

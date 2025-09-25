@@ -53,52 +53,63 @@ public class ServiceContextBindingImpl implements ServiceContextBinding {
 		return new SecurityServiceContext(principal);
 	}
 
+	@Override
+	public ServiceContext getCurrentServiceContext() {
+		AuthenticatedPrincipalData authenticatedPrincipalData = fromCurrentContext();
+
+		if (authenticatedPrincipalData == null) {
+			return null;
+		}
+		return fromPrincipal(authenticatedPrincipalData);
+	}
+
 	private final ThreadLocal<AuthenticatedPrincipalData> principalHolder =
 		new ThreadLocal<>();
 
 	private static class SecurityServiceContext implements ServiceContext {
 
 		public SecurityServiceContext(AuthenticatedPrincipalData principal) {
-			this.principal = principal;
+			this._authenticatedPrincipalData = principal;
 
-			tenantInfo = _createTenantInfo(principal);
-			userInfo = _createUserInfo(principal);
-			correlationIds = _createCorrelationIds(principal);
+			_tenantInfo = _createTenantInfo(principal);
+			_userInfo = _createUserInfo(principal);
+			_correlationIds = _createCorrelationIds(principal);
 		}
 
 		@Override
 		public Optional<String> clientIp() {
-			return Optional.ofNullable(principal.getClientIp());
+			return Optional.ofNullable(_authenticatedPrincipalData.getClientIp());
 		}
 
 		@Override
 		public CorrelationIds correlation() {
-			return correlationIds;
+			return _correlationIds;
 		}
 
 		@Override
 		public Instant expiresAt() {
-			return principal.getExpiresAt();
+			return _authenticatedPrincipalData.getExpiresAt();
 		}
 
 		@Override
 		public Instant issuedAt() {
-			return principal.getIssuedAt();
+			return _authenticatedPrincipalData.getIssuedAt();
 		}
+
 
 		@Override
 		public TenantInfo tenant() {
-			return tenantInfo;
+			return _tenantInfo;
 		}
 
 		@Override
 		public UserInfo user() {
-			return userInfo;
+			return _userInfo;
 		}
 
 		@Override
 		public Optional<String> userAgent() {
-			return Optional.ofNullable(principal.getUserAgent());
+			return Optional.ofNullable(_authenticatedPrincipalData.getUserAgent());
 		}
 
 		private CorrelationIds _createCorrelationIds(
@@ -123,10 +134,11 @@ public class ServiceContextBindingImpl implements ServiceContextBinding {
 				() -> "user-" + principal.getUserId(), List::of, List::of);
 		}
 
-		private final CorrelationIds correlationIds;
-		private final AuthenticatedPrincipalData principal;
-		private final TenantInfo tenantInfo;
-		private final UserInfo userInfo;
+
+		private final CorrelationIds _correlationIds;
+		private final AuthenticatedPrincipalData _authenticatedPrincipalData;
+		private final TenantInfo _tenantInfo;
+		private final UserInfo _userInfo;
 
 	}
 

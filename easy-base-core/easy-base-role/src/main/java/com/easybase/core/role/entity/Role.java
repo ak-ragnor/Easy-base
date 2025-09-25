@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.auth.entity;
+package com.easybase.core.role.entity;
 
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.infrastructure.data.entity.BaseEntity;
@@ -39,28 +39,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = true, exclude = {"permissions", "userRoles"})
+@EqualsAndHashCode(callSuper = true, exclude = "userRoles")
 @NoArgsConstructor
 @Table(
 	name = "eb_roles",
 	uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "tenant_id"})}
 )
-@ToString(exclude = {"permissions", "userRoles"})
+@ToString(exclude = "userRoles")
 public class Role extends BaseEntity {
-
-	public void addPermission(Permission permission) {
-		RolePermission rolePermission = new RolePermission(this, permission);
-
-		permissions.add(rolePermission);
-	}
-
-	public void removePermission(Permission permission) {
-		permissions.removeIf(
-			rp -> rp.getPermission(
-			).equals(
-				permission
-			));
-	}
 
 	@Column(name = "description")
 	@Size(max = 255)
@@ -76,12 +62,6 @@ public class Role extends BaseEntity {
 	@NotBlank
 	@Size(max = 50)
 	private String name;
-
-	@OneToMany(
-		cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "role",
-		orphanRemoval = true
-	)
-	private Set<RolePermission> permissions = new HashSet<>();
 
 	@JoinColumn(name = "tenant_id")
 	@ManyToOne(fetch = FetchType.LAZY)

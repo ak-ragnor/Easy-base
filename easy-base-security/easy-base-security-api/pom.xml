@@ -16,6 +16,18 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-common-exception</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-context-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>
 		</dependency>

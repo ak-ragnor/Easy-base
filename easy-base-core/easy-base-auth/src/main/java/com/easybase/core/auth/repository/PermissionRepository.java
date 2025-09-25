@@ -22,31 +22,12 @@ import org.springframework.stereotype.Repository;
  * @author Akhash R
  */
 @Repository
-public interface PermissionRepository extends BaseRepository<Permission, UUID> {
+public interface PermissionRepository extends BaseRepository<Permission> {
 
 	public boolean existsByPermissionKey(String permissionKey);
 
 	public boolean existsByResourceTypeAndAction(
 		String resourceType, String action);
-
-	@Query(
-		"SELECT p FROM Permission p " + "JOIN p.rolePermissions rp " +
-			"JOIN rp.role r " + "JOIN r.userRoles ur " +
-				"WHERE ur.user.id = :userId " + "AND ur.isActive = true " +
-					"AND r.isActive = true"
-	)
-	public List<Permission> findActivePermissionsByUserId(
-		@Param("userId") UUID userId);
-
-	@Query(
-		"SELECT p FROM Permission p " + "JOIN p.rolePermissions rp " +
-			"JOIN rp.role r " + "JOIN r.userRoles ur " +
-				"WHERE ur.user.id = :userId " +
-					"AND ur.tenant.id = :tenantId " +
-						"AND ur.isActive = true " + "AND r.isActive = true"
-	)
-	public List<Permission> findActivePermissionsByUserIdAndTenantId(
-		@Param("userId") UUID userId, @Param("tenantId") UUID tenantId);
 
 	public Optional<Permission> findByPermissionKey(String permissionKey);
 
@@ -54,5 +35,13 @@ public interface PermissionRepository extends BaseRepository<Permission, UUID> {
 
 	public Optional<Permission> findByResourceTypeAndAction(
 		String resourceType, String action);
+
+	@Query(
+		"SELECT DISTINCT p FROM Permission p " +
+			"JOIN RolePermission rp ON p.id = rp.permission.id " +
+				"WHERE rp.roleId IN :roleIds"
+	)
+	public List<Permission> findPermissionsByRoleIds(
+		@Param("roleIds") List<UUID> roleIds);
 
 }

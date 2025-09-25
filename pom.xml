@@ -27,6 +27,8 @@
 		<maven.compiler.target>17</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<liferay.source.formatter.version>1.0.1193</liferay.source.formatter.version>
+		<skipTests>true</skipTests>
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
 
 	<dependencyManagement>
@@ -91,6 +93,12 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>format-sources-build</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

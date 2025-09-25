@@ -15,6 +15,7 @@ import com.easybase.security.api.exception.AuthenticationException;
 import com.easybase.security.api.service.AuthenticationFacade;
 import com.easybase.security.api.service.SessionService;
 import com.easybase.security.api.service.TokenService;
+import com.easybase.security.core.service.PermissionContextBinding;
 import com.easybase.security.core.service.ServiceContextBinding;
 import com.easybase.security.jwt.config.JwtProperties;
 import com.easybase.security.web.authentication.JwtAuthenticationToken;
@@ -128,6 +129,7 @@ public class AuthController {
 
 		SecurityContextHolder.clearContext();
 		_serviceContextBinding.clear();
+		_permissionContextBinding.clear();
 
 		return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
 	}
@@ -262,6 +264,7 @@ public class AuthController {
 	private final AuthenticationFacade _authenticationFacade;
 	private final JwtProperties _jwtProperties;
 	private final ServiceContextBinding _serviceContextBinding;
+	private final PermissionContextBinding _permissionContextBinding;
 	private final SessionService _sessionService;
 	private final TokenService _tokenService;
 

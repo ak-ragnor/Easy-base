@@ -42,6 +42,7 @@ public interface ServiceContext {
 	 */
 	public Instant expiresAt();
 
+
 	/**
 	 * Checks if the current context represents an authenticated user.
 	 *
@@ -57,6 +58,7 @@ public interface ServiceContext {
 	 * @return token issued timestamp, may be null for anonymous access
 	 */
 	public Instant issuedAt();
+
 
 	/**
 	 * Gets the current tenant information.

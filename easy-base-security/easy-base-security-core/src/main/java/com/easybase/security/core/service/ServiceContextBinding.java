@@ -21,4 +21,6 @@ public interface ServiceContextBinding {
 
 	public ServiceContext fromPrincipal(AuthenticatedPrincipalData principal);
 
+	public ServiceContext getCurrentServiceContext();
+
 }

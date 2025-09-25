@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.auth.repository;
+package com.easybase.core.role.repository;
 
-import com.easybase.core.auth.entity.Role;
+import com.easybase.core.role.entity.Role;
 import com.easybase.infrastructure.data.repository.BaseRepository;
 
 import java.util.List;
@@ -22,17 +22,11 @@ import org.springframework.stereotype.Repository;
  * @author Akhash R
  */
 @Repository
-public interface RoleRepository extends BaseRepository<Role, UUID> {
+public interface RoleRepository extends BaseRepository<Role> {
 
 	public boolean existsByNameAndIsSystemTrue(String name);
 
 	public boolean existsByNameAndTenantId(String name, UUID tenantId);
-
-	@Query(
-		"SELECT DISTINCT r FROM Role r " + "LEFT JOIN FETCH r.permissions p " +
-			"LEFT JOIN FETCH p.permission " + "WHERE r.id = :roleId"
-	)
-	public Optional<Role> findByIdWithPermissions(@Param("roleId") UUID roleId);
 
 	public List<Role> findByIsSystemTrue();
 
@@ -43,7 +37,8 @@ public interface RoleRepository extends BaseRepository<Role, UUID> {
 	public List<Role> findByTenantId(UUID tenantId);
 
 	@Query(
-		"SELECT r FROM Role r WHERE r.isSystem = true OR r.tenant.id = :tenantId"
+		"SELECT r FROM Role r " +
+			"WHERE (r.isSystem = true) OR (r.tenant.id = :tenantId AND r.isActive = true)"
 	)
 	public List<Role> findSystemAndTenantRoles(
 		@Param("tenantId") UUID tenantId);

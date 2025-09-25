@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.auth.entity;
+package com.easybase.core.role.entity;
 
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.user.entity.User;

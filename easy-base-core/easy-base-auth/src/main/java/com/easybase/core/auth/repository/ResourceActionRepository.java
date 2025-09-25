@@ -21,7 +21,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ResourceActionRepository
-	extends BaseRepository<ResourceAction, UUID> {
+	extends BaseRepository<ResourceAction> {
 
 	public boolean existsByResourceTypeAndActionKey(
 		String resourceType, String actionKey);

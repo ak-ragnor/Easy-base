@@ -5,19 +5,24 @@
 
 package com.easybase.api.auth.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Result of a permission check operation.
  *
  * @author Akhash R
  */
-@AllArgsConstructor
 @Data
-@NoArgsConstructor
 public class PermissionCheckResult {
+
+	public PermissionCheckResult() {
+	}
+
+	public PermissionCheckResult(boolean hasPermission, String permissionKey, String reason) {
+		this.hasPermission = hasPermission;
+		this.permissionKey = permissionKey;
+		this.reason = reason;
+	}
 
 	public static PermissionCheckResult allowed(String permissionKey) {
 		return new PermissionCheckResult(
