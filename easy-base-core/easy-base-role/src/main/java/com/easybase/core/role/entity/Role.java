@@ -5,30 +5,22 @@
 
 package com.easybase.core.role.entity;
 
-import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.infrastructure.data.entity.BaseEntity;
+import com.easybase.infrastructure.data.entity.SingleKeyBaseEntity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 /**
  * Role entity representing both system and custom roles.
@@ -39,38 +31,30 @@ import lombok.ToString;
 @AllArgsConstructor
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = true, exclude = "userRoles")
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Table(
 	name = "eb_roles",
 	uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "tenant_id"})}
 )
-@ToString(exclude = "userRoles")
-public class Role extends BaseEntity {
+public class Role extends SingleKeyBaseEntity {
+
+	@Column(name = "is_active", nullable = false)
+	private boolean active = true;
 
 	@Column(name = "description")
 	@Size(max = 255)
 	private String description;
-
-	@Column(name = "is_active", nullable = false)
-	private boolean isActive = true;
-
-	@Column(name = "is_system", nullable = false)
-	private boolean isSystem = false;
 
 	@Column(name = "name", nullable = false)
 	@NotBlank
 	@Size(max = 50)
 	private String name;
 
-	@JoinColumn(name = "tenant_id")
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Tenant tenant;
+	@Column(name = "is_system", nullable = false)
+	private boolean system = false;
 
-	@OneToMany(
-		cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "role",
-		orphanRemoval = true
-	)
-	private Set<UserRole> userRoles = new HashSet<>();
+	@Column(name = "tenant_id")
+	private UUID tenantId;
 
 }

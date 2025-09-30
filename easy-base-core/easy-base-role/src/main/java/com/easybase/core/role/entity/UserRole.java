@@ -5,48 +5,42 @@
 
 package com.easybase.core.role.entity;
 
-import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.core.user.entity.User;
+import com.easybase.infrastructure.data.entity.CompositeKeyBaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.io.Serializable;
-
 import java.time.Instant;
-
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
  * Join entity for many-to-many relationship between User and Role.
- * Tracks user role assignments with audit information.
+ * Uses only UUID references to avoid dependencies on other modules.
  *
  * @author Akhash R
  */
 @AllArgsConstructor
 @Data
 @Entity
+@EqualsAndHashCode(callSuper = true)
 @IdClass(UserRole.UserRoleId.class)
 @NoArgsConstructor
 @Table(name = "eb_user_roles")
-public class UserRole {
+public class UserRole extends CompositeKeyBaseEntity {
 
-	public UserRole(User user, Role role, Tenant tenant) {
-		this.user = user;
-		this.role = role;
-		this.tenant = tenant;
-
-		this.assignedAt = Instant.now();
+	public UserRole(UUID userId, UUID roleId, UUID tenantId) {
+		this.userId = userId;
+		this.roleId = roleId;
+		this.tenantId = tenantId;
 	}
 
 	@AllArgsConstructor
@@ -54,35 +48,26 @@ public class UserRole {
 	@NoArgsConstructor
 	public static class UserRoleId implements Serializable {
 
-		private UUID role;
-		private UUID user;
+		private UUID roleId;
+		private UUID userId;
 
 	}
 
-	@Column(name = "assigned_at", nullable = false)
-	private Instant assignedAt = Instant.now();
-
-	@Column(name = "assigned_by")
-	private UUID assignedBy;
+	@Column(name = "is_active", nullable = false)
+	private boolean active = true;
 
 	@Column(name = "expires_at")
 	private Instant expiresAt;
 
-	@Column(name = "is_active", nullable = false)
-	private boolean isActive = true;
-
+	@Column(name = "role_id", nullable = false)
 	@Id
-	@JoinColumn(name = "role_id", nullable = false)
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Role role;
+	private UUID roleId;
 
-	@JoinColumn(name = "tenant_id")
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Tenant tenant;
+	@Column(name = "tenant_id")
+	private UUID tenantId;
 
+	@Column(name = "user_id", nullable = false)
 	@Id
-	@JoinColumn(name = "user_id", nullable = false)
-	@ManyToOne(fetch = FetchType.LAZY)
-	private User user;
+	private UUID userId;
 
 }

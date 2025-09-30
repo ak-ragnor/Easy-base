@@ -27,6 +27,7 @@ public interface PermissionProvider {
 	 * @param permissions the set of permission keys
 	 * @return a fully constructed PermissionContext
 	 */
-	public PermissionContext build(UUID userId, UUID tenantId, Set<String> permissions);
+	public PermissionContext build(
+		UUID userId, UUID tenantId, Set<String> permissions);
 
 }

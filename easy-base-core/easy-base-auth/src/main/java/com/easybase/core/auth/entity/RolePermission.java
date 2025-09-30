@@ -5,45 +5,39 @@
 
 package com.easybase.core.auth.entity;
 
+import com.easybase.infrastructure.data.entity.CompositeKeyBaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.io.Serializable;
-
-import java.time.Instant;
-
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
  * Join entity for many-to-many relationship between Role and Permission.
- * Stores the relationship with role ID as UUID rather than entity reference
- * to avoid circular dependency between auth and role modules.
+ * Uses only UUID references to avoid circular dependencies between modules.
  *
  * @author Akhash R
  */
-@AllArgsConstructor
 @Data
 @Entity
+@EqualsAndHashCode(callSuper = true)
 @IdClass(RolePermission.RolePermissionId.class)
 @NoArgsConstructor
 @Table(name = "eb_role_permissions")
-public class RolePermission {
+public class RolePermission extends CompositeKeyBaseEntity {
 
-	public RolePermission(UUID roleId, Permission permission) {
+	public RolePermission(UUID roleId, UUID permissionId) {
 		this.roleId = roleId;
-		this.permission = permission;
-
-		this.grantedAt = Instant.now();
+		this.permissionId = permissionId;
 	}
 
 	@AllArgsConstructor
@@ -51,21 +45,14 @@ public class RolePermission {
 	@NoArgsConstructor
 	public static class RolePermissionId implements Serializable {
 
-		private UUID permission;
+		private UUID permissionId;
 		private UUID roleId;
 
 	}
 
-	@Column(name = "granted_at", nullable = false)
-	private Instant grantedAt = Instant.now();
-
-	@Column(name = "granted_by")
-	private UUID grantedBy;
-
+	@Column(name = "permission_id", nullable = false)
 	@Id
-	@JoinColumn(name = "permission_id", nullable = false)
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Permission permission;
+	private UUID permissionId;
 
 	@Column(name = "role_id", nullable = false)
 	@Id

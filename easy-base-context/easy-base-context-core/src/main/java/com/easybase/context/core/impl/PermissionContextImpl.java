@@ -36,13 +36,13 @@ public class PermissionContextImpl implements PermissionContext {
 	}
 
 	@Override
-	public UUID userId() {
-		return _userId;
+	public UUID tenantId() {
+		return _tenantId;
 	}
 
 	@Override
-	public UUID tenantId() {
-		return _tenantId;
+	public UUID userId() {
+		return _userId;
 	}
 
 	/**
@@ -57,21 +57,25 @@ public class PermissionContextImpl implements PermissionContext {
 		 * @return the created PermissionContext
 		 */
 		public PermissionContext build() {
-			PermissionContextImpl context = new PermissionContextImpl();
-			context._userId = _userId;
-			context._tenantId = _tenantId;
-			context._permissions = _permissions;
-			return context;
+			PermissionContextImpl permissionContextImpl =
+				new PermissionContextImpl();
+
+			permissionContextImpl._userId = _userId;
+			permissionContextImpl._tenantId = _tenantId;
+			permissionContextImpl._permissions = _permissions;
+
+			return permissionContextImpl;
 		}
 
 		/**
-		 * Sets the user ID.
+		 * Sets the permissions.
 		 *
-		 * @param userId the user ID
+		 * @param permissions the set of permission keys
 		 * @return this builder for chaining
 		 */
-		public PermissionContextBuilder userId(UUID userId) {
-			_userId = userId;
+		public PermissionContextBuilder permissions(Set<String> permissions) {
+			_permissions = permissions;
+
 			return this;
 		}
 
@@ -83,28 +87,30 @@ public class PermissionContextImpl implements PermissionContext {
 		 */
 		public PermissionContextBuilder tenantId(UUID tenantId) {
 			_tenantId = tenantId;
+
 			return this;
 		}
 
 		/**
-		 * Sets the permissions.
+		 * Sets the user ID.
 		 *
-		 * @param permissions the set of permission keys
+		 * @param userId the user ID
 		 * @return this builder for chaining
 		 */
-		public PermissionContextBuilder permissions(Set<String> permissions) {
-			_permissions = permissions;
+		public PermissionContextBuilder userId(UUID userId) {
+			_userId = userId;
+
 			return this;
 		}
 
-		private UUID _userId;
-		private UUID _tenantId;
 		private Set<String> _permissions;
+		private UUID _tenantId;
+		private UUID _userId;
 
 	}
 
-	private UUID _userId;
-	private UUID _tenantId;
 	private Set<String> _permissions;
+	private UUID _tenantId;
+	private UUID _userId;
 
 }

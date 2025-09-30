@@ -6,7 +6,7 @@
 package com.easybase.core.auth.repository;
 
 import com.easybase.core.auth.entity.Permission;
-import com.easybase.infrastructure.data.repository.BaseRepository;
+import com.easybase.infrastructure.data.repository.SingleKeyBaseRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Repository;
  * @author Akhash R
  */
 @Repository
-public interface PermissionRepository extends BaseRepository<Permission> {
+public interface PermissionRepository extends SingleKeyBaseRepository<Permission> {
 
 	public boolean existsByPermissionKey(String permissionKey);
 
@@ -37,9 +37,8 @@ public interface PermissionRepository extends BaseRepository<Permission> {
 		String resourceType, String action);
 
 	@Query(
-		"SELECT DISTINCT p FROM Permission p " +
-			"JOIN RolePermission rp ON p.id = rp.permission.id " +
-				"WHERE rp.roleId IN :roleIds"
+		"SELECT DISTINCT p FROM Permission p JOIN RolePermission rp ON p.id = rp.permission.id " +
+			"WHERE rp.roleId IN :roleIds"
 	)
 	public List<Permission> findPermissionsByRoleIds(
 		@Param("roleIds") List<UUID> roleIds);

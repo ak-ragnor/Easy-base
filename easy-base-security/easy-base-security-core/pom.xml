@@ -17,7 +17,19 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-auth</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-context-api</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-role</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 
@@ -36,18 +48,6 @@
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-user</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-auth</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-role</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 

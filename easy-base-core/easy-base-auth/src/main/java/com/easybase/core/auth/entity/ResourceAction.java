@@ -5,7 +5,7 @@
 
 package com.easybase.core.auth.entity;
 
-import com.easybase.infrastructure.data.entity.BaseEntity;
+import com.easybase.infrastructure.data.entity.SingleKeyBaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +37,7 @@ import lombok.NoArgsConstructor;
 		@UniqueConstraint(columnNames = {"resource_type", "action_key"})
 	}
 )
-public class ResourceAction extends BaseEntity {
+public class ResourceAction extends SingleKeyBaseEntity {
 
 	@Column(name = "action_key", nullable = false)
 	@NotBlank
@@ -49,12 +49,12 @@ public class ResourceAction extends BaseEntity {
 	@Size(max = 100)
 	private String actionName;
 
+	@Column(name = "is_active", nullable = false)
+	private boolean active = true;
+
 	@Column(name = "description")
 	@Size(max = 255)
 	private String description;
-
-	@Column(name = "is_active", nullable = false)
-	private boolean isActive = true;
 
 	@Column(name = "resource_type", nullable = false)
 	@NotBlank

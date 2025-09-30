@@ -235,8 +235,8 @@ public class JwtSessionAuthenticationFilter extends OncePerRequestFilter {
 		);
 	}
 
-	private final ServiceContextBinding _serviceContextBinding;
 	private final PermissionContextBinding _permissionContextBinding;
+	private final ServiceContextBinding _serviceContextBinding;
 	private final SessionService _sessionService;
 	private final TokenService _tokenService;
 

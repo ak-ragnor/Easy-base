@@ -9,8 +9,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
-import java.time.LocalDateTime;
-
+import java.time.Instant;
 import java.util.UUID;
 
 import lombok.Getter;
@@ -27,7 +26,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @MappedSuperclass
 @Setter
 @ToString
-public abstract class BaseEntity {
+public abstract class SingleKeyBaseEntity {
 
 	@Override
 	public boolean equals(Object o) {
@@ -35,11 +34,11 @@ public abstract class BaseEntity {
 			return true;
 		}
 
-		if (!(o instanceof BaseEntity)) {
+		if (!(o instanceof SingleKeyBaseEntity)) {
 			return false;
 		}
 
-		BaseEntity that = (BaseEntity)o;
+		SingleKeyBaseEntity that = (SingleKeyBaseEntity)o;
 
 		if ((id != null) && id.equals(that.id)) {
 			return true;
@@ -58,14 +57,14 @@ public abstract class BaseEntity {
 	}
 
 	@Column(name = "created_by", updatable = false)
-	protected String createdBy;
+	protected UUID createdBy;
 
 	@Column(name = "updated_by")
-	protected String updatedBy;
+	protected UUID updatedBy;
 
 	@Column(name = "created_at", nullable = false, updatable = false)
 	@CreationTimestamp
-	private LocalDateTime createdAt;
+	private Instant createdAt;
 
 	@Column(
 		columnDefinition = "boolean default false", name = "is_deleted",
@@ -82,6 +81,6 @@ public abstract class BaseEntity {
 
 	@Column(name = "updated_at", nullable = false)
 	@UpdateTimestamp
-	private LocalDateTime updatedAt;
+	private Instant updatedAt;
 
 }

@@ -5,7 +5,7 @@
 
 package com.easybase.core.auth.entity;
 
-import com.easybase.infrastructure.data.entity.BaseEntity;
+import com.easybase.infrastructure.data.entity.SingleKeyBaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,14 +43,14 @@ import lombok.ToString;
 	}
 )
 @ToString(exclude = "rolePermissions")
-public class Permission extends BaseEntity {
+public class Permission extends SingleKeyBaseEntity {
 
 	public Permission(String resourceType, String action, String description) {
 		this.resourceType = resourceType;
 		this.action = action;
 		this.description = description;
 
-		this.permissionKey = resourceType + ":" + action;
+		permissionKey = resourceType + ":" + action;
 	}
 
 	@Column(name = "action", nullable = false)

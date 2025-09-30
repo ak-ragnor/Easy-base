@@ -15,15 +15,6 @@ import lombok.Data;
 @Data
 public class PermissionCheckResult {
 
-	public PermissionCheckResult() {
-	}
-
-	public PermissionCheckResult(boolean hasPermission, String permissionKey, String reason) {
-		this.hasPermission = hasPermission;
-		this.permissionKey = permissionKey;
-		this.reason = reason;
-	}
-
 	public static PermissionCheckResult allowed(String permissionKey) {
 		return new PermissionCheckResult(
 			true, permissionKey, "Permission granted");
@@ -33,6 +24,17 @@ public class PermissionCheckResult {
 		String permissionKey, String reason) {
 
 		return new PermissionCheckResult(false, permissionKey, reason);
+	}
+
+	public PermissionCheckResult() {
+	}
+
+	public PermissionCheckResult(
+		boolean hasPermission, String permissionKey, String reason) {
+
+		this.hasPermission = hasPermission;
+		this.permissionKey = permissionKey;
+		this.reason = reason;
 	}
 
 	private boolean hasPermission;

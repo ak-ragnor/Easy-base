@@ -6,7 +6,7 @@
 package com.easybase.core.role.repository;
 
 import com.easybase.core.role.entity.Role;
-import com.easybase.infrastructure.data.repository.BaseRepository;
+import com.easybase.infrastructure.data.repository.SingleKeyBaseRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,23 +22,23 @@ import org.springframework.stereotype.Repository;
  * @author Akhash R
  */
 @Repository
-public interface RoleRepository extends BaseRepository<Role> {
+public interface RoleRepository extends SingleKeyBaseRepository<Role> {
 
-	public boolean existsByNameAndIsSystemTrue(String name);
+	public boolean existsByNameAndSystemTrue(String name);
 
 	public boolean existsByNameAndTenantId(String name, UUID tenantId);
 
-	public List<Role> findByIsSystemTrue();
+	public List<Role> findBySystemTrue();
 
-	public Optional<Role> findByNameAndIsSystemTrue(String name);
+	public Optional<Role> findByNameAndSystemTrue(String name);
 
 	public Optional<Role> findByNameAndTenantId(String name, UUID tenantId);
 
 	public List<Role> findByTenantId(UUID tenantId);
 
 	@Query(
-		"SELECT r FROM Role r " +
-			"WHERE (r.isSystem = true) OR (r.tenant.id = :tenantId AND r.isActive = true)"
+		"SELECT r FROM Role r WHERE (r.system = true) OR (r.tenantId = :tenantId " +
+			"AND r.active = true)"
 	)
 	public List<Role> findSystemAndTenantRoles(
 		@Param("tenantId") UUID tenantId);

@@ -6,7 +6,7 @@
 package com.easybase.core.user.entity;
 
 import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.infrastructure.data.entity.BaseEntity;
+import com.easybase.infrastructure.data.entity.SingleKeyBaseEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -22,9 +22,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,7 +43,7 @@ import lombok.ToString;
 	uniqueConstraints = @UniqueConstraint(columnNames = "email")
 )
 @ToString
-public class User extends BaseEntity {
+public class User extends SingleKeyBaseEntity {
 
 	@OneToMany(
 		cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user"
@@ -73,6 +71,5 @@ public class User extends BaseEntity {
 	@JoinColumn(name = "tenant_id")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Tenant tenant;
-
 
 }

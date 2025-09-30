@@ -66,17 +66,6 @@ public class PermissionChecker {
 	}
 
 	/**
-	 * Check if current user has the specified permission.
-	 *
-	 * @param permissionKey the permission key to check
-	 * @return true if user has the permission
-	 */
-	public boolean hasPermission(String permissionKey) {
-		PermissionContext context = _getCurrentPermissionContext();
-		return context.hasPermission(permissionKey);
-	}
-
-	/**
 	 * Check if current user has all of the specified permissions.
 	 *
 	 * @param permissionKeys the permission keys to check
@@ -84,6 +73,7 @@ public class PermissionChecker {
 	 */
 	public boolean hasAllPermissions(String... permissionKeys) {
 		PermissionContext context = _getCurrentPermissionContext();
+
 		return context.hasAllPermissions(permissionKeys);
 	}
 
@@ -95,7 +85,20 @@ public class PermissionChecker {
 	 */
 	public boolean hasAnyPermission(String... permissionKeys) {
 		PermissionContext context = _getCurrentPermissionContext();
+
 		return context.hasAnyPermission(permissionKeys);
+	}
+
+	/**
+	 * Check if current user has the specified permission.
+	 *
+	 * @param permissionKey the permission key to check
+	 * @return true if user has the permission
+	 */
+	public boolean hasPermission(String permissionKey) {
+		PermissionContext context = _getCurrentPermissionContext();
+
+		return context.hasPermission(permissionKey);
 	}
 
 	/**
@@ -105,7 +108,8 @@ public class PermissionChecker {
 	 * @throws IllegalStateException if no context is available
 	 */
 	private PermissionContext _getCurrentPermissionContext() {
-		PermissionContext context = _permissionContextProvider.getCurrentPermissionContext();
+		PermissionContext context =
+			_permissionContextProvider.getCurrentPermissionContext();
 
 		if (context == null) {
 			throw new IllegalStateException(

@@ -33,7 +33,19 @@
 
 		<dependency>
 			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-context-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-infrastructure-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-security-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -46,18 +58,6 @@
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-user</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-security-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-context-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

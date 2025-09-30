@@ -16,19 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-role</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-auth</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-security-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -39,23 +27,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>jakarta.validation</groupId>
-			<artifactId>jakarta.validation-api</artifactId>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-role</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
@@ -63,5 +37,9 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-	</dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>	</dependencies>
 </project>

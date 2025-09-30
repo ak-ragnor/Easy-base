@@ -80,17 +80,17 @@ public class ServiceContextImpl implements ServiceContext {
 		 * @return the created ServiceContext
 		 */
 		public ServiceContext build() {
-			ServiceContextImpl context = new ServiceContextImpl();
+			ServiceContextImpl serviceContextImpl = new ServiceContextImpl();
 
-			context._clientIp = _clientIp;
-			context._correlation = _correlation;
-			context._expiresAt = _expiresAt;
-			context._issuedAt = _issuedAt;
-			context._tenant = _tenant;
-			context._user = _user;
-			context._userAgent = _userAgent;
+			serviceContextImpl._clientIp = _clientIp;
+			serviceContextImpl._correlation = _correlation;
+			serviceContextImpl._expiresAt = _expiresAt;
+			serviceContextImpl._issuedAt = _issuedAt;
+			serviceContextImpl._tenant = _tenant;
+			serviceContextImpl._user = _user;
+			serviceContextImpl._userAgent = _userAgent;
 
-			return context;
+			return serviceContextImpl;
 		}
 
 		/**
@@ -140,7 +140,6 @@ public class ServiceContextImpl implements ServiceContext {
 
 			return this;
 		}
-
 
 		/**
 		 * Sets the tenant information.

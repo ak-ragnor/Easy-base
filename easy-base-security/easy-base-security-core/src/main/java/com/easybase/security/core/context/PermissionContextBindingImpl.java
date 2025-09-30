@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +35,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class PermissionContextBindingImpl implements PermissionContextBinding, PermissionContextProvider {
+public class PermissionContextBindingImpl
+	implements PermissionContextBinding, PermissionContextProvider {
 
 	@Override
 	public void bind(AuthenticatedPrincipalData principal) {
@@ -52,18 +54,19 @@ public class PermissionContextBindingImpl implements PermissionContextBinding, P
 	}
 
 	@Override
-	public PermissionContext fromPrincipal(AuthenticatedPrincipalData principal) {
+	public PermissionContext fromPrincipal(
+		AuthenticatedPrincipalData principal) {
+
 		Set<String> permissions = _getUserPermissions(principal);
 
 		return _permissionProvider.build(
-			principal.getUserId(),
-			principal.getTenantId(),
-			permissions);
+			principal.getUserId(), principal.getTenantId(), permissions);
 	}
 
 	@Override
 	public PermissionContext getCurrentPermissionContext() {
-		AuthenticatedPrincipalData authenticatedPrincipalData = fromCurrentContext();
+		AuthenticatedPrincipalData authenticatedPrincipalData =
+			fromCurrentContext();
 
 		if (authenticatedPrincipalData == null) {
 			return null;
@@ -72,25 +75,27 @@ public class PermissionContextBindingImpl implements PermissionContextBinding, P
 		return fromPrincipal(authenticatedPrincipalData);
 	}
 
-	private final PermissionProvider _permissionProvider;
-	private final PermissionRepository _permissionRepository;
-	private final RoleQueryService _roleQueryService;
-	private final ThreadLocal<AuthenticatedPrincipalData> _principalHolder =
-		new ThreadLocal<>();
-
 	/**
 	 * Loads user permissions for the given principal.
 	 *
 	 * @param principal the authenticated principal data
 	 * @return set of permission keys
 	 */
-	private Set<String> _getUserPermissions(AuthenticatedPrincipalData principal) {
+	private Set<String> _getUserPermissions(
+		AuthenticatedPrincipalData principal) {
+
 		UUID userId = principal.getUserId();
 		UUID tenantId = principal.getTenantId();
 
-		List<UUID> roleIds = tenantId != null ?
-			_roleQueryService.getActiveRoleIdsByUserIdAndTenantId(userId, tenantId) :
-			_roleQueryService.getActiveRoleIdsByUserId(userId);
+		List<UUID> roleIds;
+
+		if (tenantId != null) {
+			roleIds = _roleQueryService.getActiveRoleIdsByUserIdAndTenantId(
+				userId, tenantId);
+		}
+		else {
+			roleIds = _roleQueryService.getActiveRoleIdsByUserId(userId);
+		}
 
 		if (roleIds.isEmpty()) {
 			return Set.of();
@@ -99,10 +104,19 @@ public class PermissionContextBindingImpl implements PermissionContextBinding, P
 		List<Permission> userPermissions =
 			_permissionRepository.findPermissionsByRoleIds(roleIds);
 
-		return userPermissions.stream()
-			.map(Permission::getPermissionKey)
-			.collect(Collectors.toSet());
+		Stream<Permission> permissionStream = userPermissions.stream();
+
+		return permissionStream.map(
+			Permission::getPermissionKey
+		).collect(
+			Collectors.toSet()
+		);
 	}
 
+	private final PermissionProvider _permissionProvider;
+	private final PermissionRepository _permissionRepository;
+	private final ThreadLocal<AuthenticatedPrincipalData> _principalHolder =
+		new ThreadLocal<>();
+	private final RoleQueryService _roleQueryService;
 
 }

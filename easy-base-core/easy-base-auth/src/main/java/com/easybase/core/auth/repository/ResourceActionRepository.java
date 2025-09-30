@@ -6,11 +6,10 @@
 package com.easybase.core.auth.repository;
 
 import com.easybase.core.auth.entity.ResourceAction;
-import com.easybase.infrastructure.data.repository.BaseRepository;
+import com.easybase.infrastructure.data.repository.SingleKeyBaseRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ResourceActionRepository
-	extends BaseRepository<ResourceAction> {
+	extends SingleKeyBaseRepository<ResourceAction> {
 
 	public boolean existsByResourceTypeAndActionKey(
 		String resourceType, String actionKey);

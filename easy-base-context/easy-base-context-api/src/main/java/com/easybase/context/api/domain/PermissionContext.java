@@ -18,27 +18,40 @@ import java.util.UUID;
 public interface PermissionContext {
 
 	/**
-	 * Gets all permissions for the current user.
-	 * Loaded during authentication for performance.
+	 * Checks if user has all of the specified permissions.
 	 *
-	 * @return set of permission keys (e.g., "ROLE:CREATE", "USER:UPDATE")
+	 * @param permissionKeys the permission keys to check
+	 * @return true if user has all permissions
 	 */
-	public Set<String> permissions();
+	public default boolean hasAllPermissions(String... permissionKeys) {
+		Set<String> userPermissions = permissions();
+
+		for (String permission : permissionKeys) {
+			if (!userPermissions.contains(permission)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	/**
-	 * Gets the user ID this permission context belongs to.
+	 * Checks if user has any of the specified permissions.
 	 *
-	 * @return the user ID
+	 * @param permissionKeys the permission keys to check
+	 * @return true if user has at least one permission
 	 */
-	public UUID userId();
+	public default boolean hasAnyPermission(String... permissionKeys) {
+		Set<String> userPermissions = permissions();
 
-	/**
-	 * Gets the tenant ID this permission context belongs to.
-	 * May be null for system-wide permissions.
-	 *
-	 * @return the tenant ID, may be null
-	 */
-	public UUID tenantId();
+		for (String permission : permissionKeys) {
+			if (userPermissions.contains(permission)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/**
 	 * Convenience method to check if user has specific permission.
@@ -51,35 +64,26 @@ public interface PermissionContext {
 	}
 
 	/**
-	 * Checks if user has all of the specified permissions.
+	 * Gets all permissions for the current user.
+	 * Loaded during authentication for performance.
 	 *
-	 * @param permissionKeys the permission keys to check
-	 * @return true if user has all permissions
+	 * @return set of permission keys (e.g., "ROLE:CREATE", "USER:UPDATE")
 	 */
-	public default boolean hasAllPermissions(String... permissionKeys) {
-		Set<String> userPermissions = permissions();
-		for (String permission : permissionKeys) {
-			if (!userPermissions.contains(permission)) {
-				return false;
-			}
-		}
-		return true;
-	}
+	public Set<String> permissions();
 
 	/**
-	 * Checks if user has any of the specified permissions.
+	 * Gets the tenant ID this permission context belongs to.
+	 * May be null for system-wide permissions.
 	 *
-	 * @param permissionKeys the permission keys to check
-	 * @return true if user has at least one permission
+	 * @return the tenant ID, may be null
 	 */
-	public default boolean hasAnyPermission(String... permissionKeys) {
-		Set<String> userPermissions = permissions();
-		for (String permission : permissionKeys) {
-			if (userPermissions.contains(permission)) {
-				return true;
-			}
-		}
-		return false;
-	}
+	public UUID tenantId();
+
+	/**
+	 * Gets the user ID this permission context belongs to.
+	 *
+	 * @return the user ID
+	 */
+	public UUID userId();
 
 }

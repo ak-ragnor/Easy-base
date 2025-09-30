@@ -7,16 +7,15 @@ package com.easybase.core.role.service;
 
 import com.easybase.common.exception.ConflictException;
 import com.easybase.context.core.util.PermissionChecker;
-import com.easybase.core.auth.action.RoleActions;
+import com.easybase.core.role.action.RoleActions;
 import com.easybase.core.auth.repository.RolePermissionRepository;
 import com.easybase.core.role.entity.Role;
 import com.easybase.core.role.entity.UserRole;
 import com.easybase.core.role.repository.RoleRepository;
 import com.easybase.core.role.repository.UserRoleRepository;
-import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.core.user.entity.User;
 
 import java.time.Instant;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -37,8 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RoleService {
 
-	private final PermissionChecker _permissionChecker;
-
 	@CacheEvict(
 		allEntries = true, value = {"userPermissions", "userTenantPermissions"}
 	)
@@ -50,33 +47,26 @@ public class RoleService {
 		if (_userRoleRepository.existsByUserIdAndRoleId(userId, roleId)) {
 			throw new ConflictException("User already has this role assigned");
 		}
+        
+		_roleQueryService.getRoleById(roleId);
 
-		User user = new User();
-		user.setId(userId);
-
-		Role role = _roleQueryService.getRoleById(roleId);
-
-		Tenant tenant = null;
-		if (tenantId != null) {
-			tenant = new Tenant();
-			tenant.setId(tenantId);
-		}
-
-		UserRole userRole = new UserRole(user, role, tenant);
+		UserRole userRole = new UserRole(userId, roleId, tenantId);
 		userRole.setExpiresAt(expiresAt);
 
 		return _userRoleRepository.save(userRole);
 	}
 
-	public Role createRole(String name, String description, UUID tenantId, boolean isSystem) {
+	public Role createRole(
+		String name, String description, UUID tenantId, boolean system) {
+
 		_permissionChecker.check(RoleActions.CREATE);
 
-		if (isSystem && _roleRepository.existsByNameAndIsSystemTrue(name)) {
+		if (system && _roleRepository.existsByNameAndSystemTrue(name)) {
 			throw new ConflictException(
 				"System role with name '" + name + "' already exists");
 		}
 
-		if (!isSystem && (tenantId != null) &&
+		if (!system && (tenantId != null) &&
 			_roleRepository.existsByNameAndTenantId(name, tenantId)) {
 
 			throw new ConflictException(
@@ -84,15 +74,14 @@ public class RoleService {
 		}
 
 		Role role = new Role();
+
 		role.setName(name);
 		role.setDescription(description);
-		role.setSystem(isSystem);
+		role.setSystem(system);
 		role.setActive(true);
 
-		if (!isSystem && (tenantId != null)) {
-			Tenant tenant = new Tenant();
-			tenant.setId(tenantId);
-			role.setTenant(tenant);
+		if (!system && (tenantId != null)) {
+			role.setTenantId(tenantId);
 		}
 
 		return _roleRepository.save(role);
@@ -158,6 +147,7 @@ public class RoleService {
 		return _roleRepository.save(role);
 	}
 
+	private final PermissionChecker _permissionChecker;
 	private final RolePermissionRepository _rolePermissionRepository;
 	private final RoleQueryService _roleQueryService;
 	private final RoleRepository _roleRepository;

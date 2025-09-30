@@ -21,6 +21,6 @@ public interface PermissionContextProvider {
 	 *
 	 * @return the current PermissionContext, or null if none is available
 	 */
-	PermissionContext getCurrentPermissionContext();
+	public PermissionContext getCurrentPermissionContext();
 
 }

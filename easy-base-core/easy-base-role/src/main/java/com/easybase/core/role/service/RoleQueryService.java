@@ -14,6 +14,7 @@ import com.easybase.core.role.repository.UserRoleRepository;
 import java.time.Instant;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
@@ -63,35 +64,34 @@ public class RoleQueryService {
 
 	@Transactional(readOnly = true)
 	public Role getRoleById(UUID roleId) {
-		return _roleRepository.findById(
-			roleId
-		).orElseThrow(
+		Optional<Role> roleOptional = _roleRepository.findById(roleId);
+
+		return roleOptional.orElseThrow(
 			() -> new ResourceNotFoundException(
-				"Role not found with id: " + roleId)
-		);
+				"Role not found with id: " + roleId));
 	}
 
 	@Transactional(readOnly = true)
 	public Role getRoleByName(String name, UUID tenantId) {
 		if (tenantId != null) {
-			return _roleRepository.findByNameAndTenantId(
-				name, tenantId
-			).orElseThrow(
-				() -> new ResourceNotFoundException("Role not found: " + name)
-			);
+			Optional<Role> roleOptional = _roleRepository.findByNameAndTenantId(
+				name, tenantId);
+
+			return roleOptional.orElseThrow(
+				() -> new ResourceNotFoundException("Role not found: " + name));
 		}
 
-		return _roleRepository.findByNameAndIsSystemTrue(
-			name
-		).orElseThrow(
+		Optional<Role> systemRoleOptional =
+			_roleRepository.findByNameAndSystemTrue(name);
+
+		return systemRoleOptional.orElseThrow(
 			() -> new ResourceNotFoundException(
-				"System role not found: " + name)
-		);
+				"System role not found: " + name));
 	}
 
 	@Transactional(readOnly = true)
 	public List<Role> getSystemRoles() {
-		return _roleRepository.findByIsSystemTrue();
+		return _roleRepository.findBySystemTrue();
 	}
 
 	@Transactional(readOnly = true)
@@ -101,12 +101,12 @@ public class RoleQueryService {
 
 	@Transactional(readOnly = true)
 	public List<UserRole> getUserRoles(UUID userId) {
-		return _userRoleRepository.findByUserIdAndIsActiveTrue(userId);
+		return _userRoleRepository.findByUserIdAndActiveTrue(userId);
 	}
 
 	@Transactional(readOnly = true)
 	public List<UserRole> getUserRoles(UUID userId, UUID tenantId) {
-		return _userRoleRepository.findByUserIdAndTenantIdAndIsActiveTrue(
+		return _userRoleRepository.findByUserIdAndTenantIdAndActiveTrue(
 			userId, tenantId);
 	}
 

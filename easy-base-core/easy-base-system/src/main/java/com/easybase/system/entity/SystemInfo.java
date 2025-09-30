@@ -5,7 +5,7 @@
 
 package com.easybase.system.entity;
 
-import com.easybase.infrastructure.data.entity.BaseEntity;
+import com.easybase.infrastructure.data.entity.SingleKeyBaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Table(name = "eb_system_info")
-public class SystemInfo extends BaseEntity {
+public class SystemInfo extends SingleKeyBaseEntity {
 
 	@Column(name = "app_version", nullable = false)
 	private String appVersion;

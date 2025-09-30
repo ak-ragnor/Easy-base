@@ -19,6 +19,7 @@ public interface PermissionContextBinding {
 
 	public AuthenticatedPrincipalData fromCurrentContext();
 
-	public PermissionContext fromPrincipal(AuthenticatedPrincipalData principal);
+	public PermissionContext fromPrincipal(
+		AuthenticatedPrincipalData principal);
 
 }

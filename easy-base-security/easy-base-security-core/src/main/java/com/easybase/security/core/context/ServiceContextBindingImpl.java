@@ -55,11 +55,13 @@ public class ServiceContextBindingImpl implements ServiceContextBinding {
 
 	@Override
 	public ServiceContext getCurrentServiceContext() {
-		AuthenticatedPrincipalData authenticatedPrincipalData = fromCurrentContext();
+		AuthenticatedPrincipalData authenticatedPrincipalData =
+			fromCurrentContext();
 
 		if (authenticatedPrincipalData == null) {
 			return null;
 		}
+
 		return fromPrincipal(authenticatedPrincipalData);
 	}
 
@@ -69,7 +71,7 @@ public class ServiceContextBindingImpl implements ServiceContextBinding {
 	private static class SecurityServiceContext implements ServiceContext {
 
 		public SecurityServiceContext(AuthenticatedPrincipalData principal) {
-			this._authenticatedPrincipalData = principal;
+			_authenticatedPrincipalData = principal;
 
 			_tenantInfo = _createTenantInfo(principal);
 			_userInfo = _createUserInfo(principal);
@@ -78,7 +80,8 @@ public class ServiceContextBindingImpl implements ServiceContextBinding {
 
 		@Override
 		public Optional<String> clientIp() {
-			return Optional.ofNullable(_authenticatedPrincipalData.getClientIp());
+			return Optional.ofNullable(
+				_authenticatedPrincipalData.getClientIp());
 		}
 
 		@Override
@@ -96,7 +99,6 @@ public class ServiceContextBindingImpl implements ServiceContextBinding {
 			return _authenticatedPrincipalData.getIssuedAt();
 		}
 
-
 		@Override
 		public TenantInfo tenant() {
 			return _tenantInfo;
@@ -109,7 +111,8 @@ public class ServiceContextBindingImpl implements ServiceContextBinding {
 
 		@Override
 		public Optional<String> userAgent() {
-			return Optional.ofNullable(_authenticatedPrincipalData.getUserAgent());
+			return Optional.ofNullable(
+				_authenticatedPrincipalData.getUserAgent());
 		}
 
 		private CorrelationIds _createCorrelationIds(
@@ -134,9 +137,8 @@ public class ServiceContextBindingImpl implements ServiceContextBinding {
 				() -> "user-" + principal.getUserId(), List::of, List::of);
 		}
 
-
-		private final CorrelationIds _correlationIds;
 		private final AuthenticatedPrincipalData _authenticatedPrincipalData;
+		private final CorrelationIds _correlationIds;
 		private final TenantInfo _tenantInfo;
 		private final UserInfo _userInfo;
 

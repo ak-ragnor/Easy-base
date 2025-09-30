@@ -11,6 +11,7 @@ import com.easybase.core.auth.entity.Permission;
 import com.easybase.core.auth.repository.PermissionRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class PermissionService {
 
 		String permissionKey = resourceType + ":" + action;
 
-		if (permissionRepository.existsByPermissionKey(permissionKey)) {
+		if (_permissionRepository.existsByPermissionKey(permissionKey)) {
 			throw new ConflictException(
 				"Permission already exists: " + permissionKey);
 		}
@@ -41,66 +42,67 @@ public class PermissionService {
 		Permission permission = new Permission(
 			resourceType, action, description);
 
-		return permissionRepository.save(permission);
+		return _permissionRepository.save(permission);
 	}
 
 	public void deletePermission(UUID permissionId) {
 		Permission permission = getPermissionById(permissionId);
 
-		permissionRepository.delete(permission);
+		_permissionRepository.delete(permission);
 	}
 
 	@Transactional(readOnly = true)
 	public List<Permission> getAllPermissions() {
-		return permissionRepository.findAll();
+		return _permissionRepository.findAll();
 	}
 
 	@Transactional(readOnly = true)
 	public Permission getPermissionById(UUID permissionId) {
-		return permissionRepository.findById(
-			permissionId
-		).orElseThrow(
+		Optional<Permission> permissionOptional =
+			_permissionRepository.findById(permissionId);
+
+		return permissionOptional.orElseThrow(
 			() -> new ResourceNotFoundException(
-				"Permission not found with id: " + permissionId)
-		);
+				"Permission not found with id: " + permissionId));
 	}
 
 	@Transactional(readOnly = true)
 	public Permission getPermissionByKey(String permissionKey) {
-		return permissionRepository.findByPermissionKey(
-			permissionKey
-		).orElseThrow(
+		Optional<Permission> permissionOptional =
+			_permissionRepository.findByPermissionKey(permissionKey);
+
+		return permissionOptional.orElseThrow(
 			() -> new ResourceNotFoundException(
-				"Permission not found: " + permissionKey)
-		);
+				"Permission not found: " + permissionKey));
 	}
 
 	@Transactional(readOnly = true)
 	public Permission getPermissionByResourceAndAction(
 		String resourceType, String action) {
 
-		return permissionRepository.findByResourceTypeAndAction(
-			resourceType, action
-		).orElseThrow(
+		Optional<Permission> permissionOptional =
+			_permissionRepository.findByResourceTypeAndAction(
+				resourceType, action);
+
+		return permissionOptional.orElseThrow(
 			() -> new ResourceNotFoundException(
 				"Permission not found for resource: " + resourceType +
-					", action: " + action)
-		);
+					", action: " + action));
 	}
 
 	@Transactional(readOnly = true)
 	public List<Permission> getPermissionsByResource(String resourceType) {
-		return permissionRepository.findByResourceType(resourceType);
+		return _permissionRepository.findByResourceType(resourceType);
 	}
 
 	@Transactional(readOnly = true)
 	public boolean permissionExists(String permissionKey) {
-		return permissionRepository.existsByPermissionKey(permissionKey);
+		return _permissionRepository.existsByPermissionKey(permissionKey);
 	}
 
 	@Transactional(readOnly = true)
 	public boolean permissionExists(String resourceType, String action) {
-		return permissionRepository.existsByResourceTypeAndAction(
+		return _permissionRepository.existsByResourceTypeAndAction(
 			resourceType, action);
 	}
 
@@ -109,9 +111,9 @@ public class PermissionService {
 
 		permission.setDescription(description);
 
-		return permissionRepository.save(permission);
+		return _permissionRepository.save(permission);
 	}
 
-	private final PermissionRepository permissionRepository;
+	private final PermissionRepository _permissionRepository;
 
 }

@@ -5,7 +5,7 @@
 
 package com.easybase.infrastructure.data.repository;
 
-import com.easybase.infrastructure.data.entity.BaseEntity;
+import com.easybase.infrastructure.data.entity.SingleKeyBaseEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,8 +27,8 @@ import org.springframework.data.repository.query.Param;
  * @author Akhash R
  */
 @NoRepositoryBean
-public interface TenantAwareRepository<T extends BaseEntity>
-	extends BaseRepository<T> {
+public interface TenantAwareRepository<T extends SingleKeyBaseEntity>
+	extends SingleKeyBaseRepository<T> {
 
 	/**
 	 * Checks if an active entity exists for the given tenant.

@@ -5,7 +5,7 @@
 
 package com.easybase.core.tenant.entity;
 
-import com.easybase.infrastructure.data.entity.BaseEntity;
+import com.easybase.infrastructure.data.entity.SingleKeyBaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Table(name = "eb_tenants")
-public class Tenant extends BaseEntity {
+public class Tenant extends SingleKeyBaseEntity {
 
 	@Column(length = 255, name = "name", nullable = false)
 	private String name;
