@@ -9,6 +9,7 @@ import com.easybase.context.api.domain.PermissionContext;
 import com.easybase.context.api.port.PermissionProvider;
 import com.easybase.context.core.impl.PermissionContextImpl;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 /**
  * Implementation of {@link PermissionProvider} that provides utilities for creating permission contexts.
  *
- * <p>This provider implementation creates permission contexts from permission data
+ * <p>This provider implementation creates permission contexts from permission and role data
  * without managing any thread-local storage.</p>
  *
  * @author Akhash R
@@ -27,7 +28,8 @@ public class PermissionProviderImpl implements PermissionProvider {
 
 	@Override
 	public PermissionContext build(
-		UUID userId, UUID tenantId, Set<String> permissions) {
+		UUID userId, UUID tenantId, Set<String> permissions,
+		List<String> roles) {
 
 		return PermissionContextImpl.builder(
 		).userId(
@@ -36,6 +38,8 @@ public class PermissionProviderImpl implements PermissionProvider {
 			tenantId
 		).permissions(
 			permissions
+		).roles(
+			roles
 		).build();
 	}
 

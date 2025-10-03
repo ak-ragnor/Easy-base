@@ -90,6 +90,11 @@ public class RoleQueryService {
 	}
 
 	@Transactional(readOnly = true)
+	public List<Role> getRolesByIds(List<UUID> roleIds) {
+		return _roleRepository.findAllById(roleIds);
+	}
+
+	@Transactional(readOnly = true)
 	public List<Role> getSystemRoles() {
 		return _roleRepository.findBySystemTrue();
 	}

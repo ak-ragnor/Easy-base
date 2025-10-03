@@ -8,6 +8,7 @@ package com.easybase.context.core.util;
 import com.easybase.common.exception.ForbiddenException;
 import com.easybase.context.api.domain.PermissionContext;
 import com.easybase.context.api.port.PermissionContextProvider;
+import com.easybase.infrastructure.auth.constants.SystemRoles;
 
 import java.util.Arrays;
 
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 /**
  * Utility component for checking permissions using PermissionContext.
  * Provides permission checking methods that can be injected into services.
+ * ADMIN users bypass all permission checks.
  *
  * @author Akhash R
  */
@@ -27,6 +29,7 @@ public class PermissionChecker {
 
 	/**
 	 * Check permission and throw exception if denied.
+	 * ADMIN users automatically pass all checks.
 	 *
 	 * @param permissionKey the permission key to check
 	 * @throws ForbiddenException if permission is denied
@@ -67,36 +70,57 @@ public class PermissionChecker {
 
 	/**
 	 * Check if current user has all of the specified permissions.
+	 * ADMIN users automatically have all permissions.
 	 *
 	 * @param permissionKeys the permission keys to check
-	 * @return true if user has all permissions
+	 * @return true if user has all permissions or is an ADMIN
 	 */
 	public boolean hasAllPermissions(String... permissionKeys) {
 		PermissionContext context = _getCurrentPermissionContext();
+
+		// ADMIN users bypass all permission checks
+
+		if (context.hasRole(ADMIN_ROLE)) {
+			return true;
+		}
 
 		return context.hasAllPermissions(permissionKeys);
 	}
 
 	/**
 	 * Check if current user has any of the specified permissions.
+	 * ADMIN users automatically have all permissions.
 	 *
 	 * @param permissionKeys the permission keys to check
-	 * @return true if user has at least one permission
+	 * @return true if user has at least one permission or is an ADMIN
 	 */
 	public boolean hasAnyPermission(String... permissionKeys) {
 		PermissionContext context = _getCurrentPermissionContext();
+
+		// ADMIN users bypass all permission checks
+
+		if (context.hasRole(ADMIN_ROLE)) {
+			return true;
+		}
 
 		return context.hasAnyPermission(permissionKeys);
 	}
 
 	/**
 	 * Check if current user has the specified permission.
+	 * ADMIN users automatically have all permissions.
 	 *
 	 * @param permissionKey the permission key to check
-	 * @return true if user has the permission
+	 * @return true if user has the permission or is an ADMIN
 	 */
 	public boolean hasPermission(String permissionKey) {
 		PermissionContext context = _getCurrentPermissionContext();
+
+		// ADMIN users bypass all permission checks
+
+		if (context.hasRole(ADMIN_ROLE)) {
+			return true;
+		}
 
 		return context.hasPermission(permissionKey);
 	}
@@ -118,6 +142,8 @@ public class PermissionChecker {
 
 		return context;
 	}
+
+	private static final String ADMIN_ROLE = SystemRoles.ADMIN;
 
 	private final PermissionContextProvider _permissionContextProvider;
 

@@ -19,10 +19,13 @@ import lombok.NoArgsConstructor;
 /**
  * DTO for Permission entity.
  *
+ * @deprecated Replaced by {@link ResourceActionDto} and {@link RolePermissionDto}.
+ * Use ResourceActionDto for action definitions and RolePermissionDto for role-based permissions.
  * @author Akhash R
  */
 @AllArgsConstructor
 @Data
+@Deprecated
 @NoArgsConstructor
 public class PermissionDto {
 

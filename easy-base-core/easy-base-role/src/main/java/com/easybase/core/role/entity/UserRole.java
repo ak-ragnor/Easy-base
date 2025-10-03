@@ -14,7 +14,9 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 
 import java.io.Serializable;
+
 import java.time.Instant;
+
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;

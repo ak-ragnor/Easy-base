@@ -5,21 +5,30 @@
 
 package com.easybase.core.auth.action;
 
+import com.easybase.infrastructure.auth.annotation.ActionDefinition;
+import com.easybase.infrastructure.auth.annotation.ActionRoles;
+
 /**
  * Action constants for permission-related operations.
  *
  * @author Akhash R
  */
+@ActionDefinition(resourceType = "PERMISSION")
 public final class PermissionActions {
 
+	@ActionRoles({"ADMIN"})
 	public static final String CREATE = "PERMISSION:CREATE";
 
+	@ActionRoles({"ADMIN"})
 	public static final String DELETE = "PERMISSION:DELETE";
 
+	@ActionRoles({"ADMIN"})
 	public static final String LIST = "PERMISSION:LIST";
 
+	@ActionRoles({"ADMIN"})
 	public static final String UPDATE = "PERMISSION:UPDATE";
 
+	@ActionRoles({"ADMIN", "USER"})
 	public static final String VIEW = "PERMISSION:VIEW";
 
 	private PermissionActions() {

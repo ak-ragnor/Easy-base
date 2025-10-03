@@ -7,6 +7,7 @@ package com.easybase.context.core.impl;
 
 import com.easybase.context.api.domain.PermissionContext;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,6 +34,11 @@ public class PermissionContextImpl implements PermissionContext {
 	@Override
 	public Set<String> permissions() {
 		return _permissions;
+	}
+
+	@Override
+	public List<String> roles() {
+		return _roles;
 	}
 
 	@Override
@@ -63,6 +69,7 @@ public class PermissionContextImpl implements PermissionContext {
 			permissionContextImpl._userId = _userId;
 			permissionContextImpl._tenantId = _tenantId;
 			permissionContextImpl._permissions = _permissions;
+			permissionContextImpl._roles = _roles;
 
 			return permissionContextImpl;
 		}
@@ -75,6 +82,18 @@ public class PermissionContextImpl implements PermissionContext {
 		 */
 		public PermissionContextBuilder permissions(Set<String> permissions) {
 			_permissions = permissions;
+
+			return this;
+		}
+
+		/**
+		 * Sets the roles.
+		 *
+		 * @param roles the list of role names
+		 * @return this builder for chaining
+		 */
+		public PermissionContextBuilder roles(List<String> roles) {
+			_roles = roles;
 
 			return this;
 		}
@@ -104,12 +123,14 @@ public class PermissionContextImpl implements PermissionContext {
 		}
 
 		private Set<String> _permissions;
+		private List<String> _roles;
 		private UUID _tenantId;
 		private UUID _userId;
 
 	}
 
 	private Set<String> _permissions;
+	private List<String> _roles;
 	private UUID _tenantId;
 	private UUID _userId;
 

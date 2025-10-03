@@ -25,14 +25,19 @@ public interface ResourceActionRepository
 	public boolean existsByResourceTypeAndActionKey(
 		String resourceType, String actionKey);
 
-	public List<ResourceAction> findByIsActiveTrue();
+	public Optional<ResourceAction> findByActionKey(String actionKey);
+
+	public List<ResourceAction> findByActiveTrue();
 
 	public List<ResourceAction> findByResourceType(String resourceType);
 
 	public Optional<ResourceAction> findByResourceTypeAndActionKey(
 		String resourceType, String actionKey);
 
-	public List<ResourceAction> findByResourceTypeAndIsActiveTrue(
+	public List<ResourceAction> findByResourceTypeAndActiveTrue(
+		String resourceType);
+
+	public List<ResourceAction> findByResourceTypeOrderByBitValue(
 		String resourceType);
 
 }

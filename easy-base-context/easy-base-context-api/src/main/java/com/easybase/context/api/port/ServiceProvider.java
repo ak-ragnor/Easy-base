@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
  *
  * @author Akhash R
  */
-public interface ContextProvider {
+public interface ServiceProvider {
 
 	/**
 	 * Builds a ServiceContext from the given HTTP request.

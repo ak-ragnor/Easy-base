@@ -20,7 +20,8 @@ import org.springframework.stereotype.Repository;
  * @author Akhash R
  */
 @Repository
-public interface SystemInfoRepository extends SingleKeyBaseRepository<SystemInfo> {
+public interface SystemInfoRepository
+	extends SingleKeyBaseRepository<SystemInfo> {
 
 	@Query(
 		"SELECT s FROM SystemInfo s WHERE s.status = 'ACTIVE' ORDER BY s.createdAt DESC"

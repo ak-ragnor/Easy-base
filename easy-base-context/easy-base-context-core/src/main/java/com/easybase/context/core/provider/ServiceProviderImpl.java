@@ -9,7 +9,7 @@ import com.easybase.context.api.domain.CorrelationIds;
 import com.easybase.context.api.domain.ServiceContext;
 import com.easybase.context.api.domain.TenantInfo;
 import com.easybase.context.api.domain.UserInfo;
-import com.easybase.context.api.port.ContextProvider;
+import com.easybase.context.api.port.ServiceProvider;
 import com.easybase.context.api.port.TenantInfoResolver;
 import com.easybase.context.api.port.UserInfoResolver;
 import com.easybase.context.core.impl.ServiceContextImpl;
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * Default implementation of {@link ContextProvider} that uses authentication facade
+ * Default implementation of {@link ServiceProvider} that uses authentication facade
  * and resolvers to build complete ServiceContext from HTTP requests.
  *
  * <p>This provider handles token extraction, authentication, user resolution,
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class DefaultContextProvider implements ContextProvider {
+public class ServiceProviderImpl implements ServiceProvider {
 
 	@Override
 	public ServiceContext build(HttpServletRequest request) {

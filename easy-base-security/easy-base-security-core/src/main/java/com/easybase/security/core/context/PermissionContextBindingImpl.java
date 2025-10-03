@@ -8,16 +8,19 @@ package com.easybase.security.core.context;
 import com.easybase.context.api.domain.PermissionContext;
 import com.easybase.context.api.port.PermissionContextProvider;
 import com.easybase.context.api.port.PermissionProvider;
-import com.easybase.core.auth.entity.Permission;
-import com.easybase.core.auth.repository.PermissionRepository;
+import com.easybase.core.auth.entity.ResourceAction;
+import com.easybase.core.auth.entity.RolePermission;
+import com.easybase.core.auth.repository.ResourceActionRepository;
+import com.easybase.core.auth.repository.RolePermissionRepository;
+import com.easybase.core.role.entity.Role;
 import com.easybase.core.role.service.RoleQueryService;
 import com.easybase.security.api.dto.AuthenticatedPrincipalData;
 import com.easybase.security.core.service.PermissionContextBinding;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
@@ -58,9 +61,10 @@ public class PermissionContextBindingImpl
 		AuthenticatedPrincipalData principal) {
 
 		Set<String> permissions = _getUserPermissions(principal);
+		List<String> roles = _getUserRoles(principal);
 
 		return _permissionProvider.build(
-			principal.getUserId(), principal.getTenantId(), permissions);
+			principal.getUserId(), principal.getTenantId(), permissions, roles);
 	}
 
 	@Override
@@ -76,7 +80,25 @@ public class PermissionContextBindingImpl
 	}
 
 	/**
-	 * Loads user permissions for the given principal.
+	 * Gets role IDs for the given principal.
+	 *
+	 * @param principal the authenticated principal data
+	 * @return list of role IDs
+	 */
+	private List<UUID> _getRoleIds(AuthenticatedPrincipalData principal) {
+		UUID userId = principal.getUserId();
+		UUID tenantId = principal.getTenantId();
+
+		if (tenantId != null) {
+			return _roleQueryService.getActiveRoleIdsByUserIdAndTenantId(
+				userId, tenantId);
+		}
+
+		return _roleQueryService.getActiveRoleIdsByUserId(userId);
+	}
+
+	/**
+	 * Loads user permissions for the given principal using bitwise operations.
 	 *
 	 * @param principal the authenticated principal data
 	 * @return set of permission keys
@@ -84,39 +106,66 @@ public class PermissionContextBindingImpl
 	private Set<String> _getUserPermissions(
 		AuthenticatedPrincipalData principal) {
 
-		UUID userId = principal.getUserId();
-		UUID tenantId = principal.getTenantId();
-
-		List<UUID> roleIds;
-
-		if (tenantId != null) {
-			roleIds = _roleQueryService.getActiveRoleIdsByUserIdAndTenantId(
-				userId, tenantId);
-		}
-		else {
-			roleIds = _roleQueryService.getActiveRoleIdsByUserId(userId);
-		}
+		List<UUID> roleIds = _getRoleIds(principal);
 
 		if (roleIds.isEmpty()) {
 			return Set.of();
 		}
 
-		List<Permission> userPermissions =
-			_permissionRepository.findPermissionsByRoleIds(roleIds);
 
-		Stream<Permission> permissionStream = userPermissions.stream();
+		List<RolePermission> rolePermissions =
+			_rolePermissionRepository.findByRoleIdIn(roleIds);
 
-		return permissionStream.map(
-			Permission::getPermissionKey
-		).collect(
-			Collectors.toSet()
+		Set<String> permissionKeys = new HashSet<>();
+
+		for (RolePermission rolePerm : rolePermissions) {
+			String resourceType = rolePerm.getResourceType();
+			long permissionsMask = rolePerm.getPermissionsMask();
+
+			List<ResourceAction> actions =
+				_resourceActionRepository.findByResourceTypeAndActiveTrue(
+					resourceType);
+
+			for (ResourceAction action : actions) {
+				if ((permissionsMask & action.getBitValue()) != 0) {
+					permissionKeys.add(action.getActionKey());
+				}
+			}
+		}
+
+		return permissionKeys;
+	}
+
+	/**
+	 * Loads user roles for the given principal.
+	 *
+	 * @param principal the authenticated principal data
+	 * @return list of role names
+	 */
+	private List<String> _getUserRoles(AuthenticatedPrincipalData principal) {
+		List<UUID> roleIds = _getRoleIds(principal);
+
+		if (roleIds.isEmpty()) {
+			return List.of();
+		}
+
+		List<Role> roles = _roleQueryService.getRolesByIds(
+				roleIds
 		);
+
+		Stream<Role> roleStream = roles.stream(
+		);
+
+		return roleStream.map(
+			role -> role.getName()
+		).toList();
 	}
 
 	private final PermissionProvider _permissionProvider;
-	private final PermissionRepository _permissionRepository;
 	private final ThreadLocal<AuthenticatedPrincipalData> _principalHolder =
 		new ThreadLocal<>();
+	private final ResourceActionRepository _resourceActionRepository;
+	private final RolePermissionRepository _rolePermissionRepository;
 	private final RoleQueryService _roleQueryService;
 
 }

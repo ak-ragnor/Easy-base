@@ -9,7 +9,7 @@ import com.easybase.common.exception.ExpiredTokenException;
 import com.easybase.common.exception.HttpErrorHandler;
 import com.easybase.common.exception.InvalidTokenException;
 import com.easybase.context.api.domain.ServiceContext;
-import com.easybase.context.api.port.ContextProvider;
+import com.easybase.context.api.port.ServiceProvider;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -71,6 +71,6 @@ public class ServiceContextFilter implements Filter {
 		}
 	}
 
-	private final ContextProvider _contextProvider;
+	private final ServiceProvider _contextProvider;
 
 }

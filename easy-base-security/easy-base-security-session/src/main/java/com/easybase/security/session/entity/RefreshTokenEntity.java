@@ -35,7 +35,7 @@ import org.hibernate.annotations.CreationTimestamp;
 			columnList = "tokenHash", name = "idx_refresh_token", unique = true
 		),
 		@Index(columnList = "sessionId", name = "idx_session_id"),
-		@Index(columnList = "expiresAt", name = "idx_expires_at")
+		@Index(columnList = "expiresAt", name = "idx_refresh_token_expires_at")
 	},
 	name = "refresh_tokens"
 )

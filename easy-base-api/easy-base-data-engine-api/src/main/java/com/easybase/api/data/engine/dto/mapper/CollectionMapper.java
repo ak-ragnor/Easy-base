@@ -11,10 +11,10 @@ import com.easybase.core.data.engine.entity.Attribute;
 import com.easybase.core.data.engine.entity.Collection;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
+import java.time.ZoneId;
+
 import java.util.Collections;
 import java.util.List;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
@@ -38,8 +38,16 @@ public class CollectionMapper implements BaseMapper<Collection, CollectionDto> {
 			{
 				setId(collection.getId());
 				setName(collection.getName());
-				setCreatedAt(collection.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDateTime());
-				setUpdatedAt(collection.getUpdatedAt().atZone(ZoneId.systemDefault()).toLocalDateTime());
+				setCreatedAt(
+					collection.getCreatedAt(
+					).atZone(
+						ZoneId.systemDefault()
+					).toLocalDateTime());
+				setUpdatedAt(
+					collection.getUpdatedAt(
+					).atZone(
+						ZoneId.systemDefault()
+					).toLocalDateTime());
 
 				if (collection.getAttributes() == null) {
 					setAttributes(Collections.emptyList());

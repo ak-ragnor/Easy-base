@@ -17,7 +17,8 @@ import org.springframework.data.repository.NoRepositoryBean;
  * @author Akhash R
  */
 @NoRepositoryBean
-public interface CompositeKeyBaseRepository<T, ID> extends JpaRepository<T, ID> {
+public interface CompositeKeyBaseRepository<T, ID>
+	extends JpaRepository<T, ID> {
 
 	/**
 	 * Soft delete an entity by setting the deleted flag to true.
@@ -26,9 +27,11 @@ public interface CompositeKeyBaseRepository<T, ID> extends JpaRepository<T, ID> 
 	 * @return the updated entity
 	 */
 	default T softDelete(T entity) {
+
 		// Note: This would need reflection or specific implementation
 		// in concrete repositories since CompositeKeyEntity methods
 		// aren't accessible here due to generic constraints
+
 		return save(entity);
 	}
 

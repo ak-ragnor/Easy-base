@@ -52,6 +52,9 @@ public class ResourceAction extends SingleKeyBaseEntity {
 	@Column(name = "is_active", nullable = false)
 	private boolean active = true;
 
+	@Column(name = "bit_value", nullable = false)
+	private int bitValue;
+
 	@Column(name = "description")
 	@Size(max = 255)
 	private String description;

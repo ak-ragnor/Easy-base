@@ -7,8 +7,8 @@ package com.easybase.core.role.service;
 
 import com.easybase.common.exception.ConflictException;
 import com.easybase.context.core.util.PermissionChecker;
-import com.easybase.core.role.action.RoleActions;
 import com.easybase.core.auth.repository.RolePermissionRepository;
+import com.easybase.core.role.action.RoleActions;
 import com.easybase.core.role.entity.Role;
 import com.easybase.core.role.entity.UserRole;
 import com.easybase.core.role.repository.RoleRepository;
@@ -47,10 +47,11 @@ public class RoleService {
 		if (_userRoleRepository.existsByUserIdAndRoleId(userId, roleId)) {
 			throw new ConflictException("User already has this role assigned");
 		}
-        
+
 		_roleQueryService.getRoleById(roleId);
 
 		UserRole userRole = new UserRole(userId, roleId, tenantId);
+
 		userRole.setExpiresAt(expiresAt);
 
 		return _userRoleRepository.save(userRole);

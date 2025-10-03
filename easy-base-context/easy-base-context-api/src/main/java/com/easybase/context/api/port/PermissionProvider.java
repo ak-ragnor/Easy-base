@@ -7,6 +7,7 @@ package com.easybase.context.api.port;
 
 import com.easybase.context.api.domain.PermissionContext;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,11 +24,13 @@ public interface PermissionProvider {
 	 * Builds a PermissionContext for the given user and tenant.
 	 *
 	 * @param userId the user ID
-	 * @param tenantId the tenant ID (may be null for system-wide permissions)
+	 * @param tenantId the tenant ID
 	 * @param permissions the set of permission keys
+	 * @param roles the list of role names
 	 * @return a fully constructed PermissionContext
 	 */
 	public PermissionContext build(
-		UUID userId, UUID tenantId, Set<String> permissions);
+		UUID userId, UUID tenantId, Set<String> permissions,
+		List<String> roles);
 
 }

@@ -11,6 +11,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 
 import java.time.Instant;
+
 import java.util.UUID;
 
 import lombok.Data;
@@ -24,6 +25,17 @@ import lombok.Data;
 @Data
 @MappedSuperclass
 public abstract class CompositeKeyBaseEntity {
+
+	@PrePersist
+	protected void onCreate() {
+		createdAt = Instant.now();
+		updatedAt = Instant.now();
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		updatedAt = Instant.now();
+	}
 
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private Instant createdAt;
@@ -39,16 +51,5 @@ public abstract class CompositeKeyBaseEntity {
 
 	@Column(name = "updated_by")
 	private UUID updatedBy;
-
-	@PrePersist
-	protected void onCreate() {
-		createdAt = Instant.now();
-		updatedAt = Instant.now();
-	}
-
-	@PreUpdate
-	protected void onUpdate() {
-		updatedAt = Instant.now();
-	}
 
 }

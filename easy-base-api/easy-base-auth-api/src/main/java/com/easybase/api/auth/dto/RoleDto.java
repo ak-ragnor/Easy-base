@@ -40,7 +40,7 @@ public class RoleDto {
 	@Size(max = 50)
 	private String name;
 
-	private Set<PermissionDto> permissions;
+	private Set<RolePermissionDto> permissions;
 	private UUID tenantId;
 	private Instant updatedAt;
 

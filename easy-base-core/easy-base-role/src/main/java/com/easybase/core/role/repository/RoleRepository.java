@@ -28,11 +28,13 @@ public interface RoleRepository extends SingleKeyBaseRepository<Role> {
 
 	public boolean existsByNameAndTenantId(String name, UUID tenantId);
 
-	public List<Role> findBySystemTrue();
+	public Optional<Role> findByName(String name);
 
 	public Optional<Role> findByNameAndSystemTrue(String name);
 
 	public Optional<Role> findByNameAndTenantId(String name, UUID tenantId);
+
+	public List<Role> findBySystemTrue();
 
 	public List<Role> findByTenantId(UUID tenantId);
 

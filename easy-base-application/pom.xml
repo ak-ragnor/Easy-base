@@ -65,6 +65,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-initializer</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.jooq</groupId>
 			<artifactId>jooq</artifactId>
 			<version>3.19.8</version>
