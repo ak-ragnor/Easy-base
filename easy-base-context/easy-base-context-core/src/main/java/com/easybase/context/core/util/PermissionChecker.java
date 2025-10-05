@@ -7,7 +7,6 @@ package com.easybase.context.core.util;
 
 import com.easybase.common.exception.ForbiddenException;
 import com.easybase.context.api.domain.PermissionContext;
-import com.easybase.context.api.port.PermissionContextProvider;
 import com.easybase.infrastructure.auth.constants.SystemRoles;
 
 import java.util.Arrays;
@@ -126,25 +125,16 @@ public class PermissionChecker {
 	}
 
 	/**
-	 * Gets the current PermissionContext from the PermissionContextProvider.
+	 * Gets the current PermissionContext.
 	 *
 	 * @return the current PermissionContext
-	 * @throws IllegalStateException if no context is available
 	 */
 	private PermissionContext _getCurrentPermissionContext() {
-		PermissionContext context =
-			_permissionContextProvider.getCurrentPermissionContext();
-
-		if (context == null) {
-			throw new IllegalStateException(
-				"No PermissionContext available in current thread");
-		}
-
-		return context;
+		return _permissionContext;
 	}
 
 	private static final String ADMIN_ROLE = SystemRoles.ADMIN;
 
-	private final PermissionContextProvider _permissionContextProvider;
+	private final PermissionContext _permissionContext;
 
 }

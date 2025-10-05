@@ -5,19 +5,12 @@
 
 package com.easybase.security.core.context;
 
-import com.easybase.context.api.domain.CorrelationIds;
 import com.easybase.context.api.domain.ServiceContext;
-import com.easybase.context.api.domain.TenantInfo;
-import com.easybase.context.api.domain.UserInfo;
+import com.easybase.context.api.port.ServiceContextProvider;
 import com.easybase.security.api.dto.AuthenticatedPrincipalData;
 import com.easybase.security.core.service.ServiceContextBinding;
 
-import java.time.Instant;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
@@ -31,26 +24,13 @@ import org.springframework.stereotype.Component;
  * @author Akhash
  */
 @Component
-public class ServiceContextBindingImpl implements ServiceContextBinding {
-
-	@Override
-	public void bind(AuthenticatedPrincipalData principal) {
-		principalHolder.set(principal);
-	}
-
-	@Override
-	public void clear() {
-		principalHolder.remove();
-	}
-
-	@Override
-	public AuthenticatedPrincipalData fromCurrentContext() {
-		return principalHolder.get();
-	}
+@RequiredArgsConstructor
+public class ServiceContextBindingImpl extends AbstractContextBinding
+	implements ServiceContextBinding {
 
 	@Override
 	public ServiceContext fromPrincipal(AuthenticatedPrincipalData principal) {
-		return new SecurityServiceContext(principal);
+		return _serviceContextProvider.build(principal);
 	}
 
 	@Override
@@ -65,83 +45,6 @@ public class ServiceContextBindingImpl implements ServiceContextBinding {
 		return fromPrincipal(authenticatedPrincipalData);
 	}
 
-	private final ThreadLocal<AuthenticatedPrincipalData> principalHolder =
-		new ThreadLocal<>();
-
-	private static class SecurityServiceContext implements ServiceContext {
-
-		public SecurityServiceContext(AuthenticatedPrincipalData principal) {
-			_authenticatedPrincipalData = principal;
-
-			_tenantInfo = _createTenantInfo(principal);
-			_userInfo = _createUserInfo(principal);
-			_correlationIds = _createCorrelationIds(principal);
-		}
-
-		@Override
-		public Optional<String> clientIp() {
-			return Optional.ofNullable(
-				_authenticatedPrincipalData.getClientIp());
-		}
-
-		@Override
-		public CorrelationIds correlation() {
-			return _correlationIds;
-		}
-
-		@Override
-		public Instant expiresAt() {
-			return _authenticatedPrincipalData.getExpiresAt();
-		}
-
-		@Override
-		public Instant issuedAt() {
-			return _authenticatedPrincipalData.getIssuedAt();
-		}
-
-		@Override
-		public TenantInfo tenant() {
-			return _tenantInfo;
-		}
-
-		@Override
-		public UserInfo user() {
-			return _userInfo;
-		}
-
-		@Override
-		public Optional<String> userAgent() {
-			return Optional.ofNullable(
-				_authenticatedPrincipalData.getUserAgent());
-		}
-
-		private CorrelationIds _createCorrelationIds(
-			AuthenticatedPrincipalData principal) {
-
-			return new CorrelationIds(
-				String.valueOf(UUID.randomUUID()), principal.getSessionId(),
-				null);
-		}
-
-		private TenantInfo _createTenantInfo(
-			AuthenticatedPrincipalData principal) {
-
-			return new TenantInfo(
-				principal.getTenantId(), true,
-				() -> "Tenant-" + principal.getTenantId(), Map::of);
-		}
-
-		private UserInfo _createUserInfo(AuthenticatedPrincipalData principal) {
-			return new UserInfo(
-				principal.getUserId(), null, true,
-				() -> "user-" + principal.getUserId(), List::of, List::of);
-		}
-
-		private final AuthenticatedPrincipalData _authenticatedPrincipalData;
-		private final CorrelationIds _correlationIds;
-		private final TenantInfo _tenantInfo;
-		private final UserInfo _userInfo;
-
-	}
+	private final ServiceContextProvider _serviceContextProvider;
 
 }

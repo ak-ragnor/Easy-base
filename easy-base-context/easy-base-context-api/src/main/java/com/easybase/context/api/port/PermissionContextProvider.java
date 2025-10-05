@@ -7,20 +7,29 @@ package com.easybase.context.api.port;
 
 import com.easybase.context.api.domain.PermissionContext;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 /**
- * SPI interface for providing access to the current PermissionContext.
- * This is a simpler interface than PermissionContextBinding that allows
- * modules to access permission context without circular dependencies.
+ * SPI interface for building PermissionContext instances.
+ * Implementations provide different permission context construction strategies.
  *
  * @author Akhash R
  */
 public interface PermissionContextProvider {
 
 	/**
-	 * Gets the current PermissionContext for the thread.
+	 * Builds a PermissionContext for the given user and tenant.
 	 *
-	 * @return the current PermissionContext, or null if none is available
+	 * @param userId the user ID
+	 * @param tenantId the tenant ID
+	 * @param permissions the set of permission keys
+	 * @param roles the list of role names
+	 * @return a fully constructed PermissionContext
 	 */
-	public PermissionContext getCurrentPermissionContext();
+	public PermissionContext build(
+		UUID userId, UUID tenantId, Set<String> permissions,
+		List<String> roles);
 
 }

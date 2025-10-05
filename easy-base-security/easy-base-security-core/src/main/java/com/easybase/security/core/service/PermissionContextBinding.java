@@ -6,6 +6,7 @@
 package com.easybase.security.core.service;
 
 import com.easybase.context.api.domain.PermissionContext;
+import com.easybase.context.api.domain.ServiceContext;
 import com.easybase.security.api.dto.AuthenticatedPrincipalData;
 
 /**
@@ -21,5 +22,7 @@ public interface PermissionContextBinding {
 
 	public PermissionContext fromPrincipal(
 		AuthenticatedPrincipalData principal);
+
+	public PermissionContext getCurrentPermissionContext();
 
 }

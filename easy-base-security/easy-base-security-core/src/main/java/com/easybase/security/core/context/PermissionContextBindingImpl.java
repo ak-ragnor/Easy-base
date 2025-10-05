@@ -7,7 +7,6 @@ package com.easybase.security.core.context;
 
 import com.easybase.context.api.domain.PermissionContext;
 import com.easybase.context.api.port.PermissionContextProvider;
-import com.easybase.context.api.port.PermissionProvider;
 import com.easybase.core.auth.entity.ResourceAction;
 import com.easybase.core.auth.entity.RolePermission;
 import com.easybase.core.auth.repository.ResourceActionRepository;
@@ -38,22 +37,19 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class PermissionContextBindingImpl
-	implements PermissionContextBinding, PermissionContextProvider {
+public class PermissionContextBindingImpl extends AbstractContextBinding
+	implements PermissionContextBinding {
 
 	@Override
-	public void bind(AuthenticatedPrincipalData principal) {
-		_principalHolder.set(principal);
-	}
+	public PermissionContext getCurrentPermissionContext() {
+		AuthenticatedPrincipalData authenticatedPrincipalData =
+				fromCurrentContext();
 
-	@Override
-	public void clear() {
-		_principalHolder.remove();
-	}
+		if (authenticatedPrincipalData == null) {
+			return null;
+		}
 
-	@Override
-	public AuthenticatedPrincipalData fromCurrentContext() {
-		return _principalHolder.get();
+		return fromPrincipal(authenticatedPrincipalData);
 	}
 
 	@Override
@@ -63,20 +59,8 @@ public class PermissionContextBindingImpl
 		Set<String> permissions = _getUserPermissions(principal);
 		List<String> roles = _getUserRoles(principal);
 
-		return _permissionProvider.build(
+		return _permissionContextProvider.build(
 			principal.getUserId(), principal.getTenantId(), permissions, roles);
-	}
-
-	@Override
-	public PermissionContext getCurrentPermissionContext() {
-		AuthenticatedPrincipalData authenticatedPrincipalData =
-			fromCurrentContext();
-
-		if (authenticatedPrincipalData == null) {
-			return null;
-		}
-
-		return fromPrincipal(authenticatedPrincipalData);
 	}
 
 	/**
@@ -161,9 +145,7 @@ public class PermissionContextBindingImpl
 		).toList();
 	}
 
-	private final PermissionProvider _permissionProvider;
-	private final ThreadLocal<AuthenticatedPrincipalData> _principalHolder =
-		new ThreadLocal<>();
+	private final PermissionContextProvider _permissionContextProvider;
 	private final ResourceActionRepository _resourceActionRepository;
 	private final RolePermissionRepository _rolePermissionRepository;
 	private final RoleQueryService _roleQueryService;

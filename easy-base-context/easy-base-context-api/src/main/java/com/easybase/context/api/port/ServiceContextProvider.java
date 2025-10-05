@@ -7,23 +7,21 @@ package com.easybase.context.api.port;
 
 import com.easybase.context.api.domain.ServiceContext;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 /**
- * SPI interface for building ServiceContext from HTTP requests.
+ * SPI interface for building ServiceContext.
  * Implementations can provide different context resolution strategies
  * based on authentication method, environment, or testing needs.
  *
  * @author Akhash R
  */
-public interface ServiceProvider {
+public interface ServiceContextProvider {
 
 	/**
-	 * Builds a ServiceContext from the given HTTP request.
+	 * Builds a ServiceContext from principal data.
 	 *
-	 * @param request the HTTP request to process
+	 * @param principal the principal data (implementation specific)
 	 * @return a fully constructed ServiceContext
 	 */
-	public ServiceContext build(HttpServletRequest request);
+	public ServiceContext build(Object principal);
 
 }

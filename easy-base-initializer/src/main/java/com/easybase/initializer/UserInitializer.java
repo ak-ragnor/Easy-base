@@ -44,15 +44,14 @@ public class UserInitializer implements ApplicationRunner {
 	@Transactional
 	public void run(ApplicationArguments args) {
 		log.info("=== Step 4: Default User Initialization ===");
-		createDefaultAdminUser();
+		createGuestUser();
+		createAdminUser();
 	}
 
-	private void createDefaultAdminUser() {
+	private void createAdminUser() {
 		log.info("Checking for default admin user...");
 
 		Tenant defaultTenant = _tenantService.getDefaultTenant();
-
-		// Check if admin user already exists
 
 		if (_userRepository.existsByEmailAndTenantId(
 				_adminEmail, defaultTenant.getId())) {
@@ -65,18 +64,12 @@ public class UserInitializer implements ApplicationRunner {
 
 		try {
 
-			// Create admin user
-
 			User adminUser = _userService.createUser(
 				_adminEmail, "Admin", "User", "Administrator",
 				defaultTenant.getId());
 
-			// Update password to configured admin password
-
 			_userService.updatePasswordCredential(
 				adminUser.getId(), _adminPassword);
-
-			// Get ADMIN role
 
 			Role adminRole = _roleRepository.findByNameAndSystemTrue(
 				SystemRoles.ADMIN
@@ -84,8 +77,6 @@ public class UserInitializer implements ApplicationRunner {
 				() -> new IllegalStateException(
 					"ADMIN role not found. Ensure DefaultRolesInitializer ran successfully.")
 			);
-
-			// Assign ADMIN role to user
 
 			UserRole userRole = new UserRole(
 				adminUser.getId(), adminRole.getId(), defaultTenant.getId());
@@ -96,8 +87,6 @@ public class UserInitializer implements ApplicationRunner {
 				"Created default admin user: {} with ADMIN role", _adminEmail);
 		}
 		catch (ConflictException e) {
-
-			// Race condition - another instance created the user
 
 			log.info(
 				"Default admin user was created concurrently: {}", _adminEmail);
@@ -111,11 +100,60 @@ public class UserInitializer implements ApplicationRunner {
 		log.info("Default user initialization completed");
 	}
 
+	private void createGuestUser() {
+		log.info("Checking for default guest user...");
+
+		Tenant defaultTenant = _tenantService.getDefaultTenant();
+
+		if (_userRepository.existsByEmailAndTenantId(
+				_guestEmail, defaultTenant.getId())) {
+
+			log.info("Default guest user already exists: {}", _guestEmail);
+
+			return;
+		}
+
+		try {
+
+			User guestUser = _userService.createUser(
+				_guestEmail, "Guest", "User", "Guest",
+				defaultTenant.getId());
+
+			Role guestRole = _roleRepository.findByNameAndSystemTrue(
+				SystemRoles.GUEST
+			).orElseThrow(
+				() -> new IllegalStateException(
+					"GUEST role not found. Ensure DefaultRolesInitializer ran successfully.")
+			);
+
+			UserRole userRole = new UserRole(
+				guestUser.getId(), guestRole.getId(), defaultTenant.getId());
+
+			_userRoleRepository.save(userRole);
+
+			log.info(
+				"Created default guest user: {} with GUEST role", _guestEmail);
+		}
+		catch (ConflictException e) {
+
+			log.info(
+				"Default guest user was created concurrently: {}", _guestEmail);
+		}
+		catch (Exception e) {
+			log.error("Failed to create default guest user", e);
+
+			throw e;
+		}
+	}
+
 	@Value("${easy-base.admin.email:admin@easybase.com}")
 	private String _adminEmail;
 
 	@Value("${easy-base.admin.password:admin123}")
 	private String _adminPassword;
+
+	@Value("${easy-base.guest.email:guest@easybase.com}")
+	private String _guestEmail;
 
 	private final RoleRepository _roleRepository;
 	private final TenantService _tenantService;
