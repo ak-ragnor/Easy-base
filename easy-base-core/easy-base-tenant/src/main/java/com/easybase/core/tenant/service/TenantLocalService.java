@@ -12,38 +12,33 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * External-facing service interface for tenant operations.
- * Performs permission checks before delegating to TenantLocalService.
- * Never performs persistence directly - always delegates to TenantLocalService.
+ * Local service interface for tenant business logic and data operations.
+ * Contains all business logic, repository calls, and transaction management.
+ * Does NOT perform permission checks - that's the responsibility of TenantService.
  *
  * @author Akhash R
  */
-public interface TenantService {
+public interface TenantLocalService {
 
 	/**
 	 * Creates a new tenant with the given name.
-	 * Requires TENANT:CREATE permission.
 	 *
 	 * @param name the tenant name
 	 * @return the created tenant
 	 * @throws com.easybase.common.exception.ConflictException if name already exists
-	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
 	Tenant createTenant(String name);
 
 	/**
 	 * Soft deletes a tenant by ID.
-	 * Requires TENANT:DELETE permission.
 	 *
 	 * @param tenantId the tenant ID
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if tenant not found
-	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
 	void deleteTenant(UUID tenantId);
 
 	/**
 	 * Fetches a tenant by name (optional result).
-	 * No permission check - for internal use.
 	 *
 	 * @param name the tenant name
 	 * @return Optional containing the tenant if found
@@ -52,7 +47,6 @@ public interface TenantService {
 
 	/**
 	 * Gets or creates the default tenant.
-	 * No permission check - for system use.
 	 *
 	 * @return the default tenant
 	 */
@@ -60,45 +54,37 @@ public interface TenantService {
 
 	/**
 	 * Gets a tenant by name.
-	 * Requires TENANT:VIEW permission.
 	 *
 	 * @param name the tenant name
 	 * @return the tenant
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
-	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
 	Tenant getTenant(String name);
 
 	/**
 	 * Gets a tenant by ID.
-	 * Requires TENANT:VIEW permission.
 	 *
 	 * @param id the tenant ID
 	 * @return the tenant
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
-	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
 	Tenant getTenant(UUID id);
 
 	/**
 	 * Gets all tenants.
-	 * Requires TENANT:LIST permission.
 	 *
 	 * @return list of all tenants
-	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
 	List<Tenant> getTenants();
 
 	/**
 	 * Updates a tenant's name.
-	 * Requires TENANT:UPDATE permission.
 	 *
 	 * @param id the tenant ID
 	 * @param name the new name
 	 * @return the updated tenant
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if tenant not found
 	 * @throws com.easybase.common.exception.ConflictException if name already exists
-	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
 	Tenant updateTenant(UUID id, String name);
 

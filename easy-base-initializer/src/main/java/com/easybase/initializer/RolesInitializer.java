@@ -7,6 +7,8 @@ package com.easybase.initializer;
 
 import com.easybase.core.role.entity.Role;
 import com.easybase.core.role.repository.RoleRepository;
+import com.easybase.core.tenant.entity.Tenant;
+import com.easybase.core.tenant.service.TenantLocalService;
 import com.easybase.infrastructure.auth.constants.SystemRoles;
 
 import lombok.RequiredArgsConstructor;
@@ -55,12 +57,17 @@ public class RolesInitializer implements ApplicationRunner {
 
 	private void createRoleIfNotExists(String name, String description) {
 		if (!_roleRepository.existsByNameAndSystemTrue(name)) {
+
 			Role role = new Role();
 
 			role.setName(name);
 			role.setDescription(description);
 			role.setSystem(true);
 			role.setActive(true);
+
+			Tenant tenant = _tenantLocalService.getDefaultTenant();
+
+			role.setTenantId(tenant.getId());
 
 			_roleRepository.save(role);
 			log.info("Created system role: {}", name);
@@ -71,5 +78,6 @@ public class RolesInitializer implements ApplicationRunner {
 	}
 
 	private final RoleRepository _roleRepository;
+	private final TenantLocalService _tenantLocalService;
 
 }

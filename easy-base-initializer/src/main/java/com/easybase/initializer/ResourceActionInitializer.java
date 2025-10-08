@@ -176,7 +176,7 @@ public class ResourceActionInitializer implements ApplicationRunner {
 
 		int nextBitValue = calculateNextBitValue(existingActions.values());
 
-		List<ResourceAction> actionsToSave = new ArrayList<>();
+		List<ResourceAction> resourceActionsList = new ArrayList<>();
 		int processedCount = 0;
 
 		for (Field field : actionClass.getDeclaredFields()) {
@@ -217,7 +217,7 @@ public class ResourceActionInitializer implements ApplicationRunner {
 							}
 						}
 
-						actionsToSave.add(action);
+						resourceActionsList.add(action);
 						processedCount++;
 					}
 				}
@@ -227,8 +227,8 @@ public class ResourceActionInitializer implements ApplicationRunner {
 			}
 		}
 
-		if (!actionsToSave.isEmpty()) {
-			_resourceActionRepository.saveAll(actionsToSave);
+		if (!resourceActionsList.isEmpty()) {
+			_resourceActionRepository.saveAll(resourceActionsList);
 		}
 
 		return processedCount;
@@ -238,9 +238,9 @@ public class ResourceActionInitializer implements ApplicationRunner {
 		Class<?> actionClass, ActionDefinition actionDef) {
 
 		String resourceType = actionDef.resourceType();
-		int mappingsCreated = 0;
+		int roleMapping = 0;
 
-		Map<String, Set<String>> rolesToPermissions = new HashMap<>();
+		Map<String, Set<String>> rolePermissionsMap = new HashMap<>();
 
 		for (Field field : actionClass.getDeclaredFields()) {
 			if (Modifier.isStatic(field.getModifiers()) &&
@@ -256,7 +256,7 @@ public class ResourceActionInitializer implements ApplicationRunner {
 						String actionKey = (String)field.get(null);
 
 						for (String roleName : actionRoles.value()) {
-							rolesToPermissions.computeIfAbsent(
+							rolePermissionsMap.computeIfAbsent(
 								roleName, k -> new HashSet<>()
 							).add(
 								actionKey
@@ -272,7 +272,7 @@ public class ResourceActionInitializer implements ApplicationRunner {
 		}
 
 		for (Map.Entry<String, Set<String>> entry :
-				rolesToPermissions.entrySet()) {
+				rolePermissionsMap.entrySet()) {
 
 			String roleName = entry.getKey();
 
@@ -299,14 +299,14 @@ public class ResourceActionInitializer implements ApplicationRunner {
 			long permissionsMask = calculatePermissionsMask(
 				actionKeys, resourceType);
 
-			Optional<RolePermission> rolePermOptional =
+			Optional<RolePermission> rolePermissionOptional =
 				_rolePermissionRepository.findByRoleIdAndResourceType(
 					roleId, resourceType);
 
 			RolePermission rolePermission;
 
-			if (rolePermOptional.isPresent()) {
-				rolePermission = rolePermOptional.get();
+			if (rolePermissionOptional.isPresent()) {
+				rolePermission = rolePermissionOptional.get();
 
 				if (rolePermission.getPermissionsMask() != permissionsMask) {
 					rolePermission.setPermissionsMask(permissionsMask);
@@ -314,21 +314,23 @@ public class ResourceActionInitializer implements ApplicationRunner {
 					log.debug(
 						"Updated permissions for role '{}' on resource '{}'",
 						roleName, resourceType);
-					mappingsCreated++;
+					roleMapping++;
 				}
 			}
 			else {
 				rolePermission = new RolePermission(
 					roleId, resourceType, permissionsMask);
+
 				_rolePermissionRepository.save(rolePermission);
+
 				log.debug(
 					"Created permissions for role '{}' on resource '{}'",
 					roleName, resourceType);
-				mappingsCreated++;
+				roleMapping++;
 			}
 		}
 
-		return mappingsCreated;
+		return roleMapping;
 	}
 
 	private final EntityManager _entityManager;

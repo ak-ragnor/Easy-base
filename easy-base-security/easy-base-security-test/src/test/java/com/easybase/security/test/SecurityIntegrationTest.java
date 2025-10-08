@@ -7,6 +7,7 @@ package com.easybase.security.test;
 
 import com.easybase.common.exception.ResourceNotFoundException;
 import com.easybase.core.tenant.entity.Tenant;
+import com.easybase.core.tenant.service.TenantLocalService;
 import com.easybase.core.tenant.service.TenantService;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.service.UserService;

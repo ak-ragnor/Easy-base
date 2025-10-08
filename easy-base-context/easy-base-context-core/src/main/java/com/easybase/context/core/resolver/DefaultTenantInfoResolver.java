@@ -10,7 +10,7 @@ import com.easybase.context.api.port.AbstractDefaultResolver;
 import com.easybase.context.api.port.TenantInfoResolver;
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.repository.TenantRepository;
-import com.easybase.core.tenant.service.TenantService;
+import com.easybase.core.tenant.service.TenantLocalService;
 
 import java.util.Map;
 import java.util.UUID;
@@ -38,7 +38,7 @@ public class DefaultTenantInfoResolver
 
 	@Override
 	protected TenantInfo createAnonymousInstance() {
-		return toInfo(_tenantService.getDefaultTenant());
+		return toInfo(_tenantLocalService.getDefaultTenant());
 	}
 
 	@Override
@@ -68,6 +68,6 @@ public class DefaultTenantInfoResolver
 	}
 
 	private final TenantRepository _tenantRepository;
-	private final TenantService _tenantService;
+	private final TenantLocalService _tenantLocalService;
 
 }

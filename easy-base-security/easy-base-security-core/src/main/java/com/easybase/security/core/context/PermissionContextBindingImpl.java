@@ -12,7 +12,7 @@ import com.easybase.core.auth.entity.RolePermission;
 import com.easybase.core.auth.repository.ResourceActionRepository;
 import com.easybase.core.auth.repository.RolePermissionRepository;
 import com.easybase.core.role.entity.Role;
-import com.easybase.core.role.service.RoleQueryService;
+import com.easybase.core.role.service.RoleLocalService;
 import com.easybase.security.api.dto.AuthenticatedPrincipalData;
 import com.easybase.security.core.service.PermissionContextBinding;
 
@@ -74,11 +74,11 @@ public class PermissionContextBindingImpl extends AbstractContextBinding
 		UUID tenantId = principal.getTenantId();
 
 		if (tenantId != null) {
-			return _roleQueryService.getActiveRoleIdsByUserIdAndTenantId(
+			return _roleLocalService.getActiveRoleIdsByUserIdAndTenantId(
 				userId, tenantId);
 		}
 
-		return _roleQueryService.getActiveRoleIdsByUserId(userId);
+		return _roleLocalService.getActiveRoleIdsByUserId(userId);
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class PermissionContextBindingImpl extends AbstractContextBinding
 			return List.of();
 		}
 
-		List<Role> roles = _roleQueryService.getRolesByIds(
+		List<Role> roles = _roleLocalService.getRolesByIds(
 				roleIds
 		);
 
@@ -148,6 +148,6 @@ public class PermissionContextBindingImpl extends AbstractContextBinding
 	private final PermissionContextProvider _permissionContextProvider;
 	private final ResourceActionRepository _resourceActionRepository;
 	private final RolePermissionRepository _rolePermissionRepository;
-	private final RoleQueryService _roleQueryService;
+	private final RoleLocalService _roleLocalService;
 
 }

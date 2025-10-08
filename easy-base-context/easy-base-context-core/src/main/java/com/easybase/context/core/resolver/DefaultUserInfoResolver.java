@@ -8,7 +8,7 @@ package com.easybase.context.core.resolver;
 import com.easybase.context.api.domain.UserInfo;
 import com.easybase.context.api.port.AbstractDefaultResolver;
 import com.easybase.context.api.port.UserInfoResolver;
-import com.easybase.core.tenant.service.TenantService;
+import com.easybase.core.tenant.service.TenantLocalService;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.repository.UserRepository;
 
@@ -40,7 +40,7 @@ public class DefaultUserInfoResolver
 	@Override
 	protected UserInfo createAnonymousInstance() {
 		User guestUser = _userRepository.findActiveByEmailAndTenantId(
-			_guestEmail, _tenantService.getDefaultTenant().getId()
+			_guestEmail, _tenantLocalService.getDefaultTenant().getId()
 		).orElseThrow(
 			() -> new IllegalStateException(
 				"Guest user not found. Ensure UserInitializer ran successfully.")
@@ -84,7 +84,7 @@ public class DefaultUserInfoResolver
 		return List.of();
 	}
 
-	private final TenantService _tenantService;
+	private final TenantLocalService _tenantLocalService;
 	private final UserRepository _userRepository;
 
 	@Value("${easy-base.guest.email:guest@easybase.com}")

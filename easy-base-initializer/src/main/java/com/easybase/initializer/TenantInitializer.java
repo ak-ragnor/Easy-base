@@ -6,7 +6,7 @@
 package com.easybase.initializer;
 
 import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.core.tenant.service.TenantService;
+import com.easybase.core.tenant.service.TenantLocalService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,7 +41,7 @@ public class TenantInitializer implements ApplicationRunner {
 		log.info("Checking for default tenant...");
 
 		try {
-			Tenant tenant = _tenantService.getDefaultTenant();
+			Tenant tenant = _tenantLocalService.getDefaultTenant();
 			log.info("Default tenant already exists: {}", tenant.getName());
 		}
 		catch (Exception e) {
@@ -53,6 +53,6 @@ public class TenantInitializer implements ApplicationRunner {
 		log.info("Default tenant initialization completed");
 	}
 
-	private final TenantService _tenantService;
+	private final TenantLocalService _tenantLocalService;
 
 }

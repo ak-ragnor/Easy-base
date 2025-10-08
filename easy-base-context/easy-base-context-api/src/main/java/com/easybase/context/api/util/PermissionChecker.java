@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.context.core.util;
+package com.easybase.context.api.util;
 
 import com.easybase.common.exception.ForbiddenException;
 import com.easybase.context.api.domain.PermissionContext;
@@ -114,8 +114,6 @@ public class PermissionChecker {
 	 */
 	public boolean hasPermission(String permissionKey) {
 		PermissionContext context = _getCurrentPermissionContext();
-
-		// ADMIN users bypass all permission checks
 
 		if (context.hasRole(ADMIN_ROLE)) {
 			return true;

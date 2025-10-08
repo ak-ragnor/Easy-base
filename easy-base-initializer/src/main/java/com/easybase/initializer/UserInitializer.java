@@ -8,13 +8,13 @@ package com.easybase.initializer;
 import com.easybase.common.exception.ConflictException;
 import com.easybase.core.role.entity.Role;
 import com.easybase.core.role.entity.UserRole;
-import com.easybase.core.role.repository.RoleRepository;
 import com.easybase.core.role.repository.UserRoleRepository;
+import com.easybase.core.role.service.RoleLocalService;
 import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.core.tenant.service.TenantService;
+import com.easybase.core.tenant.service.TenantLocalService;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.repository.UserRepository;
-import com.easybase.core.user.service.UserService;
+import com.easybase.core.user.service.UserLocalService;
 import com.easybase.infrastructure.auth.constants.SystemRoles;
 
 import lombok.RequiredArgsConstructor;
@@ -51,7 +51,7 @@ public class UserInitializer implements ApplicationRunner {
 	private void createAdminUser() {
 		log.info("Checking for default admin user...");
 
-		Tenant defaultTenant = _tenantService.getDefaultTenant();
+		Tenant defaultTenant = _tenantLocalService.getDefaultTenant();
 
 		if (_userRepository.existsByEmailAndTenantId(
 				_adminEmail, defaultTenant.getId())) {
@@ -71,12 +71,8 @@ public class UserInitializer implements ApplicationRunner {
 			_userService.updatePasswordCredential(
 				adminUser.getId(), _adminPassword);
 
-			Role adminRole = _roleRepository.findByNameAndSystemTrue(
-				SystemRoles.ADMIN
-			).orElseThrow(
-				() -> new IllegalStateException(
-					"ADMIN role not found. Ensure DefaultRolesInitializer ran successfully.")
-			);
+			Role adminRole = _roleLocalService.getRoleByName(
+				SystemRoles.ADMIN, defaultTenant.getId());
 
 			UserRole userRole = new UserRole(
 				adminUser.getId(), adminRole.getId(), defaultTenant.getId());
@@ -103,7 +99,7 @@ public class UserInitializer implements ApplicationRunner {
 	private void createGuestUser() {
 		log.info("Checking for default guest user...");
 
-		Tenant defaultTenant = _tenantService.getDefaultTenant();
+		Tenant defaultTenant = _tenantLocalService.getDefaultTenant();
 
 		if (_userRepository.existsByEmailAndTenantId(
 				_guestEmail, defaultTenant.getId())) {
@@ -119,12 +115,8 @@ public class UserInitializer implements ApplicationRunner {
 				_guestEmail, "Guest", "User", "Guest",
 				defaultTenant.getId());
 
-			Role guestRole = _roleRepository.findByNameAndSystemTrue(
-				SystemRoles.GUEST
-			).orElseThrow(
-				() -> new IllegalStateException(
-					"GUEST role not found. Ensure DefaultRolesInitializer ran successfully.")
-			);
+			Role guestRole = _roleLocalService.getRoleByName(
+				SystemRoles.GUEST, null);
 
 			UserRole userRole = new UserRole(
 				guestUser.getId(), guestRole.getId(), defaultTenant.getId());
@@ -155,10 +147,10 @@ public class UserInitializer implements ApplicationRunner {
 	@Value("${easy-base.guest.email:guest@easybase.com}")
 	private String _guestEmail;
 
-	private final RoleRepository _roleRepository;
-	private final TenantService _tenantService;
+	private final RoleLocalService _roleLocalService;
+	private final TenantLocalService _tenantLocalService;
 	private final UserRepository _userRepository;
 	private final UserRoleRepository _userRoleRepository;
-	private final UserService _userService;
+	private final UserLocalService _userService;
 
 }

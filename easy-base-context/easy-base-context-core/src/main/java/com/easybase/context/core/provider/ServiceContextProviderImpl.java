@@ -14,7 +14,7 @@ import com.easybase.context.api.port.TenantInfoResolver;
 import com.easybase.context.api.port.UserInfoResolver;
 import com.easybase.context.core.impl.ServiceContextImpl;
 import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.core.tenant.service.TenantService;
+import com.easybase.core.tenant.service.TenantLocalService;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.repository.UserRepository;
 import com.easybase.security.api.dto.AuthenticatedPrincipalData;
@@ -93,12 +93,13 @@ public class ServiceContextProviderImpl implements ServiceContextProvider {
 	}
 
 	private ServiceContext _buildGuestContext() {
-		Tenant defaultTenant = _tenantService.getDefaultTenant();
+		Tenant tenant = _tenantLocalService.getDefaultTenant();
+
 		TenantInfo tenantInfo = _tenantInfoResolver.resolve(
-			defaultTenant.getId());
+			tenant.getId());
 
 		User guestUser = _userRepository.findActiveByEmailAndTenantId(
-			_guestEmail, defaultTenant.getId()
+			_guestEmail, tenant.getId()
 		).orElseThrow(
 			() -> new IllegalStateException(
 				"Guest user not found. Ensure UserInitializer ran successfully.")
@@ -114,7 +115,7 @@ public class ServiceContextProviderImpl implements ServiceContextProvider {
 	}
 
 	private final TenantInfoResolver _tenantInfoResolver;
-	private final TenantService _tenantService;
+	private final TenantLocalService _tenantLocalService;
 	private final UserInfoResolver _userInfoResolver;
 	private final UserRepository _userRepository;
 

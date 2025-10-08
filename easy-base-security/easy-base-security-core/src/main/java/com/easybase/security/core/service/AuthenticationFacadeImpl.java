@@ -5,6 +5,7 @@
 
 package com.easybase.security.core.service;
 
+import com.easybase.core.role.service.RoleLocalService;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.service.UserService;
 import com.easybase.security.api.dto.AuthenticatedPrincipalData;
@@ -104,18 +105,9 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 	public AuthenticatedPrincipalData authenticateCredentials(
 		LoginRequest loginRequest) {
 
-		// Validate credentials against user service
-
 		User user = _userService.authenticateUser(
 			loginRequest.getUserName(), loginRequest.getPassword(),
 			loginRequest.getTenantId());
-
-		// Get user authorities/roles
-
-		List<String> authorities = _userService.getUserAuthorities(
-			user.getId());
-
-		// Create session with proper user data
 
 		CreateSessionRequest sessionRequest = new CreateSessionRequest();
 
@@ -135,6 +127,10 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 		principalData.setUserId(session.getUserId());
 		principalData.setTenantId(session.getTenantId());
 		principalData.setSessionId(session.getSessionId());
+
+		List<String> authorities = _roleLocalService.getUserAuthorities(
+				user.getId());
+
 		principalData.setAuthorities(authorities);
 		principalData.setMetadata(session.getMetadata());
 		principalData.setIssuedAt(session.getCreatedAt());
@@ -155,8 +151,6 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 	public AuthenticatedPrincipalData refreshAuthentication(
 		String refreshToken) {
 
-		// Validate refresh token
-
 		Optional<RefreshTokenEntity> tokenEntityOptional =
 			_refreshTokenService.validateRefreshToken(refreshToken);
 
@@ -168,8 +162,6 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 		RefreshTokenEntity tokenEntity = tokenEntityOptional.get();
 
 		String sessionId = tokenEntity.getSessionId();
-
-		// Get associated session
 
 		Optional<Session> sessionOptional = _sessionService.getSession(
 			sessionId);
@@ -184,8 +176,6 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 			throw new AuthenticationException("Session revoked");
 		}
 
-		// Create authenticated principal data
-
 		AuthenticatedPrincipalData principalData =
 			new AuthenticatedPrincipalData();
 
@@ -193,7 +183,7 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 		principalData.setTenantId(activeSession.getTenantId());
 		principalData.setSessionId(activeSession.getSessionId());
 
-		List<String> authorities = _userService.getUserAuthorities(
+		List<String> authorities = _roleLocalService.getUserAuthorities(
 			activeSession.getUserId());
 
 		principalData.setAuthorities(authorities);
@@ -213,6 +203,7 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 	}
 
 	private final RefreshTokenService _refreshTokenService;
+	private final RoleLocalService _roleLocalService;
 	private final SessionProperties _sessionProperties;
 	private final SessionService _sessionService;
 	private final TokenService _tokenService;
