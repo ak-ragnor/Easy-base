@@ -40,7 +40,9 @@ public class DefaultUserInfoResolver
 	@Override
 	protected UserInfo createAnonymousInstance() {
 		User guestUser = _userRepository.findActiveByEmailAndTenantId(
-			_guestEmail, _tenantLocalService.getDefaultTenant().getId()
+			_guestEmail,
+			_tenantLocalService.getDefaultTenant(
+			).getId()
 		).orElseThrow(
 			() -> new IllegalStateException(
 				"Guest user not found. Ensure UserInitializer ran successfully.")
@@ -84,10 +86,10 @@ public class DefaultUserInfoResolver
 		return List.of();
 	}
 
-	private final TenantLocalService _tenantLocalService;
-	private final UserRepository _userRepository;
-
 	@Value("${easy-base.guest.email:guest@easybase.com}")
 	private String _guestEmail;
+
+	private final TenantLocalService _tenantLocalService;
+	private final UserRepository _userRepository;
 
 }

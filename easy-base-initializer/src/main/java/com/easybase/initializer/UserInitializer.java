@@ -63,7 +63,6 @@ public class UserInitializer implements ApplicationRunner {
 		}
 
 		try {
-
 			User adminUser = _userService.createUser(
 				_adminEmail, "Admin", "User", "Administrator",
 				defaultTenant.getId());
@@ -83,7 +82,6 @@ public class UserInitializer implements ApplicationRunner {
 				"Created default admin user: {} with ADMIN role", _adminEmail);
 		}
 		catch (ConflictException e) {
-
 			log.info(
 				"Default admin user was created concurrently: {}", _adminEmail);
 		}
@@ -110,10 +108,8 @@ public class UserInitializer implements ApplicationRunner {
 		}
 
 		try {
-
 			User guestUser = _userService.createUser(
-				_guestEmail, "Guest", "User", "Guest",
-				defaultTenant.getId());
+				_guestEmail, "Guest", "User", "Guest", defaultTenant.getId());
 
 			Role guestRole = _roleLocalService.getRoleByName(
 				SystemRoles.GUEST, null);
@@ -127,7 +123,6 @@ public class UserInitializer implements ApplicationRunner {
 				"Created default guest user: {} with GUEST role", _guestEmail);
 		}
 		catch (ConflictException e) {
-
 			log.info(
 				"Default guest user was created concurrently: {}", _guestEmail);
 		}

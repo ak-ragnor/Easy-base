@@ -29,8 +29,8 @@ import org.springframework.stereotype.Service;
  *
  * @author Akhash R
  */
-@Service
 @RequiredArgsConstructor
+@Service
 public class UserServiceImpl implements UserService {
 
 	@Override
@@ -50,12 +50,16 @@ public class UserServiceImpl implements UserService {
 		UUID userId, String type, Map<String, Object> credentialData) {
 
 		_permissionChecker.check(UserActions.UPDATE);
-		return _userLocalService.addUserCredential(userId, type, credentialData);
+
+		return _userLocalService.addUserCredential(
+			userId, type, credentialData);
 	}
 
 	@Override
 	public User authenticateUser(String email, String password, UUID tenantId) {
+
 		// No permission check - public authentication endpoint
+
 		return _userLocalService.authenticateUser(email, password, tenantId);
 	}
 
@@ -65,6 +69,7 @@ public class UserServiceImpl implements UserService {
 		UUID tenantId) {
 
 		_permissionChecker.check(UserActions.CREATE);
+
 		return _userLocalService.createUser(
 			email, firstName, lastName, displayName, tenantId);
 	}
@@ -78,17 +83,21 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User getUser(String email, UUID tenantId) {
 		_permissionChecker.check(UserActions.VIEW);
+
 		return _userLocalService.getUser(email, tenantId);
 	}
 
 	@Override
 	public User getUser(UUID id) {
 		_permissionChecker.check(UserActions.VIEW);
+
 		return _userLocalService.getUser(id);
 	}
 
 	@Override
-	public UserCredential getUserCredential(UUID userId, String credentialType) {
+	public UserCredential getUserCredential(
+		UUID userId, String credentialType) {
+
 		_permissionChecker.check(UserActions.VIEW);
 
 		return _userLocalService.getUserCredential(userId, credentialType);
@@ -104,6 +113,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<User> getUsers(UUID tenantId) {
 		_permissionChecker.check(UserActions.LIST);
+
 		return _userLocalService.getUsers(tenantId);
 	}
 
@@ -118,7 +128,9 @@ public class UserServiceImpl implements UserService {
 		UUID userId, String plainPassword) {
 
 		_permissionChecker.check(UserActions.CHANGE_PASSWORD);
-		return _userLocalService.updatePasswordCredential(userId, plainPassword);
+
+		return _userLocalService.updatePasswordCredential(
+			userId, plainPassword);
 	}
 
 	@Override
@@ -126,7 +138,9 @@ public class UserServiceImpl implements UserService {
 		UUID id, String firstName, String lastName, String displayName) {
 
 		_permissionChecker.check(UserActions.UPDATE);
-		return _userLocalService.updateUser(id, firstName, lastName, displayName);
+
+		return _userLocalService.updateUser(
+			id, firstName, lastName, displayName);
 	}
 
 	private final PermissionChecker _permissionChecker;

@@ -28,8 +28,8 @@ import org.springframework.stereotype.Service;
  *
  * @author Akhash R
  */
-@Service
 @RequiredArgsConstructor
+@Service
 public class DataRecordServiceImpl implements DataRecordService {
 
 	@Override
@@ -71,7 +71,7 @@ public class DataRecordServiceImpl implements DataRecordService {
 		return _dataRecordLocalService.updateRecord(tenantId, table, id, data);
 	}
 
-	private final PermissionChecker _permissionChecker;
 	private final DataRecordLocalService _dataRecordLocalService;
+	private final PermissionChecker _permissionChecker;
 
 }

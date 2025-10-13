@@ -5,6 +5,8 @@
 
 package com.easybase.api.auth.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -17,7 +19,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO for ResourceAction entity.
+ * Consolidated DTO for ResourceAction entity.
+ * Used for create, update, and read operations.
  *
  * @author Akhash R
  */
@@ -35,18 +38,21 @@ public class ResourceActionDto {
 	private String actionName;
 
 	private boolean active;
-	private int bitValue;
+
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private Instant createdAt;
 
 	@Size(max = 255)
 	private String description;
 
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private UUID id;
 
 	@NotBlank
 	@Size(max = 50)
 	private String resourceType;
 
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private Instant updatedAt;
 
 }

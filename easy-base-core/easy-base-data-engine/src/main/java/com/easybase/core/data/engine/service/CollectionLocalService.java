@@ -79,6 +79,7 @@ public interface CollectionLocalService {
 	 * @return the updated collection
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if collection not found
 	 */
-	Collection updateCollection(UUID collectionId, List<Attribute> newAttributes);
+	Collection updateCollection(
+		UUID collectionId, List<Attribute> newAttributes);
 
 }

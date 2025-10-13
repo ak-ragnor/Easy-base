@@ -14,7 +14,6 @@ import com.easybase.infrastructure.api.dto.response.ApiResponse;
 
 import jakarta.validation.Valid;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -92,10 +91,10 @@ public class UserController {
 
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<UserDto>>> getUsers() {
-
 		List<User> users = _userService.getUsers(_serviceContext.tenantId());
 
-		ApiResponse<List<UserDto>> response = ApiResponse.success(_userMapper.toDto(users));
+		ApiResponse<List<UserDto>> response = ApiResponse.success(
+			_userMapper.toDto(users));
 
 		return ResponseEntity.ok(response);
 	}

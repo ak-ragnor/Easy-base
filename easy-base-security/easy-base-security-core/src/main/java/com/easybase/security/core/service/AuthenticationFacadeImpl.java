@@ -129,7 +129,7 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 		principalData.setSessionId(session.getSessionId());
 
 		List<String> authorities = _roleLocalService.getUserAuthorities(
-				user.getId());
+			user.getId());
 
 		principalData.setAuthorities(authorities);
 		principalData.setMetadata(session.getMetadata());

@@ -9,12 +9,12 @@ import com.easybase.common.exception.ConflictException;
 import com.easybase.common.exception.ResourceNotFoundException;
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.repository.TenantRepository;
+import com.easybase.core.tenant.service.TenantLocalService;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.easybase.core.tenant.service.TenantLocalService;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;

@@ -37,20 +37,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class PermissionContextBindingImpl extends AbstractContextBinding
-	implements PermissionContextBinding {
-
-	@Override
-	public PermissionContext getCurrentPermissionContext() {
-		AuthenticatedPrincipalData authenticatedPrincipalData =
-				fromCurrentContext();
-
-		if (authenticatedPrincipalData == null) {
-			return null;
-		}
-
-		return fromPrincipal(authenticatedPrincipalData);
-	}
+public class PermissionContextBindingImpl
+	extends AbstractContextBinding implements PermissionContextBinding {
 
 	@Override
 	public PermissionContext fromPrincipal(
@@ -61,6 +49,18 @@ public class PermissionContextBindingImpl extends AbstractContextBinding
 
 		return _permissionContextProvider.build(
 			principal.getUserId(), principal.getTenantId(), permissions, roles);
+	}
+
+	@Override
+	public PermissionContext getCurrentPermissionContext() {
+		AuthenticatedPrincipalData authenticatedPrincipalData =
+			fromCurrentContext();
+
+		if (authenticatedPrincipalData == null) {
+			return null;
+		}
+
+		return fromPrincipal(authenticatedPrincipalData);
 	}
 
 	/**
@@ -95,7 +95,6 @@ public class PermissionContextBindingImpl extends AbstractContextBinding
 		if (roleIds.isEmpty()) {
 			return Set.of();
 		}
-
 
 		List<RolePermission> rolePermissions =
 			_rolePermissionRepository.findByRoleIdIn(roleIds);
@@ -133,12 +132,9 @@ public class PermissionContextBindingImpl extends AbstractContextBinding
 			return List.of();
 		}
 
-		List<Role> roles = _roleLocalService.getRolesByIds(
-				roleIds
-		);
+		List<Role> roles = _roleLocalService.getRolesByIds(roleIds);
 
-		Stream<Role> roleStream = roles.stream(
-		);
+		Stream<Role> roleStream = roles.stream();
 
 		return roleStream.map(
 			role -> role.getName()
@@ -147,7 +143,7 @@ public class PermissionContextBindingImpl extends AbstractContextBinding
 
 	private final PermissionContextProvider _permissionContextProvider;
 	private final ResourceActionRepository _resourceActionRepository;
-	private final RolePermissionRepository _rolePermissionRepository;
 	private final RoleLocalService _roleLocalService;
+	private final RolePermissionRepository _rolePermissionRepository;
 
 }

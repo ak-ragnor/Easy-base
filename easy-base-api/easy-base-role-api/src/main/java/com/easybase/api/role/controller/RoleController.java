@@ -7,17 +7,16 @@ package com.easybase.api.role.controller;
 
 import com.easybase.api.role.dto.RoleDto;
 import com.easybase.api.role.dto.UserRoleAssignmentDto;
+import com.easybase.api.role.dto.mapper.RoleMapper;
+import com.easybase.api.role.dto.mapper.UserRoleAssignmentMapper;
 import com.easybase.core.role.entity.Role;
 import com.easybase.core.role.entity.UserRole;
 import com.easybase.core.role.service.RoleService;
 
 import jakarta.validation.Valid;
 
-import java.time.Instant;
-
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 
@@ -43,121 +42,142 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RoleController {
 
-	@PostMapping("/{roleId}/assign")
-	@ResponseStatus(HttpStatus.CREATED)
-	public UserRoleAssignmentDto assignRole(
-		@PathVariable UUID roleId, @RequestParam UUID userId,
-		@RequestParam(required = false) UUID tenantId,
-		@RequestParam(required = false) Instant expiresAt) {
-
-		UserRole userRole = _roleService.assignRoleToUser(
-			userId, roleId, tenantId, expiresAt);
-
-		return _convertToUserRoleAssignmentDto(userRole);
-	}
-
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public RoleDto createRole(@RequestBody @Valid RoleDto roleDto) {
-		Role role = _roleService.createRole(
-			roleDto.getName(), roleDto.getDescription(), roleDto.getTenantId(),
-			roleDto.isSystem());
-
-		return _convertToRoleDto(role);
-	}
-
+	/**
+	 * Delete a role.
+	 * DELETE /api/roles/{roleId}
+	 *
+	 * @param roleId the role ID
+	 */
 	@DeleteMapping("/{roleId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteRole(@PathVariable UUID roleId) {
 		_roleService.deleteRole(roleId);
 	}
 
-	@GetMapping
-	public List<RoleDto> getAvailableRoles(
-		@RequestParam(required = false) UUID tenantId) {
-
-		List<Role> roles = _roleService.getAvailableRoles(tenantId);
-
-		Stream<Role> rolesStream = roles.stream();
-
-		return rolesStream.map(
-			this::_convertToRoleDto
-		).toList();
-	}
-
-	@GetMapping("/{roleId}")
-	public RoleDto getRoleById(@PathVariable UUID roleId) {
-		Role role = _roleService.getRoleById(roleId);
-
-		return _convertToRoleDto(role);
-	}
-
-	@GetMapping("/user/{userId}")
-	public List<UserRoleAssignmentDto> getUserRoles(@PathVariable UUID userId) {
-		List<UserRole> userRoles = _roleService.getUserRoles(userId);
-
-		Stream<UserRole> userRolesStream = userRoles.stream();
-
-		return userRolesStream.map(
-			this::_convertToUserRoleAssignmentDto
-		).toList();
-	}
-
-	@PostMapping("/{roleId}/unassign")
+	/**
+	 * Unassign a role from a user.
+	 * DELETE /api/roles/{roleId}/users/{userId}
+	 *
+	 * @param roleId the role ID
+	 * @param userId the user ID
+	 */
+	@DeleteMapping("/{roleId}/users/{userId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void unassignRole(
-		@PathVariable UUID roleId, @RequestParam UUID userId,
-		@RequestParam(required = false) UUID tenantId) {
+	public void deleteUserRoleAssignment(
+		@PathVariable UUID roleId, @PathVariable UUID userId) {
 
 		_roleService.revokeRoleFromUser(userId, roleId);
 	}
 
+	/**
+	 * Get a specific role by ID.
+	 * GET /api/roles/{roleId}
+	 *
+	 * @param roleId the role ID
+	 * @return the role
+	 */
+	@GetMapping("/{roleId}")
+	public RoleDto getRoleById(@PathVariable UUID roleId) {
+		Role role = _roleService.getRoleById(roleId);
+
+		return _roleMapper.toDto(role);
+	}
+
+	/**
+	 * Get all available roles, optionally filtered by tenant.
+	 * GET /api/roles?tenantId={uuid}
+	 *
+	 * @param tenantId optional tenant filter
+	 * @return list of roles
+	 */
+	@GetMapping
+	public List<RoleDto> getRoles(
+		@RequestParam(required = false) UUID tenantId) {
+
+		List<Role> roles = _roleService.getAvailableRoles(tenantId);
+
+		return _roleMapper.toDto(roles);
+	}
+
+	/**
+	 * Get all role assignments for a specific user.
+	 * GET /api/roles/users/{userId}
+	 *
+	 * @param userId the user ID
+	 * @return list of user role assignments
+	 */
+	@GetMapping("/users/{userId}")
+	public List<UserRoleAssignmentDto> getUserRoleAssignments(
+		@PathVariable UUID userId) {
+
+		List<UserRole> userRoles = _roleService.getUserRoles(userId);
+
+		return _userRoleAssignmentMapper.toDto(userRoles);
+	}
+
+	/**
+	 * Create a new role.
+	 * POST /api/roles
+	 *
+	 * @param dto the role DTO
+	 * @return the created role
+	 */
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	public RoleDto postRole(@RequestBody @Valid RoleDto dto) {
+		Role role = _roleService.createRole(
+			dto.getName(), dto.getDescription(), dto.getTenantId(),
+			dto.isSystem());
+
+		return _roleMapper.toDto(role);
+	}
+
+	/**
+	 * Assign a role to a user.
+	 * POST /api/roles/{roleId}/users
+	 *
+	 * @param roleId the role ID
+	 * @param dto the assignment DTO containing userId, tenantId, expiresAt
+	 * @return the created assignment
+	 */
+	@PostMapping("/{roleId}/users")
+	@ResponseStatus(HttpStatus.CREATED)
+	public UserRoleAssignmentDto postUserRoleAssignment(
+		@PathVariable UUID roleId,
+		@RequestBody @Valid UserRoleAssignmentDto dto) {
+
+		// Validate roleId matches
+
+		if (!roleId.equals(dto.getRoleId())) {
+			throw new IllegalArgumentException(
+				"Role ID in path does not match role ID in request body");
+		}
+
+		UserRole userRole = _roleService.assignRoleToUser(
+			dto.getUserId(), roleId, dto.getTenantId(), dto.getExpiresAt());
+
+		return _userRoleAssignmentMapper.toDto(userRole);
+	}
+
+	/**
+	 * Update an existing role.
+	 * PUT /api/roles/{roleId}
+	 *
+	 * @param roleId the role ID
+	 * @param dto the role DTO with updated fields
+	 * @return the updated role
+	 */
 	@PutMapping("/{roleId}")
-	public RoleDto updateRole(
-		@PathVariable UUID roleId, @RequestBody @Valid RoleDto roleDto) {
+	public RoleDto putRole(
+		@PathVariable UUID roleId, @RequestBody @Valid RoleDto dto) {
 
-		Role role = _roleService.updateRole(roleId, roleDto.getDescription());
+		Role role = _roleService.updateRole(roleId, dto.getDescription());
 
-		return _convertToRoleDto(role);
+		return _roleMapper.toDto(role);
 	}
 
-	private RoleDto _convertToRoleDto(Role role) {
-		RoleDto dto = new RoleDto();
-
-		dto.setId(role.getId());
-		dto.setName(role.getName());
-		dto.setDescription(role.getDescription());
-
-		dto.setTenantId(role.getTenantId());
-
-		dto.setSystem(role.isSystem());
-		dto.setActive(role.isActive());
-
-		dto.setCreatedDate(role.getCreatedAt());
-
-		dto.setLastModifiedDate(role.getUpdatedAt());
-
-		return dto;
-	}
-
-	private UserRoleAssignmentDto _convertToUserRoleAssignmentDto(
-		UserRole userRole) {
-
-		UserRoleAssignmentDto dto = new UserRoleAssignmentDto();
-
-		dto.setUserId(userRole.getUserId());
-		dto.setRoleId(userRole.getRoleId());
-
-		dto.setTenantId(userRole.getTenantId());
-
-		dto.setActive(userRole.isActive());
-		dto.setAssignedAt(userRole.getCreatedAt());
-		dto.setAssignedBy(userRole.getCreatedBy());
-		dto.setExpiresAt(userRole.getExpiresAt());
-
-		return dto;
-	}
-
+	private final RoleMapper _roleMapper;
 	private final RoleService _roleService;
+	private final UserRoleAssignmentMapper _userRoleAssignmentMapper;
 
 }

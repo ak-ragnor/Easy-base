@@ -25,8 +25,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class ServiceContextBindingImpl extends AbstractContextBinding
-	implements ServiceContextBinding {
+public class ServiceContextBindingImpl
+	extends AbstractContextBinding implements ServiceContextBinding {
 
 	@Override
 	public ServiceContext fromPrincipal(AuthenticatedPrincipalData principal) {

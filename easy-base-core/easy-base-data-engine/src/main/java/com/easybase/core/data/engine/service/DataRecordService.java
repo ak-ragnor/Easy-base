@@ -30,7 +30,8 @@ public interface DataRecordService {
 	 * @return the created record
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	DataRecord createRecord(UUID tenantId, String table, Map<String, Object> data);
+	DataRecord createRecord(
+		UUID tenantId, String table, Map<String, Object> data);
 
 	/**
 	 * Deletes a record.

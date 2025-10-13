@@ -28,25 +28,6 @@ import org.springframework.web.context.annotation.RequestScope;
 public class ContextConfiguration {
 
 	/**
-	 * Provides request-scoped ServiceContext bean.
-	 * The context is retrieved from thread-local storage via ServiceContextBinding.
-	 *
-	 * @return the ServiceContext for the current request
-	 */
-	@Bean
-	@RequestScope
-	public ServiceContext serviceContext() {
-		ServiceContext context = _serviceContextBinding.getCurrentServiceContext();
-
-		if (context == null) {
-			throw new IllegalStateException(
-				"ServiceContext not found. Ensure JwtSessionAuthenticationFilter authenticated the request.");
-		}
-
-		return context;
-	}
-
-	/**
 	 * Provides request-scoped PermissionContext bean.
 	 * The context is retrieved from thread-local storage via PermissionContextBinding.
 	 *
@@ -55,11 +36,32 @@ public class ContextConfiguration {
 	@Bean
 	@RequestScope
 	public PermissionContext permissionContext() {
-		PermissionContext context = _permissionContextBinding.getCurrentPermissionContext();
+		PermissionContext context =
+			_permissionContextBinding.getCurrentPermissionContext();
 
 		if (context == null) {
 			throw new IllegalStateException(
 				"PermissionContext not found. Ensure JwtSessionAuthenticationFilter authenticated the request.");
+		}
+
+		return context;
+	}
+
+	/**
+	 * Provides request-scoped ServiceContext bean.
+	 * The context is retrieved from thread-local storage via ServiceContextBinding.
+	 *
+	 * @return the ServiceContext for the current request
+	 */
+	@Bean
+	@RequestScope
+	public ServiceContext serviceContext() {
+		ServiceContext context =
+			_serviceContextBinding.getCurrentServiceContext();
+
+		if (context == null) {
+			throw new IllegalStateException(
+				"ServiceContext not found. Ensure JwtSessionAuthenticationFilter authenticated the request.");
 		}
 
 		return context;

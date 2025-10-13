@@ -91,6 +91,7 @@ public interface CollectionService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if collection not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Collection updateCollection(UUID collectionId, List<Attribute> newAttributes);
+	Collection updateCollection(
+		UUID collectionId, List<Attribute> newAttributes);
 
 }

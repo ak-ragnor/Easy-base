@@ -23,19 +23,24 @@ import org.springframework.stereotype.Component;
  * @author Akhash R
  */
 @Component
-public class PermissionContextProviderImpl implements PermissionContextProvider {
+public class PermissionContextProviderImpl
+	implements PermissionContextProvider {
 
 	@Override
 	public PermissionContext build(
 		UUID userId, UUID tenantId, Set<String> permissions,
 		List<String> roles) {
 
-		return PermissionContextImpl.builder()
-			.userId(userId)
-			.tenantId(tenantId)
-			.permissions(permissions)
-			.roles(roles)
-			.build();
+		return PermissionContextImpl.builder(
+		).userId(
+			userId
+		).tenantId(
+			tenantId
+		).permissions(
+			permissions
+		).roles(
+			roles
+		).build();
 	}
 
 }

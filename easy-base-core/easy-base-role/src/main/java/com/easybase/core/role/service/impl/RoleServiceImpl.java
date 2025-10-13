@@ -13,6 +13,7 @@ import com.easybase.core.role.service.RoleLocalService;
 import com.easybase.core.role.service.RoleService;
 
 import java.time.Instant;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -29,8 +30,8 @@ import org.springframework.stereotype.Service;
  *
  * @author Akhash R
  */
-@Service
 @RequiredArgsConstructor
+@Service
 public class RoleServiceImpl implements RoleService {
 
 	@Override
@@ -38,6 +39,7 @@ public class RoleServiceImpl implements RoleService {
 		UUID userId, UUID roleId, UUID tenantId, Instant expiresAt) {
 
 		_permissionChecker.check(RoleActions.ASSIGN);
+
 		return _roleLocalService.assignRoleToUser(
 			userId, roleId, tenantId, expiresAt);
 	}
@@ -47,7 +49,9 @@ public class RoleServiceImpl implements RoleService {
 		String name, String description, UUID tenantId, boolean system) {
 
 		_permissionChecker.check(RoleActions.CREATE);
-		return _roleLocalService.createRole(name, description, tenantId, system);
+
+		return _roleLocalService.createRole(
+			name, description, tenantId, system);
 	}
 
 	@Override
@@ -59,18 +63,21 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public List<Role> getAvailableRoles(UUID tenantId) {
 		_permissionChecker.check(RoleActions.LIST);
+
 		return _roleLocalService.getAvailableRoles(tenantId);
 	}
 
 	@Override
 	public Role getRoleById(UUID roleId) {
 		_permissionChecker.check(RoleActions.VIEW);
+
 		return _roleLocalService.getRoleById(roleId);
 	}
 
 	@Override
 	public List<UserRole> getUserRoles(UUID userId) {
 		_permissionChecker.check(RoleActions.VIEW);
+
 		return _roleLocalService.getUserRoles(userId);
 	}
 
@@ -83,6 +90,7 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public Role updateRole(UUID roleId, String description) {
 		_permissionChecker.check(RoleActions.UPDATE);
+
 		return _roleLocalService.updateRole(roleId, description);
 	}
 

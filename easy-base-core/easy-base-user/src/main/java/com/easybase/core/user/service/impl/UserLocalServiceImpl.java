@@ -13,6 +13,7 @@ import com.easybase.core.user.entity.User;
 import com.easybase.core.user.entity.UserCredential;
 import com.easybase.core.user.repository.UserCredentialRepository;
 import com.easybase.core.user.repository.UserRepository;
+import com.easybase.core.user.service.UserLocalService;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +22,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.easybase.core.user.service.UserLocalService;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;

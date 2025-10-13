@@ -46,28 +46,58 @@ public class ServiceContextProviderImpl implements ServiceContextProvider {
 		}
 
 		AuthenticatedPrincipalData principal =
-			(AuthenticatedPrincipalData) principalData;
+			(AuthenticatedPrincipalData)principalData;
 
 		UserInfo user = _resolveUser(principal);
 		TenantInfo tenant = _resolveTenant(principal);
 		CorrelationIds correlation = _buildCorrelation(principal);
 
-		return ServiceContextImpl.builder()
-			.user(user)
-			.tenant(tenant)
-			.correlation(correlation)
-			.issuedAt(principal.getIssuedAt())
-			.expiresAt(principal.getExpiresAt())
-			.clientIp(principal.getClientIp())
-			.userAgent(principal.getUserAgent())
-			.build();
+		return ServiceContextImpl.builder(
+		).user(
+			user
+		).tenant(
+			tenant
+		).correlation(
+			correlation
+		).issuedAt(
+			principal.getIssuedAt()
+		).expiresAt(
+			principal.getExpiresAt()
+		).clientIp(
+			principal.getClientIp()
+		).userAgent(
+			principal.getUserAgent()
+		).build();
 	}
 
 	private CorrelationIds _buildCorrelation(
 		AuthenticatedPrincipalData principal) {
 
-		return CorrelationIds.create(
-			principal.getSessionId(), null);
+		return CorrelationIds.create(principal.getSessionId(), null);
+	}
+
+	private ServiceContext _buildGuestContext() {
+		Tenant tenant = _tenantLocalService.getDefaultTenant();
+
+		TenantInfo tenantInfo = _tenantInfoResolver.resolve(tenant.getId());
+
+		User guestUser = _userRepository.findActiveByEmailAndTenantId(
+			_guestEmail, tenant.getId()
+		).orElseThrow(
+			() -> new IllegalStateException(
+				"Guest user not found. Ensure UserInitializer ran successfully.")
+		);
+
+		UserInfo userInfo = _userInfoResolver.resolve(guestUser.getId());
+
+		return ServiceContextImpl.builder(
+		).user(
+			userInfo
+		).tenant(
+			tenantInfo
+		).correlation(
+			CorrelationIds.create(null, null)
+		).build();
 	}
 
 	private TenantInfo _resolveTenant(
@@ -92,34 +122,12 @@ public class ServiceContextProviderImpl implements ServiceContextProvider {
 		}
 	}
 
-	private ServiceContext _buildGuestContext() {
-		Tenant tenant = _tenantLocalService.getDefaultTenant();
-
-		TenantInfo tenantInfo = _tenantInfoResolver.resolve(
-			tenant.getId());
-
-		User guestUser = _userRepository.findActiveByEmailAndTenantId(
-			_guestEmail, tenant.getId()
-		).orElseThrow(
-			() -> new IllegalStateException(
-				"Guest user not found. Ensure UserInitializer ran successfully.")
-		);
-
-		UserInfo userInfo = _userInfoResolver.resolve(guestUser.getId());
-
-		return ServiceContextImpl.builder()
-			.user(userInfo)
-			.tenant(tenantInfo)
-			.correlation(CorrelationIds.create(null, null))
-			.build();
-	}
+	@Value("${easy-base.guest.email:guest@easybase.com}")
+	private String _guestEmail;
 
 	private final TenantInfoResolver _tenantInfoResolver;
 	private final TenantLocalService _tenantLocalService;
 	private final UserInfoResolver _userInfoResolver;
 	private final UserRepository _userRepository;
-
-	@Value("${easy-base.guest.email:guest@easybase.com}")
-	private String _guestEmail;
 
 }

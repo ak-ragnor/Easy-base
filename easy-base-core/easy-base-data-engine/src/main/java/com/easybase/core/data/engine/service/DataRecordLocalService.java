@@ -28,7 +28,8 @@ public interface DataRecordLocalService {
 	 * @param data the record data
 	 * @return the created record
 	 */
-	DataRecord createRecord(UUID tenantId, String table, Map<String, Object> data);
+	DataRecord createRecord(
+		UUID tenantId, String table, Map<String, Object> data);
 
 	/**
 	 * Deletes a record.

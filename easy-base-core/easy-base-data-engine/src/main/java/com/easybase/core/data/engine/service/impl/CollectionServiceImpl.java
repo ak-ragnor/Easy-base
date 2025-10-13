@@ -30,8 +30,8 @@ import org.springframework.stereotype.Service;
  *
  * @author Akhash R
  */
-@Service
 @RequiredArgsConstructor
+@Service
 public class CollectionServiceImpl implements CollectionService {
 
 	@Override
@@ -82,7 +82,7 @@ public class CollectionServiceImpl implements CollectionService {
 			collectionId, newAttributes);
 	}
 
-	private final PermissionChecker _permissionChecker;
 	private final CollectionLocalService _collectionLocalService;
+	private final PermissionChecker _permissionChecker;
 
 }

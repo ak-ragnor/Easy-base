@@ -130,25 +130,6 @@ public class RoleLocalServiceImpl implements RoleLocalService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<String> getUserAuthorities(UUID userId) {
-		List<UserRole> userRoles = getActiveUserRoles(userId);
-
-		if (userRoles.isEmpty()) {
-			return List.of();
-		}
-
-		List<UUID> roleIds = userRoles.stream()
-			.map(UserRole::getRoleId)
-			.toList();
-
-		List<Role> roles = getRolesByIds(roleIds);
-
-		return roles.stream()
-			.map(Role::getName)
-			.toList();
-	}
-
-	@Transactional(readOnly = true)
 	public Role getRoleById(UUID roleId) {
 		Optional<Role> roleOptional = _roleRepository.findById(roleId);
 
@@ -188,6 +169,27 @@ public class RoleLocalServiceImpl implements RoleLocalService {
 	@Transactional(readOnly = true)
 	public List<Role> getTenantRoles(UUID tenantId) {
 		return _roleRepository.findByTenantId(tenantId);
+	}
+
+	@Transactional(readOnly = true)
+	public List<String> getUserAuthorities(UUID userId) {
+		List<UserRole> userRoles = getActiveUserRoles(userId);
+
+		if (userRoles.isEmpty()) {
+			return List.of();
+		}
+
+		List<UUID> roleIds = userRoles.stream(
+		).map(
+			UserRole::getRoleId
+		).toList();
+
+		List<Role> roles = getRolesByIds(roleIds);
+
+		return roles.stream(
+		).map(
+			Role::getName
+		).toList();
 	}
 
 	@Transactional(readOnly = true)

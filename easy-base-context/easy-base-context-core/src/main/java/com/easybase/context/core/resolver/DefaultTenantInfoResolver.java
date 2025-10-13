@@ -67,7 +67,7 @@ public class DefaultTenantInfoResolver
 		return Map.of();
 	}
 
-	private final TenantRepository _tenantRepository;
 	private final TenantLocalService _tenantLocalService;
+	private final TenantRepository _tenantRepository;
 
 }

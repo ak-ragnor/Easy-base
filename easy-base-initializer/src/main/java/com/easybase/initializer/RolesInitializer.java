@@ -57,7 +57,6 @@ public class RolesInitializer implements ApplicationRunner {
 
 	private void createRoleIfNotExists(String name, String description) {
 		if (!_roleRepository.existsByNameAndSystemTrue(name)) {
-
 			Role role = new Role();
 
 			role.setName(name);

@@ -28,8 +28,8 @@ import org.springframework.stereotype.Service;
  *
  * @author Akhash R
  */
-@Service
 @RequiredArgsConstructor
+@Service
 public class TenantServiceImpl implements TenantService {
 
 	@Override
@@ -63,24 +63,28 @@ public class TenantServiceImpl implements TenantService {
 	@Override
 	public Tenant getTenant(String name) {
 		_permissionChecker.check(TenantActions.VIEW);
+
 		return _tenantLocalService.getTenant(name);
 	}
 
 	@Override
 	public Tenant getTenant(UUID id) {
 		_permissionChecker.check(TenantActions.VIEW);
+
 		return _tenantLocalService.getTenant(id);
 	}
 
 	@Override
 	public List<Tenant> getTenants() {
 		_permissionChecker.check(TenantActions.LIST);
+
 		return _tenantLocalService.getTenants();
 	}
 
 	@Override
 	public Tenant updateTenant(UUID id, String name) {
 		_permissionChecker.check(TenantActions.UPDATE);
+
 		return _tenantLocalService.updateTenant(id, name);
 	}
 

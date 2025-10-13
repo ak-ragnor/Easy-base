@@ -27,8 +27,8 @@ import org.springframework.stereotype.Service;
  *
  * @author Akhash R
  */
-@Service
 @RequiredArgsConstructor
+@Service
 public class ResourceActionServiceImpl implements ResourceActionService {
 
 	@Override

@@ -5,6 +5,8 @@
 
 package com.easybase.api.role.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
@@ -16,7 +18,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO for user role assignment.
+ * Consolidated DTO for user role assignment operations.
+ * Used for assigning, unassigning, and reading user role assignments.
+ *
+ * - For ASSIGN (POST /api/roles/{roleId}/users): provide userId, tenantId (optional), expiresAt (optional)
+ * - For UNASSIGN (DELETE /api/roles/{roleId}/users/{userId}): userId in path
+ * - For READ (GET): all fields are returned
  *
  * @author Akhash R
  */
@@ -25,9 +32,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserRoleAssignmentDto {
 
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private Instant assignedAt;
+
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private UUID assignedBy;
+
 	private Instant expiresAt;
+
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private boolean isActive;
 
 	@NotNull
