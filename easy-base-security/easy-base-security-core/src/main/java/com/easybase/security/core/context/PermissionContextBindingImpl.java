@@ -102,15 +102,14 @@ public class PermissionContextBindingImpl
 		Set<String> permissionKeys = new HashSet<>();
 
 		for (RolePermission rolePerm : rolePermissions) {
-			String resourceType = rolePerm.getResourceType();
-			long permissionsMask = rolePerm.getPermissionsMask();
-
 			List<ResourceAction> actions =
 				_resourceActionRepository.findByResourceTypeAndActiveTrue(
-					resourceType);
+					rolePerm.getResourceType());
 
 			for (ResourceAction action : actions) {
-				if ((permissionsMask & action.getBitValue()) != 0) {
+				if ((rolePerm.getPermissionsMask() & action.getBitValue()) !=
+						0) {
+
 					permissionKeys.add(action.getActionKey());
 				}
 			}
@@ -134,9 +133,9 @@ public class PermissionContextBindingImpl
 
 		List<Role> roles = _roleLocalService.getRolesByIds(roleIds);
 
-		Stream<Role> roleStream = roles.stream();
+		Stream<Role> rolesStream = roles.stream();
 
-		return roleStream.map(
+		return rolesStream.map(
 			role -> role.getName()
 		).toList();
 	}

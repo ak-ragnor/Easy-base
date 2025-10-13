@@ -34,20 +34,22 @@ public class TenantInitializer implements ApplicationRunner {
 	@Transactional
 	public void run(ApplicationArguments args) {
 		log.info("=== Step 1: Default Tenant Initialization ===");
-		createDefaultTenant();
+
+		_createTenant();
 	}
 
-	private void createDefaultTenant() {
+	private void _createTenant() {
 		log.info("Checking for default tenant...");
 
 		try {
 			Tenant tenant = _tenantLocalService.getDefaultTenant();
+
 			log.info("Default tenant already exists: {}", tenant.getName());
 		}
-		catch (Exception e) {
-			log.error("Failed to initialize default tenant", e);
+		catch (Exception exception) {
+			log.error("Failed to initialize default tenant", exception);
 
-			throw e;
+			throw exception;
 		}
 
 		log.info("Default tenant initialization completed");

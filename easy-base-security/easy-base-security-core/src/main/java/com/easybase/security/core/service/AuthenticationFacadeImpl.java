@@ -132,6 +132,7 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 			user.getId());
 
 		principalData.setAuthorities(authorities);
+
 		principalData.setMetadata(session.getMetadata());
 		principalData.setIssuedAt(session.getCreatedAt());
 		principalData.setExpiresAt(session.getExpiresAt());
@@ -161,10 +162,8 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 
 		RefreshTokenEntity tokenEntity = tokenEntityOptional.get();
 
-		String sessionId = tokenEntity.getSessionId();
-
 		Optional<Session> sessionOptional = _sessionService.getSession(
-			sessionId);
+			tokenEntity.getSessionId());
 
 		if (sessionOptional.isEmpty()) {
 			throw new AuthenticationException("Session not found or expired");

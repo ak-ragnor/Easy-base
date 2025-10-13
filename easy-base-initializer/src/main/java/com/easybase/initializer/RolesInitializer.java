@@ -37,25 +37,26 @@ public class RolesInitializer implements ApplicationRunner {
 	@Transactional
 	public void run(ApplicationArguments args) {
 		log.info("=== Step 2: Default Roles Initialization ===");
-		createDefaultRoles();
+
+		_createRoles();
 	}
 
-	private void createDefaultRoles() {
+	private void _createRoles() {
 		log.info("Creating default system roles...");
 
-		createRoleIfNotExists(
+		_createRoleIfNotExists(
 			SystemRoles.ADMIN, "Administrator role with full system access");
 
-		createRoleIfNotExists(
+		_createRoleIfNotExists(
 			SystemRoles.USER, "Standard authenticated user role");
 
-		createRoleIfNotExists(
+		_createRoleIfNotExists(
 			SystemRoles.GUEST, "Guest role with limited read-only permissions");
 
 		log.info("Default roles initialization completed");
 	}
 
-	private void createRoleIfNotExists(String name, String description) {
+	private void _createRoleIfNotExists(String name, String description) {
 		if (!_roleRepository.existsByNameAndSystemTrue(name)) {
 			Role role = new Role();
 

@@ -44,11 +44,12 @@ public class UserInitializer implements ApplicationRunner {
 	@Transactional
 	public void run(ApplicationArguments args) {
 		log.info("=== Step 4: Default User Initialization ===");
-		createGuestUser();
-		createAdminUser();
+
+		_createAdminUser();
+		_createGuestUser();
 	}
 
-	private void createAdminUser() {
+	private void _createAdminUser() {
 		log.info("Checking for default admin user...");
 
 		Tenant defaultTenant = _tenantLocalService.getDefaultTenant();
@@ -81,20 +82,20 @@ public class UserInitializer implements ApplicationRunner {
 			log.info(
 				"Created default admin user: {} with ADMIN role", _adminEmail);
 		}
-		catch (ConflictException e) {
+		catch (ConflictException conflictException) {
 			log.info(
 				"Default admin user was created concurrently: {}", _adminEmail);
 		}
-		catch (Exception e) {
-			log.error("Failed to create default admin user", e);
+		catch (Exception exception) {
+			log.error("Failed to create default admin user", exception);
 
-			throw e;
+			throw exception;
 		}
 
 		log.info("Default user initialization completed");
 	}
 
-	private void createGuestUser() {
+	private void _createGuestUser() {
 		log.info("Checking for default guest user...");
 
 		Tenant defaultTenant = _tenantLocalService.getDefaultTenant();
@@ -122,14 +123,14 @@ public class UserInitializer implements ApplicationRunner {
 			log.info(
 				"Created default guest user: {} with GUEST role", _guestEmail);
 		}
-		catch (ConflictException e) {
+		catch (ConflictException conflictException) {
 			log.info(
 				"Default guest user was created concurrently: {}", _guestEmail);
 		}
-		catch (Exception e) {
-			log.error("Failed to create default guest user", e);
+		catch (Exception exception) {
+			log.error("Failed to create default guest user", exception);
 
-			throw e;
+			throw exception;
 		}
 	}
 
