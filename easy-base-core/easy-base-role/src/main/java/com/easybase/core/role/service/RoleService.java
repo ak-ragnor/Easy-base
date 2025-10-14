@@ -34,7 +34,7 @@ public interface RoleService {
 	 * @throws com.easybase.common.exception.ConflictException if user already has the role
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	UserRole assignRoleToUser(
+	public UserRole assignRoleToUser(
 		UUID userId, UUID roleId, UUID tenantId, Instant expiresAt);
 
 	/**
@@ -49,7 +49,7 @@ public interface RoleService {
 	 * @throws com.easybase.common.exception.ConflictException if role already exists
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Role createRole(
+	public Role createRole(
 		String name, String description, UUID tenantId, boolean system);
 
 	/**
@@ -61,7 +61,7 @@ public interface RoleService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if role not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void deleteRole(UUID roleId);
+	public void deleteRole(UUID roleId);
 
 	/**
 	 * Gets all available roles for a tenant (system + tenant-specific).
@@ -71,7 +71,7 @@ public interface RoleService {
 	 * @return list of available roles
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<Role> getAvailableRoles(UUID tenantId);
+	public List<Role> getAvailableRoles(UUID tenantId);
 
 	/**
 	 * Gets a role by ID.
@@ -82,7 +82,7 @@ public interface RoleService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Role getRoleById(UUID roleId);
+	public Role getRoleById(UUID roleId);
 
 	/**
 	 * Gets all roles assigned to a user.
@@ -92,7 +92,7 @@ public interface RoleService {
 	 * @return list of user roles
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<UserRole> getUserRoles(UUID userId);
+	public List<UserRole> getUserRoles(UUID userId);
 
 	/**
 	 * Revokes a role from a user.
@@ -102,7 +102,7 @@ public interface RoleService {
 	 * @param roleId the role ID
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void revokeRoleFromUser(UUID userId, UUID roleId);
+	public void revokeRoleFromUser(UUID userId, UUID roleId);
 
 	/**
 	 * Updates a role's description.
@@ -115,6 +115,6 @@ public interface RoleService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if role not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Role updateRole(UUID roleId, String description);
+	public Role updateRole(UUID roleId, String description);
 
 }

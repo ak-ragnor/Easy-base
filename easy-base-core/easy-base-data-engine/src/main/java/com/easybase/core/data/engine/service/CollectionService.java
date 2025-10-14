@@ -34,7 +34,7 @@ public interface CollectionService {
 	 * @throws com.easybase.common.exception.ConflictException if collection already exists
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Collection createCollection(
+	public Collection createCollection(
 		UUID tenantId, String collectionName, List<Attribute> attributes);
 
 	/**
@@ -45,7 +45,7 @@ public interface CollectionService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if collection not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void deleteCollection(UUID collectionId);
+	public void deleteCollection(UUID collectionId);
 
 	/**
 	 * Gets a collection by ID.
@@ -56,7 +56,7 @@ public interface CollectionService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Collection getCollection(UUID collectionId);
+	public Collection getCollection(UUID collectionId);
 
 	/**
 	 * Gets a collection by tenant and name.
@@ -68,7 +68,7 @@ public interface CollectionService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Collection getCollection(UUID tenantId, String collectionName);
+	public Collection getCollection(UUID tenantId, String collectionName);
 
 	/**
 	 * Gets collections for a tenant with pagination.
@@ -79,7 +79,7 @@ public interface CollectionService {
 	 * @return page of collections
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Page<Collection> getCollections(UUID tenantId, Pageable pageable);
+	public Page<Collection> getCollections(UUID tenantId, Pageable pageable);
 
 	/**
 	 * Updates a collection's attributes.
@@ -91,7 +91,7 @@ public interface CollectionService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if collection not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Collection updateCollection(
+	public Collection updateCollection(
 		UUID collectionId, List<Attribute> newAttributes);
 
 }

@@ -29,7 +29,7 @@ public interface UserService {
 	 * @throws com.easybase.common.exception.ConflictException if password credential already exists
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void addDefaultPasswordCredential(UUID userId);
+	public void addDefaultPasswordCredential(UUID userId);
 
 	/**
 	 * Adds password credential for a user.
@@ -40,7 +40,7 @@ public interface UserService {
 	 * @throws com.easybase.common.exception.ConflictException if password credential already exists
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void addPasswordCredential(UUID userId, String plainPassword);
+	public void addPasswordCredential(UUID userId, String plainPassword);
 
 	/**
 	 * Adds a user credential.
@@ -53,7 +53,7 @@ public interface UserService {
 	 * @throws com.easybase.common.exception.ConflictException if credential type already exists
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	UserCredential addUserCredential(
+	public UserCredential addUserCredential(
 		UUID userId, String type, Map<String, Object> credentialData);
 
 	/**
@@ -66,7 +66,7 @@ public interface UserService {
 	 * @return the authenticated user
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if authentication fails
 	 */
-	User authenticateUser(String email, String password, UUID tenantId);
+	public User authenticateUser(String email, String password, UUID tenantId);
 
 	/**
 	 * Creates a new user.
@@ -81,7 +81,7 @@ public interface UserService {
 	 * @throws com.easybase.common.exception.ConflictException if email already exists
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	User createUser(
+	public User createUser(
 		String email, String firstName, String lastName, String displayName,
 		UUID tenantId);
 
@@ -93,7 +93,7 @@ public interface UserService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if user not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void deleteUser(UUID id);
+	public void deleteUser(UUID id);
 
 	/**
 	 * Gets a user by email and tenant.
@@ -105,7 +105,7 @@ public interface UserService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	User getUser(String email, UUID tenantId);
+	public User getUser(String email, UUID tenantId);
 
 	/**
 	 * Gets a user by ID.
@@ -116,7 +116,7 @@ public interface UserService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	User getUser(UUID id);
+	public User getUser(UUID id);
 
 	/**
 	 * Gets a user credential by type.
@@ -128,7 +128,7 @@ public interface UserService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	UserCredential getUserCredential(UUID userId, String credentialType);
+	public UserCredential getUserCredential(UUID userId, String credentialType);
 
 	/**
 	 * Gets all user credentials.
@@ -138,7 +138,7 @@ public interface UserService {
 	 * @return list of credentials
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<UserCredential> getUserCredentials(UUID userId);
+	public List<UserCredential> getUserCredentials(UUID userId);
 
 	/**
 	 * Gets all users for a tenant.
@@ -148,7 +148,7 @@ public interface UserService {
 	 * @return list of users
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<User> getUsers(UUID tenantId);
+	public List<User> getUsers(UUID tenantId);
 
 	/**
 	 * Removes a user credential.
@@ -159,7 +159,7 @@ public interface UserService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if credential not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void removeUserCredential(UUID userId, String credentialType);
+	public void removeUserCredential(UUID userId, String credentialType);
 
 	/**
 	 * Updates a password credential.
@@ -171,7 +171,8 @@ public interface UserService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if credential not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	UserCredential updatePasswordCredential(UUID userId, String plainPassword);
+	public UserCredential updatePasswordCredential(
+		UUID userId, String plainPassword);
 
 	/**
 	 * Updates user information.
@@ -185,7 +186,7 @@ public interface UserService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if user not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	User updateUser(
+	public User updateUser(
 		UUID id, String firstName, String lastName, String displayName);
 
 }

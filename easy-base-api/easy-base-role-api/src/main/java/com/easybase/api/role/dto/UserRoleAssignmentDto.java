@@ -21,9 +21,6 @@ import lombok.NoArgsConstructor;
  * Consolidated DTO for user role assignment operations.
  * Used for assigning, unassigning, and reading user role assignments.
  *
- * - For ASSIGN (POST /api/roles/{roleId}/users): provide userId, tenantId (optional), expiresAt (optional)
- * - For UNASSIGN (DELETE /api/roles/{roleId}/users/{userId}): userId in path
- * - For READ (GET): all fields are returned
  *
  * @author Akhash R
  */

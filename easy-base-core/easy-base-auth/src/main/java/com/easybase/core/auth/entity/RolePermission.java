@@ -43,8 +43,7 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	public RolePermission(UUID roleId, String resourceType) {
 		this.roleId = roleId;
 		this.resourceType = resourceType;
-
-		this.permissionsMask = 0L;
+		permissionsMask = 0L;
 	}
 
 	public RolePermission(
@@ -61,7 +60,7 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 * @param bitValue the bit value of the permission to add
 	 */
 	public void addPermission(int bitValue) {
-		this.permissionsMask |= bitValue;
+		permissionsMask |= bitValue;
 	}
 
 	/**
@@ -71,7 +70,7 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 */
 	public void addPermissions(int... bitValues) {
 		for (int bitValue : bitValues) {
-			this.permissionsMask |= bitValue;
+			permissionsMask |= bitValue;
 		}
 	}
 
@@ -79,7 +78,7 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 * Clear all permissions.
 	 */
 	public void clearPermissions() {
-		this.permissionsMask = 0L;
+		permissionsMask = 0L;
 	}
 
 	/**
@@ -89,7 +88,7 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 * @return true if the permission is granted
 	 */
 	public boolean hasPermission(int bitValue) {
-		if ((this.permissionsMask & bitValue) != 0) {
+		if ((permissionsMask & bitValue) != 0) {
 			return true;
 		}
 
@@ -102,7 +101,7 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 * @param bitValue the bit value of the permission to remove
 	 */
 	public void removePermission(int bitValue) {
-		this.permissionsMask &= ~bitValue;
+		permissionsMask &= ~bitValue;
 	}
 
 	/**
@@ -112,7 +111,7 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 */
 	public void removePermissions(int... bitValues) {
 		for (int bitValue : bitValues) {
-			this.permissionsMask &= ~bitValue;
+			permissionsMask &= ~bitValue;
 		}
 	}
 

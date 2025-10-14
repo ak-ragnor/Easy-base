@@ -20,6 +20,7 @@ import com.easybase.core.user.repository.UserRepository;
 import com.easybase.security.api.dto.AuthenticatedPrincipalData;
 
 import java.util.Map;
+import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 
@@ -81,12 +82,16 @@ public class ServiceContextProviderImpl implements ServiceContextProvider {
 
 		TenantInfo tenantInfo = _tenantInfoResolver.resolve(tenant.getId());
 
-		User guestUser = _userRepository.findActiveByEmailAndTenantId(
-			_guestEmail, tenant.getId()
-		).orElseThrow(
-			() -> new IllegalStateException(
-				"Guest user not found. Ensure UserInitializer ran successfully.")
-		);
+		Optional<User> guestUserOptional =
+			_userRepository.findActiveByEmailAndTenantId(
+				_guestEmail, tenant.getId());
+
+		if (!guestUserOptional.isPresent()) {
+			throw new IllegalStateException(
+				"Guest user not found. Ensure UserInitializer ran successfully.");
+		}
+
+		User guestUser = guestUserOptional.get();
 
 		UserInfo userInfo = _userInfoResolver.resolve(guestUser.getId());
 

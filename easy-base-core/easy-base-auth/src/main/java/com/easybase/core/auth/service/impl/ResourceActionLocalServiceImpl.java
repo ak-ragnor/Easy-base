@@ -42,6 +42,7 @@ public class ResourceActionLocalServiceImpl
 		ResourceAction action = getResourceActionById(actionId);
 
 		action.setActive(true);
+
 		_resourceActionRepository.save(action);
 	}
 
@@ -88,6 +89,7 @@ public class ResourceActionLocalServiceImpl
 		ResourceAction action = getResourceActionById(actionId);
 
 		action.setActive(false);
+
 		_resourceActionRepository.save(action);
 	}
 

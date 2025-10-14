@@ -21,17 +21,17 @@
 		<!-- EasyBase Dependencies -->
 		<dependency>
 			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-auth</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-infrastructure-auth</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-infrastructure-data</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-auth</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -52,12 +52,12 @@
 
 		<!-- Spring Dependencies -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 
 		<!-- Lombok -->

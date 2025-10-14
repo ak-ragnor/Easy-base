@@ -16,19 +16,15 @@ import com.easybase.infrastructure.auth.annotation.ActionRoles;
 @ActionDefinition(resourceType = "PERMISSION")
 public final class PermissionActions {
 
-	@ActionRoles({"ADMIN"})
 	public static final String CREATE = "PERMISSION:CREATE";
 
-	@ActionRoles({"ADMIN"})
 	public static final String DELETE = "PERMISSION:DELETE";
 
-	@ActionRoles({"ADMIN"})
 	public static final String LIST = "PERMISSION:LIST";
 
-	@ActionRoles({"ADMIN"})
 	public static final String UPDATE = "PERMISSION:UPDATE";
 
-	@ActionRoles({"ADMIN", "USER"})
+	@ActionRoles("USER")
 	public static final String VIEW = "PERMISSION:VIEW";
 
 	private PermissionActions() {

@@ -32,7 +32,7 @@ public interface RoleLocalService {
 	 * @return the created UserRole
 	 * @throws com.easybase.common.exception.ConflictException if user already has the role
 	 */
-	UserRole assignRoleToUser(
+	public UserRole assignRoleToUser(
 		UUID userId, UUID roleId, UUID tenantId, Instant expiresAt);
 
 	/**
@@ -45,7 +45,7 @@ public interface RoleLocalService {
 	 * @return the created role
 	 * @throws com.easybase.common.exception.ConflictException if role already exists
 	 */
-	Role createRole(
+	public Role createRole(
 		String name, String description, UUID tenantId, boolean system);
 
 	/**
@@ -55,7 +55,7 @@ public interface RoleLocalService {
 	 * @throws com.easybase.common.exception.ConflictException if trying to delete system role
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if role not found
 	 */
-	void deleteRole(UUID roleId);
+	public void deleteRole(UUID roleId);
 
 	/**
 	 * Gets active role IDs for a user.
@@ -63,7 +63,7 @@ public interface RoleLocalService {
 	 * @param userId the user ID
 	 * @return list of active role IDs
 	 */
-	List<UUID> getActiveRoleIdsByUserId(UUID userId);
+	public List<UUID> getActiveRoleIdsByUserId(UUID userId);
 
 	/**
 	 * Gets active role IDs for a user in a specific tenant.
@@ -72,7 +72,8 @@ public interface RoleLocalService {
 	 * @param tenantId the tenant ID
 	 * @return list of active role IDs
 	 */
-	List<UUID> getActiveRoleIdsByUserIdAndTenantId(UUID userId, UUID tenantId);
+	public List<UUID> getActiveRoleIdsByUserIdAndTenantId(
+		UUID userId, UUID tenantId);
 
 	/**
 	 * Gets active user roles.
@@ -80,7 +81,7 @@ public interface RoleLocalService {
 	 * @param userId the user ID
 	 * @return list of active user roles
 	 */
-	List<UserRole> getActiveUserRoles(UUID userId);
+	public List<UserRole> getActiveUserRoles(UUID userId);
 
 	/**
 	 * Gets all available roles for a tenant (system + tenant-specific).
@@ -88,15 +89,7 @@ public interface RoleLocalService {
 	 * @param tenantId the tenant ID
 	 * @return list of available roles
 	 */
-	List<Role> getAvailableRoles(UUID tenantId);
-
-	/**
-	 * Gets user authorities/role names.
-	 *
-	 * @param userId the user ID
-	 * @return list of role names (authorities)
-	 */
-	List<String> getUserAuthorities(UUID userId);
+	public List<Role> getAvailableRoles(UUID tenantId);
 
 	/**
 	 * Gets a role by ID.
@@ -105,7 +98,7 @@ public interface RoleLocalService {
 	 * @return the role
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	Role getRoleById(UUID roleId);
+	public Role getRoleById(UUID roleId);
 
 	/**
 	 * Gets a role by name.
@@ -115,7 +108,7 @@ public interface RoleLocalService {
 	 * @return the role
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	Role getRoleByName(String name, UUID tenantId);
+	public Role getRoleByName(String name, UUID tenantId);
 
 	/**
 	 * Gets roles by their IDs.
@@ -123,14 +116,14 @@ public interface RoleLocalService {
 	 * @param roleIds list of role IDs
 	 * @return list of roles
 	 */
-	List<Role> getRolesByIds(List<UUID> roleIds);
+	public List<Role> getRolesByIds(List<UUID> roleIds);
 
 	/**
 	 * Gets all system roles.
 	 *
 	 * @return list of system roles
 	 */
-	List<Role> getSystemRoles();
+	public List<Role> getSystemRoles();
 
 	/**
 	 * Gets tenant-specific roles.
@@ -138,7 +131,15 @@ public interface RoleLocalService {
 	 * @param tenantId the tenant ID
 	 * @return list of tenant roles
 	 */
-	List<Role> getTenantRoles(UUID tenantId);
+	public List<Role> getTenantRoles(UUID tenantId);
+
+	/**
+	 * Gets user authorities/role names.
+	 *
+	 * @param userId the user ID
+	 * @return list of role names (authorities)
+	 */
+	public List<String> getUserAuthorities(UUID userId);
 
 	/**
 	 * Gets all roles assigned to a user.
@@ -146,7 +147,7 @@ public interface RoleLocalService {
 	 * @param userId the user ID
 	 * @return list of user roles
 	 */
-	List<UserRole> getUserRoles(UUID userId);
+	public List<UserRole> getUserRoles(UUID userId);
 
 	/**
 	 * Gets roles assigned to a user in a specific tenant.
@@ -155,7 +156,7 @@ public interface RoleLocalService {
 	 * @param tenantId the tenant ID
 	 * @return list of user roles
 	 */
-	List<UserRole> getUserRoles(UUID userId, UUID tenantId);
+	public List<UserRole> getUserRoles(UUID userId, UUID tenantId);
 
 	/**
 	 * Revokes a role from a user.
@@ -163,7 +164,7 @@ public interface RoleLocalService {
 	 * @param userId the user ID
 	 * @param roleId the role ID
 	 */
-	void revokeRoleFromUser(UUID userId, UUID roleId);
+	public void revokeRoleFromUser(UUID userId, UUID roleId);
 
 	/**
 	 * Updates a role's description.
@@ -174,6 +175,6 @@ public interface RoleLocalService {
 	 * @throws com.easybase.common.exception.ConflictException if trying to modify system role
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if role not found
 	 */
-	Role updateRole(UUID roleId, String description);
+	public Role updateRole(UUID roleId, String description);
 
 }

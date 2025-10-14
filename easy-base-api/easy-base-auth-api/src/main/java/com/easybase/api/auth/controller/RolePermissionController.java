@@ -5,8 +5,7 @@
 
 package com.easybase.api.auth.controller;
 
-import com.easybase.api.auth.dto.CheckPermissionRequest;
-import com.easybase.api.auth.dto.CheckPermissionResponse;
+import com.easybase.api.auth.dto.PermissionDto;
 import com.easybase.api.auth.dto.RolePermissionDto;
 import com.easybase.api.auth.dto.mapper.RolePermissionMapper;
 import com.easybase.core.auth.entity.ResourceAction;
@@ -19,6 +18,7 @@ import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,42 +45,41 @@ import org.springframework.web.bind.annotation.RestController;
 public class RolePermissionController {
 
 	/**
-	 * Check if a role has a specific permission.
-	 * This endpoint is at root level since it doesn't require roleId in path.
+	 * Check if a role has specific permissions for a resource type.
 	 *
-	 * @param request the check permission request
-	 * @return the check result
+	 * @param roleId the role ID from path
+	 * @param permissionDto the permission check DTO
+	 * @return the check result with hasPermission populated
 	 */
-	@PostMapping("/check")
-	public CheckPermissionResponse checkPermission(
-		@RequestBody @Valid CheckPermissionRequest request) {
+	@PostMapping(":check")
+	public PermissionDto checkPermissions(
+		@PathVariable UUID roleId,
+		@RequestBody @Valid PermissionDto permissionDto) {
 
-		String[] parts = request.getPermissionKey(
-		).split(
-			"\\.", 2
-		);
-
-		if (parts.length != 2) {
+		if (!roleId.equals(permissionDto.getRoleId())) {
 			throw new IllegalArgumentException(
-				"Invalid permission key format. Expected: 'resourceType.action'");
+				"Role ID in path does not match role ID in request body");
 		}
 
-		String resourceType = parts[0];
-		String actionKey = parts[1];
+		int[] bitValues = _getBitValues(
+			permissionDto.getResourceType(), permissionDto.getActions());
 
-		ResourceAction action = _resourceActionLocalService.getResourceAction(
-			resourceType, actionKey);
+		boolean hasAllPermissions = true;
 
-		if (action == null) {
-			throw new IllegalArgumentException(
-				"Unknown permission key: " + request.getPermissionKey());
+		for (int bitValue : bitValues) {
+			boolean has = _rolePermissionService.hasPermission(
+				roleId, permissionDto.getResourceType(), bitValue);
+
+			if (!has) {
+				hasAllPermissions = false;
+
+				break;
+			}
 		}
 
-		boolean hasPermission = _rolePermissionService.hasPermission(
-			request.getRoleId(), resourceType, action.getBitValue());
+		permissionDto.setHasPermission(hasAllPermissions);
 
-		return new CheckPermissionResponse(
-			hasPermission, request.getPermissionKey());
+		return permissionDto;
 	}
 
 	/**
@@ -141,8 +140,10 @@ public class RolePermissionController {
 				roleId, resourceType);
 
 		if (permission == null) {
-			return ResponseEntity.notFound(
-			).build();
+			ResponseEntity.HeadersBuilder<?> responseBuilder =
+				ResponseEntity.notFound();
+
+			return responseBuilder.build();
 		}
 
 		return ResponseEntity.ok(_rolePermissionMapper.toDto(permission));
@@ -199,8 +200,10 @@ public class RolePermissionController {
 				roleId, dto.getResourceType(), bitValues);
 
 		if (rolePermission == null) {
-			return ResponseEntity.notFound(
-			).build();
+			ResponseEntity.HeadersBuilder<?> responseBuilder =
+				ResponseEntity.notFound();
+
+			return responseBuilder.build();
 		}
 
 		return ResponseEntity.ok(_rolePermissionMapper.toDto(rolePermission));
@@ -232,11 +235,10 @@ public class RolePermissionController {
 
 		long permissionsMask = 0L;
 
-		if ((dto.getActions() != null) &&
-			!dto.getActions(
-			).isEmpty()) {
+		List<String> actions = dto.getActions();
 
-			int[] bitValues = _getBitValues(resourceType, dto.getActions());
+		if ((actions != null) && !actions.isEmpty()) {
+			int[] bitValues = _getBitValues(resourceType, actions);
 
 			for (int bitValue : bitValues) {
 				permissionsMask |= bitValue;
@@ -278,8 +280,9 @@ public class RolePermissionController {
 			bitValues.add(action.getBitValue());
 		}
 
-		return bitValues.stream(
-		).mapToInt(
+		Stream<Integer> bitValuesStream = bitValues.stream();
+
+		return bitValuesStream.mapToInt(
 			Integer::intValue
 		).toArray();
 	}

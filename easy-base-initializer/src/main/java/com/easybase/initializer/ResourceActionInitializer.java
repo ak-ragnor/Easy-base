@@ -14,6 +14,7 @@ import com.easybase.infrastructure.auth.annotation.ActionRoles;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -55,10 +56,11 @@ public class ResourceActionInitializer implements ApplicationRunner {
 	@Transactional
 	public void run(ApplicationArguments args) {
 		log.info("=== Step 3: Action Discovery ===");
-		discoverAndRegisterActions();
+
+		_discoverAndRegisterActions();
 	}
 
-	private int calculateNextBitValue(
+	private int _calculateNextBitValue(
 		Iterable<ResourceAction> existingActions) {
 
 		int maxBitValue = 0;
@@ -76,7 +78,7 @@ public class ResourceActionInitializer implements ApplicationRunner {
 		return maxBitValue << 1;
 	}
 
-	private long calculatePermissionsMask(
+	private long _calculatePermissionsMask(
 		Set<String> actionKeys, String resourceType) {
 
 		long mask = 0L;
@@ -100,7 +102,7 @@ public class ResourceActionInitializer implements ApplicationRunner {
 		return mask;
 	}
 
-	private void discoverAndRegisterActions() {
+	private void _discoverAndRegisterActions() {
 		log.info("Starting action discovery process...");
 
 		try {
@@ -131,19 +133,22 @@ public class ResourceActionInitializer implements ApplicationRunner {
 							ActionDefinition.class);
 
 						if (actionDef != null) {
-							int actionsProcessed = processActionClass(
+							int actionsProcessed = _processActionClass(
 								actionClass, actionDef);
+
 							totalActionsProcessed += actionsProcessed;
 
-							int roleMappings = processRoleMappings(
+							int roleMappings = _processRoleMappings(
 								actionClass, actionDef);
+
 							totalRoleMappingsCreated += roleMappings;
 						}
 					}
-					catch (ClassNotFoundException e) {
+					catch (ClassNotFoundException classNotFoundException) {
 						log.error(
 							"Failed to load class: {}",
-							beanDefinition.getBeanClassName(), e);
+							beanDefinition.getBeanClassName(),
+							classNotFoundException);
 					}
 				}
 			}
@@ -152,12 +157,12 @@ public class ResourceActionInitializer implements ApplicationRunner {
 				"Action discovery completed. Processed {} actions and created/updated {} role mappings.",
 				totalActionsProcessed, totalRoleMappingsCreated);
 		}
-		catch (Exception e) {
-			log.error("Error during action discovery", e);
+		catch (Exception exception) {
+			log.error("Error during action discovery", exception);
 		}
 	}
 
-	private int processActionClass(
+	private int _processActionClass(
 		Class<?> actionClass, ActionDefinition actionDef) {
 
 		String resourceType = actionDef.resourceType();
@@ -168,13 +173,14 @@ public class ResourceActionInitializer implements ApplicationRunner {
 
 		Map<String, ResourceAction> existingActions = new HashMap<>();
 
-		_resourceActionRepository.findByResourceType(
-			resourceType
-		).forEach(
-			action -> existingActions.put(action.getActionKey(), action)
-		);
+		List<ResourceAction> actions =
+			_resourceActionRepository.findByResourceType(resourceType);
 
-		int nextBitValue = calculateNextBitValue(existingActions.values());
+		for (ResourceAction action : actions) {
+			existingActions.put(action.getActionKey(), action);
+		}
+
+		int nextBitValue = _calculateNextBitValue(existingActions.values());
 
 		List<ResourceAction> resourceActionsList = new ArrayList<>();
 		int processedCount = 0;
@@ -186,6 +192,7 @@ public class ResourceActionInitializer implements ApplicationRunner {
 
 				try {
 					field.setAccessible(true);
+
 					String actionKey = (String)field.get(null);
 
 					if ((actionKey != null) && actionKey.contains(":")) {
@@ -195,6 +202,7 @@ public class ResourceActionInitializer implements ApplicationRunner {
 
 						if (action == null) {
 							action = new ResourceAction();
+
 							action.setActionKey(actionKey);
 							action.setResourceType(resourceType);
 							action.setActionName(actionName);
@@ -221,8 +229,10 @@ public class ResourceActionInitializer implements ApplicationRunner {
 						processedCount++;
 					}
 				}
-				catch (IllegalAccessException e) {
-					log.error("Failed to access field: {}", field.getName(), e);
+				catch (IllegalAccessException illegalAccessException) {
+					log.error(
+						"Failed to access field: {}", field.getName(),
+						illegalAccessException);
 				}
 			}
 		}
@@ -234,10 +244,11 @@ public class ResourceActionInitializer implements ApplicationRunner {
 		return processedCount;
 	}
 
-	private int processRoleMappings(
+	private int _processRoleMappings(
 		Class<?> actionClass, ActionDefinition actionDef) {
 
 		String resourceType = actionDef.resourceType();
+
 		int roleMapping = 0;
 
 		Map<String, Set<String>> rolePermissionsMap = new HashMap<>();
@@ -253,19 +264,21 @@ public class ResourceActionInitializer implements ApplicationRunner {
 				if (actionRoles != null) {
 					try {
 						field.setAccessible(true);
+
 						String actionKey = (String)field.get(null);
 
 						for (String roleName : actionRoles.value()) {
-							rolePermissionsMap.computeIfAbsent(
-								roleName, k -> new HashSet<>()
-							).add(
-								actionKey
-							);
+							Set<String> actionSet =
+								rolePermissionsMap.computeIfAbsent(
+									roleName, k -> new HashSet<>());
+
+							actionSet.add(actionKey);
 						}
 					}
-					catch (IllegalAccessException e) {
+					catch (IllegalAccessException illegalAccessException) {
 						log.error(
-							"Failed to access field: {}", field.getName(), e);
+							"Failed to access field: {}", field.getName(),
+							illegalAccessException);
 					}
 				}
 			}
@@ -279,14 +292,15 @@ public class ResourceActionInitializer implements ApplicationRunner {
 			UUID roleId;
 
 			try {
-				roleId = _entityManager.createQuery(
+				TypedQuery<UUID> query = _entityManager.createQuery(
 					"SELECT r.id FROM Role r WHERE r.name = :name AND r.system = true",
-					UUID.class
-				).setParameter(
-					"name", roleName
-				).getSingleResult();
+					UUID.class);
+
+				query.setParameter("name", roleName);
+
+				roleId = query.getSingleResult();
 			}
-			catch (NoResultException e) {
+			catch (NoResultException noResultException) {
 				log.warn(
 					"Role '{}' not found in database. Skipping permission assignment.",
 					roleName);
@@ -296,7 +310,7 @@ public class ResourceActionInitializer implements ApplicationRunner {
 
 			Set<String> actionKeys = entry.getValue();
 
-			long permissionsMask = calculatePermissionsMask(
+			long permissionsMask = _calculatePermissionsMask(
 				actionKeys, resourceType);
 
 			Optional<RolePermission> rolePermissionOptional =
@@ -310,10 +324,13 @@ public class ResourceActionInitializer implements ApplicationRunner {
 
 				if (rolePermission.getPermissionsMask() != permissionsMask) {
 					rolePermission.setPermissionsMask(permissionsMask);
+
 					_rolePermissionRepository.save(rolePermission);
+
 					log.debug(
 						"Updated permissions for role '{}' on resource '{}'",
 						roleName, resourceType);
+
 					roleMapping++;
 				}
 			}
@@ -326,6 +343,7 @@ public class ResourceActionInitializer implements ApplicationRunner {
 				log.debug(
 					"Created permissions for role '{}' on resource '{}'",
 					roleName, resourceType);
+
 				roleMapping++;
 			}
 		}

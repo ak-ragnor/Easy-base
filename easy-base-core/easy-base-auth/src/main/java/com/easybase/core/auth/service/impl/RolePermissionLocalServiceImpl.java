@@ -113,11 +113,15 @@ public class RolePermissionLocalServiceImpl
 	public RolePermission getPermissionsForRoleAndResource(
 		UUID roleId, String resourceType) {
 
-		return _rolePermissionRepository.findByRoleIdAndResourceType(
-			roleId, resourceType
-		).orElse(
-			null
-		);
+		Optional<RolePermission> rolePermissionOptional =
+			_rolePermissionRepository.findByRoleIdAndResourceType(
+				roleId, resourceType);
+
+		if (rolePermissionOptional.isPresent()) {
+			return rolePermissionOptional.get();
+		}
+
+		return null;
 	}
 
 	@Override
@@ -213,11 +217,15 @@ public class RolePermissionLocalServiceImpl
 	private RolePermission _getOrCreateRolePermission(
 		UUID roleId, String resourceType) {
 
-		return _rolePermissionRepository.findByRoleIdAndResourceType(
-			roleId, resourceType
-		).orElse(
-			new RolePermission(roleId, resourceType)
-		);
+		Optional<RolePermission> rolePermissionOptional =
+			_rolePermissionRepository.findByRoleIdAndResourceType(
+				roleId, resourceType);
+
+		if (rolePermissionOptional.isPresent()) {
+			return rolePermissionOptional.get();
+		}
+
+		return new RolePermission(roleId, resourceType);
 	}
 
 	private final RolePermissionRepository _rolePermissionRepository;

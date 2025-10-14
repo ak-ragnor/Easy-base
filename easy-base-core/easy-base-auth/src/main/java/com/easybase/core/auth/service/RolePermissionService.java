@@ -29,7 +29,7 @@ public interface RolePermissionService {
 	 * @return the updated role permission
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	RolePermission addPermission(
+	public RolePermission addPermission(
 		UUID roleId, String resourceType, int bitValue);
 
 	/**
@@ -42,33 +42,18 @@ public interface RolePermissionService {
 	 * @return the updated role permission
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	RolePermission addPermissions(
+	public RolePermission addPermissions(
 		UUID roleId, String resourceType, int... bitValues);
 
 	/**
-	 * Check if a role has a specific permission for a resource type.
-	 * Requires PERMISSION:VIEW permission.
+	 * Clear all permissions for a role and resource type.
+	 * Requires PERMISSION:UPDATE permission.
 	 *
 	 * @param roleId the role ID
 	 * @param resourceType the resource type
-	 * @param bitValue the permission bit value to check
-	 * @return true if the role has the permission
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	boolean hasPermission(UUID roleId, String resourceType, int bitValue);
-
-	/**
-	 * Check if any of the given roles has a specific permission for a resource type.
-	 * Requires PERMISSION:VIEW permission.
-	 *
-	 * @param roleIds the list of role IDs
-	 * @param resourceType the resource type
-	 * @param bitValue the permission bit value to check
-	 * @return true if any role has the permission
-	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
-	 */
-	boolean hasPermission(
-		List<UUID> roleIds, String resourceType, int bitValue);
+	public void clearPermissions(UUID roleId, String resourceType);
 
 	/**
 	 * Create or update role permissions for a specific resource type.
@@ -80,7 +65,7 @@ public interface RolePermissionService {
 	 * @return the created or updated role permission
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	RolePermission createOrUpdateRolePermission(
+	public RolePermission createOrUpdateRolePermission(
 		UUID roleId, String resourceType, long permissionsMask);
 
 	/**
@@ -90,7 +75,7 @@ public interface RolePermissionService {
 	 * @param roleId the role ID
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void deleteAllPermissionsForRole(UUID roleId);
+	public void deleteAllPermissionsForRole(UUID roleId);
 
 	/**
 	 * Delete permissions for a role and specific resource type.
@@ -100,7 +85,19 @@ public interface RolePermissionService {
 	 * @param resourceType the resource type
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void deletePermissionsForRoleAndResource(UUID roleId, String resourceType);
+	public void deletePermissionsForRoleAndResource(
+		UUID roleId, String resourceType);
+
+	/**
+	 * Get all role permissions for a specific resource type.
+	 * Requires PERMISSION:VIEW permission.
+	 *
+	 * @param resourceType the resource type
+	 * @return list of role permissions
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public List<RolePermission> getPermissionsByResourceType(
+		String resourceType);
 
 	/**
 	 * Get all permissions for a role.
@@ -110,7 +107,7 @@ public interface RolePermissionService {
 	 * @return list of role permissions
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<RolePermission> getPermissionsForRole(UUID roleId);
+	public List<RolePermission> getPermissionsForRole(UUID roleId);
 
 	/**
 	 * Get permissions for a role and specific resource type.
@@ -121,7 +118,7 @@ public interface RolePermissionService {
 	 * @return the role permission or null if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	RolePermission getPermissionsForRoleAndResource(
+	public RolePermission getPermissionsForRoleAndResource(
 		UUID roleId, String resourceType);
 
 	/**
@@ -132,7 +129,7 @@ public interface RolePermissionService {
 	 * @return list of role permissions
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<RolePermission> getPermissionsForRoles(List<UUID> roleIds);
+	public List<RolePermission> getPermissionsForRoles(List<UUID> roleIds);
 
 	/**
 	 * Get permissions for multiple roles and a specific resource type.
@@ -143,18 +140,34 @@ public interface RolePermissionService {
 	 * @return list of role permissions
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<RolePermission> getPermissionsForRolesAndResource(
+	public List<RolePermission> getPermissionsForRolesAndResource(
 		List<UUID> roleIds, String resourceType);
 
 	/**
-	 * Get all role permissions for a specific resource type.
+	 * Check if any of the given roles has a specific permission for a resource type.
 	 * Requires PERMISSION:VIEW permission.
 	 *
+	 * @param roleIds the list of role IDs
 	 * @param resourceType the resource type
-	 * @return list of role permissions
+	 * @param bitValue the permission bit value to check
+	 * @return true if any role has the permission
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<RolePermission> getPermissionsByResourceType(String resourceType);
+	public boolean hasPermission(
+		List<UUID> roleIds, String resourceType, int bitValue);
+
+	/**
+	 * Check if a role has a specific permission for a resource type.
+	 * Requires PERMISSION:VIEW permission.
+	 *
+	 * @param roleId the role ID
+	 * @param resourceType the resource type
+	 * @param bitValue the permission bit value to check
+	 * @return true if the role has the permission
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public boolean hasPermission(
+		UUID roleId, String resourceType, int bitValue);
 
 	/**
 	 * Remove a permission from a role for a specific resource type.
@@ -166,7 +179,7 @@ public interface RolePermissionService {
 	 * @return the updated role permission
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	RolePermission removePermission(
+	public RolePermission removePermission(
 		UUID roleId, String resourceType, int bitValue);
 
 	/**
@@ -179,17 +192,7 @@ public interface RolePermissionService {
 	 * @return the updated role permission
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	RolePermission removePermissions(
+	public RolePermission removePermissions(
 		UUID roleId, String resourceType, int... bitValues);
-
-	/**
-	 * Clear all permissions for a role and resource type.
-	 * Requires PERMISSION:UPDATE permission.
-	 *
-	 * @param roleId the role ID
-	 * @param resourceType the resource type
-	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
-	 */
-	void clearPermissions(UUID roleId, String resourceType);
 
 }

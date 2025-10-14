@@ -41,21 +41,6 @@ public class RolesInitializer implements ApplicationRunner {
 		_createRoles();
 	}
 
-	private void _createRoles() {
-		log.info("Creating default system roles...");
-
-		_createRoleIfNotExists(
-			SystemRoles.ADMIN, "Administrator role with full system access");
-
-		_createRoleIfNotExists(
-			SystemRoles.USER, "Standard authenticated user role");
-
-		_createRoleIfNotExists(
-			SystemRoles.GUEST, "Guest role with limited read-only permissions");
-
-		log.info("Default roles initialization completed");
-	}
-
 	private void _createRoleIfNotExists(String name, String description) {
 		if (!_roleRepository.existsByNameAndSystemTrue(name)) {
 			Role role = new Role();
@@ -75,6 +60,21 @@ public class RolesInitializer implements ApplicationRunner {
 		else {
 			log.debug("System role already exists: {}", name);
 		}
+	}
+
+	private void _createRoles() {
+		log.info("Creating default system roles...");
+
+		_createRoleIfNotExists(
+			SystemRoles.ADMIN, "Administrator role with full system access");
+
+		_createRoleIfNotExists(
+			SystemRoles.USER, "Standard authenticated user role");
+
+		_createRoleIfNotExists(
+			SystemRoles.GUEST, "Guest role with limited read-only permissions");
+
+		log.info("Default roles initialization completed");
 	}
 
 	private final RoleRepository _roleRepository;

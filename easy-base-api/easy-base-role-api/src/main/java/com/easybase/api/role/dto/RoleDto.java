@@ -20,11 +20,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * Consolidated DTO for Role operations.
- * Used for create, update, and read operations.
- *
- * - For CREATE (POST): provide name, description, tenantId, isSystem
- * - For UPDATE (PUT): provide description
- * - For READ (GET): all fields are returned
  *
  * @author Akhash R
  */

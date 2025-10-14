@@ -48,6 +48,12 @@
 
 		<dependency>
 			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-initializer</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-security-starter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -61,12 +67,6 @@
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-user-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-initializer</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

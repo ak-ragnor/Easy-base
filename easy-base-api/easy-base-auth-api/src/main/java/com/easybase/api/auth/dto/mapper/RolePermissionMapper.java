@@ -62,9 +62,6 @@ public class RolePermissionMapper
 			return null;
 		}
 
-		// This method is not typically used since we convert action keys
-		// to bit values in the controller before calling service methods
-
 		RolePermission entity = new RolePermission(
 			dto.getRoleId(), dto.getResourceType());
 

@@ -26,7 +26,7 @@ public interface ResourceActionService {
 	 * @param actionId the action ID
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void activateResourceAction(UUID actionId);
+	public void activateResourceAction(UUID actionId);
 
 	/**
 	 * Create a new resource action.
@@ -41,7 +41,7 @@ public interface ResourceActionService {
 	 * @throws com.easybase.common.exception.ConflictException if action already exists
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	ResourceAction createResourceAction(
+	public ResourceAction createResourceAction(
 		String resourceType, String actionKey, String actionName, int bitValue,
 		String description);
 
@@ -52,7 +52,7 @@ public interface ResourceActionService {
 	 * @param actionId the action ID
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void deactivateResourceAction(UUID actionId);
+	public void deactivateResourceAction(UUID actionId);
 
 	/**
 	 * Delete a resource action.
@@ -62,7 +62,7 @@ public interface ResourceActionService {
 	 * @param actionId the action ID
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void deleteResourceAction(UUID actionId);
+	public void deleteResourceAction(UUID actionId);
 
 	/**
 	 * Get all active resource actions for a resource type.
@@ -72,7 +72,7 @@ public interface ResourceActionService {
 	 * @return list of active resource actions
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<ResourceAction> getActiveResourceActions(String resourceType);
+	public List<ResourceAction> getActiveResourceActions(String resourceType);
 
 	/**
 	 * Get all active resource actions.
@@ -81,7 +81,7 @@ public interface ResourceActionService {
 	 * @return list of all active resource actions
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<ResourceAction> getAllActiveResourceActions();
+	public List<ResourceAction> getAllActiveResourceActions();
 
 	/**
 	 * Get a resource action by resource type and action key.
@@ -93,7 +93,8 @@ public interface ResourceActionService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	ResourceAction getResourceAction(String resourceType, String actionKey);
+	public ResourceAction getResourceAction(
+		String resourceType, String actionKey);
 
 	/**
 	 * Get a resource action by ID.
@@ -104,7 +105,7 @@ public interface ResourceActionService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	ResourceAction getResourceActionById(UUID actionId);
+	public ResourceAction getResourceActionById(UUID actionId);
 
 	/**
 	 * Get all resource actions for a resource type.
@@ -114,7 +115,7 @@ public interface ResourceActionService {
 	 * @return list of resource actions
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<ResourceAction> getResourceActions(String resourceType);
+	public List<ResourceAction> getResourceActions(String resourceType);
 
 	/**
 	 * Get all resource actions sorted by bit value.
@@ -124,7 +125,7 @@ public interface ResourceActionService {
 	 * @return list of resource actions ordered by bit value
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<ResourceAction> getResourceActionsOrdered(String resourceType);
+	public List<ResourceAction> getResourceActionsOrdered(String resourceType);
 
 	/**
 	 * Check if a resource action exists.
@@ -135,7 +136,7 @@ public interface ResourceActionService {
 	 * @return true if the action exists
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	boolean resourceActionExists(String resourceType, String actionKey);
+	public boolean resourceActionExists(String resourceType, String actionKey);
 
 	/**
 	 * Update a resource action.
@@ -149,7 +150,7 @@ public interface ResourceActionService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	ResourceAction updateResourceAction(
+	public ResourceAction updateResourceAction(
 		UUID actionId, String actionName, String description, boolean active);
 
 }

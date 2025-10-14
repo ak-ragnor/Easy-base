@@ -30,7 +30,7 @@ public interface DataRecordService {
 	 * @return the created record
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	DataRecord createRecord(
+	public DataRecord createRecord(
 		UUID tenantId, String table, Map<String, Object> data);
 
 	/**
@@ -42,7 +42,7 @@ public interface DataRecordService {
 	 * @param id the record ID
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void deleteRecord(UUID tenantId, String table, UUID id);
+	public void deleteRecord(UUID tenantId, String table, UUID id);
 
 	/**
 	 * Gets a record by ID.
@@ -55,7 +55,7 @@ public interface DataRecordService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	DataRecord getRecord(UUID tenantId, String table, UUID id);
+	public DataRecord getRecord(UUID tenantId, String table, UUID id);
 
 	/**
 	 * Gets all records for a table.
@@ -66,7 +66,7 @@ public interface DataRecordService {
 	 * @return list of records
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<DataRecord> getRecords(UUID tenantId, String table);
+	public List<DataRecord> getRecords(UUID tenantId, String table);
 
 	/**
 	 * Updates a record.
@@ -79,7 +79,7 @@ public interface DataRecordService {
 	 * @return the updated record
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	DataRecord updateRecord(
+	public DataRecord updateRecord(
 		UUID tenantId, String table, UUID id, Map<String, Object> data);
 
 }

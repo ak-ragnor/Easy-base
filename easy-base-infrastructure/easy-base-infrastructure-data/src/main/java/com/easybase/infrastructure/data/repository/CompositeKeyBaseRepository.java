@@ -26,7 +26,7 @@ public interface CompositeKeyBaseRepository<T, ID>
 	 * @param entity the entity to soft delete
 	 * @return the updated entity
 	 */
-	default T softDelete(T entity) {
+	public default T softDelete(T entity) {
 
 		// Note: This would need reflection or specific implementation
 		// in concrete repositories since CompositeKeyEntity methods

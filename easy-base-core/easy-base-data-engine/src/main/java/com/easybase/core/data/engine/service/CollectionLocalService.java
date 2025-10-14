@@ -32,7 +32,7 @@ public interface CollectionLocalService {
 	 * @return the created collection
 	 * @throws com.easybase.common.exception.ConflictException if collection already exists
 	 */
-	Collection createCollection(
+	public Collection createCollection(
 		UUID tenantId, String collectionName, List<Attribute> attributes);
 
 	/**
@@ -41,7 +41,7 @@ public interface CollectionLocalService {
 	 * @param collectionId the collection ID
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if collection not found
 	 */
-	void deleteCollection(UUID collectionId);
+	public void deleteCollection(UUID collectionId);
 
 	/**
 	 * Gets a collection by ID.
@@ -50,7 +50,7 @@ public interface CollectionLocalService {
 	 * @return the collection
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	Collection getCollection(UUID collectionId);
+	public Collection getCollection(UUID collectionId);
 
 	/**
 	 * Gets a collection by tenant and name.
@@ -60,7 +60,7 @@ public interface CollectionLocalService {
 	 * @return the collection
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	Collection getCollection(UUID tenantId, String collectionName);
+	public Collection getCollection(UUID tenantId, String collectionName);
 
 	/**
 	 * Gets collections for a tenant with pagination.
@@ -69,7 +69,7 @@ public interface CollectionLocalService {
 	 * @param pageable the pagination parameters
 	 * @return page of collections
 	 */
-	Page<Collection> getCollections(UUID tenantId, Pageable pageable);
+	public Page<Collection> getCollections(UUID tenantId, Pageable pageable);
 
 	/**
 	 * Updates a collection's attributes.
@@ -79,7 +79,7 @@ public interface CollectionLocalService {
 	 * @return the updated collection
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if collection not found
 	 */
-	Collection updateCollection(
+	public Collection updateCollection(
 		UUID collectionId, List<Attribute> newAttributes);
 
 }

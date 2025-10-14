@@ -27,7 +27,7 @@ public interface TenantLocalService {
 	 * @return the created tenant
 	 * @throws com.easybase.common.exception.ConflictException if name already exists
 	 */
-	Tenant createTenant(String name);
+	public Tenant createTenant(String name);
 
 	/**
 	 * Soft deletes a tenant by ID.
@@ -35,7 +35,7 @@ public interface TenantLocalService {
 	 * @param tenantId the tenant ID
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if tenant not found
 	 */
-	void deleteTenant(UUID tenantId);
+	public void deleteTenant(UUID tenantId);
 
 	/**
 	 * Fetches a tenant by name (optional result).
@@ -43,14 +43,14 @@ public interface TenantLocalService {
 	 * @param name the tenant name
 	 * @return Optional containing the tenant if found
 	 */
-	Optional<Tenant> fetchTenant(String name);
+	public Optional<Tenant> fetchTenant(String name);
 
 	/**
 	 * Gets or creates the default tenant.
 	 *
 	 * @return the default tenant
 	 */
-	Tenant getDefaultTenant();
+	public Tenant getDefaultTenant();
 
 	/**
 	 * Gets a tenant by name.
@@ -59,7 +59,7 @@ public interface TenantLocalService {
 	 * @return the tenant
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	Tenant getTenant(String name);
+	public Tenant getTenant(String name);
 
 	/**
 	 * Gets a tenant by ID.
@@ -68,14 +68,14 @@ public interface TenantLocalService {
 	 * @return the tenant
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	Tenant getTenant(UUID id);
+	public Tenant getTenant(UUID id);
 
 	/**
 	 * Gets all tenants.
 	 *
 	 * @return list of all tenants
 	 */
-	List<Tenant> getTenants();
+	public List<Tenant> getTenants();
 
 	/**
 	 * Updates a tenant's name.
@@ -86,6 +86,6 @@ public interface TenantLocalService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if tenant not found
 	 * @throws com.easybase.common.exception.ConflictException if name already exists
 	 */
-	Tenant updateTenant(UUID id, String name);
+	public Tenant updateTenant(UUID id, String name);
 
 }

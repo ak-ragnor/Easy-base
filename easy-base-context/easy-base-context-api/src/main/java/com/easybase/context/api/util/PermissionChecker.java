@@ -17,8 +17,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * Utility component for checking permissions using PermissionContext.
- * Provides permission checking methods that can be injected into services.
- * ADMIN users bypass all permission checks.
  *
  * @author Akhash R
  */
@@ -75,15 +73,11 @@ public class PermissionChecker {
 	 * @return true if user has all permissions or is an ADMIN
 	 */
 	public boolean hasAllPermissions(String... permissionKeys) {
-		PermissionContext context = _getCurrentPermissionContext();
-
-		// ADMIN users bypass all permission checks
-
-		if (context.hasRole(ADMIN_ROLE)) {
+		if (_permissionContext.hasRole(_ADMIN_ROLE)) {
 			return true;
 		}
 
-		return context.hasAllPermissions(permissionKeys);
+		return _permissionContext.hasAllPermissions(permissionKeys);
 	}
 
 	/**
@@ -94,15 +88,11 @@ public class PermissionChecker {
 	 * @return true if user has at least one permission or is an ADMIN
 	 */
 	public boolean hasAnyPermission(String... permissionKeys) {
-		PermissionContext context = _getCurrentPermissionContext();
-
-		// ADMIN users bypass all permission checks
-
-		if (context.hasRole(ADMIN_ROLE)) {
+		if (_permissionContext.hasRole(_ADMIN_ROLE)) {
 			return true;
 		}
 
-		return context.hasAnyPermission(permissionKeys);
+		return _permissionContext.hasAnyPermission(permissionKeys);
 	}
 
 	/**
@@ -113,25 +103,14 @@ public class PermissionChecker {
 	 * @return true if user has the permission or is an ADMIN
 	 */
 	public boolean hasPermission(String permissionKey) {
-		PermissionContext context = _getCurrentPermissionContext();
-
-		if (context.hasRole(ADMIN_ROLE)) {
+		if (_permissionContext.hasRole(_ADMIN_ROLE)) {
 			return true;
 		}
 
-		return context.hasPermission(permissionKey);
+		return _permissionContext.hasPermission(permissionKey);
 	}
 
-	/**
-	 * Gets the current PermissionContext.
-	 *
-	 * @return the current PermissionContext
-	 */
-	private PermissionContext _getCurrentPermissionContext() {
-		return _permissionContext;
-	}
-
-	private static final String ADMIN_ROLE = SystemRoles.ADMIN;
+	private static final String _ADMIN_ROLE = SystemRoles.ADMIN;
 
 	private final PermissionContext _permissionContext;
 

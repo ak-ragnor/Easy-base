@@ -27,7 +27,7 @@ public interface UserLocalService {
 	 * @param userId the user ID
 	 * @throws com.easybase.common.exception.ConflictException if password credential already exists
 	 */
-	void addDefaultPasswordCredential(UUID userId);
+	public void addDefaultPasswordCredential(UUID userId);
 
 	/**
 	 * Adds password credential for a user.
@@ -36,7 +36,7 @@ public interface UserLocalService {
 	 * @param plainPassword the plain password
 	 * @throws com.easybase.common.exception.ConflictException if password credential already exists
 	 */
-	void addPasswordCredential(UUID userId, String plainPassword);
+	public void addPasswordCredential(UUID userId, String plainPassword);
 
 	/**
 	 * Adds a user credential.
@@ -47,7 +47,7 @@ public interface UserLocalService {
 	 * @return the created credential
 	 * @throws com.easybase.common.exception.ConflictException if credential type already exists
 	 */
-	UserCredential addUserCredential(
+	public UserCredential addUserCredential(
 		UUID userId, String type, Map<String, Object> credentialData);
 
 	/**
@@ -59,7 +59,7 @@ public interface UserLocalService {
 	 * @return the authenticated user
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if authentication fails
 	 */
-	User authenticateUser(String email, String password, UUID tenantId);
+	public User authenticateUser(String email, String password, UUID tenantId);
 
 	/**
 	 * Creates a new user.
@@ -72,7 +72,7 @@ public interface UserLocalService {
 	 * @return the created user
 	 * @throws com.easybase.common.exception.ConflictException if email already exists
 	 */
-	User createUser(
+	public User createUser(
 		String email, String firstName, String lastName, String displayName,
 		UUID tenantId);
 
@@ -82,7 +82,7 @@ public interface UserLocalService {
 	 * @param id the user ID
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if user not found
 	 */
-	void deleteUser(UUID id);
+	public void deleteUser(UUID id);
 
 	/**
 	 * Gets a user by email and tenant.
@@ -92,7 +92,7 @@ public interface UserLocalService {
 	 * @return the user
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	User getUser(String email, UUID tenantId);
+	public User getUser(String email, UUID tenantId);
 
 	/**
 	 * Gets a user by ID.
@@ -101,7 +101,7 @@ public interface UserLocalService {
 	 * @return the user
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	User getUser(UUID id);
+	public User getUser(UUID id);
 
 	/**
 	 * Gets a user credential by type.
@@ -111,7 +111,7 @@ public interface UserLocalService {
 	 * @return the user credential
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	UserCredential getUserCredential(UUID userId, String credentialType);
+	public UserCredential getUserCredential(UUID userId, String credentialType);
 
 	/**
 	 * Gets all user credentials.
@@ -119,7 +119,7 @@ public interface UserLocalService {
 	 * @param userId the user ID
 	 * @return list of credentials
 	 */
-	List<UserCredential> getUserCredentials(UUID userId);
+	public List<UserCredential> getUserCredentials(UUID userId);
 
 	/**
 	 * Gets all users for a tenant.
@@ -127,7 +127,7 @@ public interface UserLocalService {
 	 * @param tenantId the tenant ID
 	 * @return list of users
 	 */
-	List<User> getUsers(UUID tenantId);
+	public List<User> getUsers(UUID tenantId);
 
 	/**
 	 * Removes a user credential.
@@ -136,7 +136,7 @@ public interface UserLocalService {
 	 * @param credentialType the credential type
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if credential not found
 	 */
-	void removeUserCredential(UUID userId, String credentialType);
+	public void removeUserCredential(UUID userId, String credentialType);
 
 	/**
 	 * Updates a password credential.
@@ -146,7 +146,8 @@ public interface UserLocalService {
 	 * @return the updated credential
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if credential not found
 	 */
-	UserCredential updatePasswordCredential(UUID userId, String plainPassword);
+	public UserCredential updatePasswordCredential(
+		UUID userId, String plainPassword);
 
 	/**
 	 * Updates user information.
@@ -158,7 +159,7 @@ public interface UserLocalService {
 	 * @return the updated user
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if user not found
 	 */
-	User updateUser(
+	public User updateUser(
 		UUID id, String firstName, String lastName, String displayName);
 
 }

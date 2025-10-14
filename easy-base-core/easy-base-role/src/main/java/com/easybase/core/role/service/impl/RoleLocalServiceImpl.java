@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 
@@ -179,15 +180,16 @@ public class RoleLocalServiceImpl implements RoleLocalService {
 			return List.of();
 		}
 
-		List<UUID> roleIds = userRoles.stream(
-		).map(
-			UserRole::getRoleId
-		).toList();
+		Stream<UserRole> userRolesStream = userRoles.stream();
 
-		List<Role> roles = getRolesByIds(roleIds);
+		List<Role> roles = getRolesByIds(
+			userRolesStream.map(
+				UserRole::getRoleId
+			).toList());
 
-		return roles.stream(
-		).map(
+		Stream<Role> rolesStream = roles.stream();
+
+		return rolesStream.map(
 			Role::getName
 		).toList();
 	}

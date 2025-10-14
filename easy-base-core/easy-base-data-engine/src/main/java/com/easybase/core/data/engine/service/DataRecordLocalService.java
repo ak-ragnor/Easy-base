@@ -28,7 +28,7 @@ public interface DataRecordLocalService {
 	 * @param data the record data
 	 * @return the created record
 	 */
-	DataRecord createRecord(
+	public DataRecord createRecord(
 		UUID tenantId, String table, Map<String, Object> data);
 
 	/**
@@ -38,7 +38,7 @@ public interface DataRecordLocalService {
 	 * @param table the table name
 	 * @param id the record ID
 	 */
-	void deleteRecord(UUID tenantId, String table, UUID id);
+	public void deleteRecord(UUID tenantId, String table, UUID id);
 
 	/**
 	 * Gets a record by ID.
@@ -49,7 +49,7 @@ public interface DataRecordLocalService {
 	 * @return the record
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	DataRecord getRecord(UUID tenantId, String table, UUID id);
+	public DataRecord getRecord(UUID tenantId, String table, UUID id);
 
 	/**
 	 * Gets all records for a table.
@@ -58,7 +58,7 @@ public interface DataRecordLocalService {
 	 * @param table the table name
 	 * @return list of records
 	 */
-	List<DataRecord> getRecords(UUID tenantId, String table);
+	public List<DataRecord> getRecords(UUID tenantId, String table);
 
 	/**
 	 * Updates a record.
@@ -69,7 +69,7 @@ public interface DataRecordLocalService {
 	 * @param data the updated data
 	 * @return the updated record
 	 */
-	DataRecord updateRecord(
+	public DataRecord updateRecord(
 		UUID tenantId, String table, UUID id, Map<String, Object> data);
 
 }

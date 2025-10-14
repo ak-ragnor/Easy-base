@@ -10,7 +10,7 @@ import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.user.entity.User;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
-import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import java.util.UUID;
 
@@ -44,16 +44,19 @@ public class UserMapper implements BaseMapper<User, UserDto> {
 				}
 
 				setTenantId(tenantId);
-				setCreatedAt(
-					user.getCreatedAt(
-					).atZone(
-						ZoneId.systemDefault()
-					).toLocalDateTime());
-				setUpdatedAt(
-					user.getUpdatedAt(
-					).atZone(
-						ZoneId.systemDefault()
-					).toLocalDateTime());
+
+				ZonedDateTime createdAt = ZonedDateTime.from(
+					user.getCreatedAt());
+				ZonedDateTime updatedAt = ZonedDateTime.from(
+					user.getUpdatedAt());
+
+				if (createdAt != null) {
+					setCreatedAt(createdAt.toLocalDateTime());
+				}
+
+				if (updatedAt != null) {
+					setUpdatedAt(updatedAt.toLocalDateTime());
+				}
 			}
 		};
 	}

@@ -24,7 +24,7 @@ public interface ResourceActionLocalService {
 	 *
 	 * @param actionId the action ID
 	 */
-	void activateResourceAction(UUID actionId);
+	public void activateResourceAction(UUID actionId);
 
 	/**
 	 * Create a new resource action.
@@ -37,7 +37,7 @@ public interface ResourceActionLocalService {
 	 * @return the created resource action
 	 * @throws com.easybase.common.exception.ConflictException if action already exists
 	 */
-	ResourceAction createResourceAction(
+	public ResourceAction createResourceAction(
 		String resourceType, String actionKey, String actionName, int bitValue,
 		String description);
 
@@ -46,7 +46,7 @@ public interface ResourceActionLocalService {
 	 *
 	 * @param actionId the action ID
 	 */
-	void deactivateResourceAction(UUID actionId);
+	public void deactivateResourceAction(UUID actionId);
 
 	/**
 	 * Delete a resource action.
@@ -54,7 +54,7 @@ public interface ResourceActionLocalService {
 	 *
 	 * @param actionId the action ID
 	 */
-	void deleteResourceAction(UUID actionId);
+	public void deleteResourceAction(UUID actionId);
 
 	/**
 	 * Get all active resource actions for a resource type.
@@ -62,14 +62,14 @@ public interface ResourceActionLocalService {
 	 * @param resourceType the resource type
 	 * @return list of active resource actions
 	 */
-	List<ResourceAction> getActiveResourceActions(String resourceType);
+	public List<ResourceAction> getActiveResourceActions(String resourceType);
 
 	/**
 	 * Get all active resource actions.
 	 *
 	 * @return list of all active resource actions
 	 */
-	List<ResourceAction> getAllActiveResourceActions();
+	public List<ResourceAction> getAllActiveResourceActions();
 
 	/**
 	 * Get a resource action by resource type and action key.
@@ -79,7 +79,8 @@ public interface ResourceActionLocalService {
 	 * @return the resource action
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	ResourceAction getResourceAction(String resourceType, String actionKey);
+	public ResourceAction getResourceAction(
+		String resourceType, String actionKey);
 
 	/**
 	 * Get a resource action by ID.
@@ -88,7 +89,7 @@ public interface ResourceActionLocalService {
 	 * @return the resource action
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	ResourceAction getResourceActionById(UUID actionId);
+	public ResourceAction getResourceActionById(UUID actionId);
 
 	/**
 	 * Get all resource actions for a resource type.
@@ -96,7 +97,7 @@ public interface ResourceActionLocalService {
 	 * @param resourceType the resource type
 	 * @return list of resource actions
 	 */
-	List<ResourceAction> getResourceActions(String resourceType);
+	public List<ResourceAction> getResourceActions(String resourceType);
 
 	/**
 	 * Get all resource actions sorted by bit value.
@@ -104,7 +105,7 @@ public interface ResourceActionLocalService {
 	 * @param resourceType the resource type
 	 * @return list of resource actions ordered by bit value
 	 */
-	List<ResourceAction> getResourceActionsOrdered(String resourceType);
+	public List<ResourceAction> getResourceActionsOrdered(String resourceType);
 
 	/**
 	 * Check if a resource action exists.
@@ -113,7 +114,7 @@ public interface ResourceActionLocalService {
 	 * @param actionKey the action key
 	 * @return true if the action exists
 	 */
-	boolean resourceActionExists(String resourceType, String actionKey);
+	public boolean resourceActionExists(String resourceType, String actionKey);
 
 	/**
 	 * Update a resource action.
@@ -125,7 +126,7 @@ public interface ResourceActionLocalService {
 	 * @return the updated resource action
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 */
-	ResourceAction updateResourceAction(
+	public ResourceAction updateResourceAction(
 		UUID actionId, String actionName, String description, boolean active);
 
 }

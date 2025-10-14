@@ -29,7 +29,7 @@ public interface TenantService {
 	 * @throws com.easybase.common.exception.ConflictException if name already exists
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Tenant createTenant(String name);
+	public Tenant createTenant(String name);
 
 	/**
 	 * Soft deletes a tenant by ID.
@@ -39,7 +39,7 @@ public interface TenantService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if tenant not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	void deleteTenant(UUID tenantId);
+	public void deleteTenant(UUID tenantId);
 
 	/**
 	 * Fetches a tenant by name (optional result).
@@ -48,7 +48,7 @@ public interface TenantService {
 	 * @param name the tenant name
 	 * @return Optional containing the tenant if found
 	 */
-	Optional<Tenant> fetchTenant(String name);
+	public Optional<Tenant> fetchTenant(String name);
 
 	/**
 	 * Gets or creates the default tenant.
@@ -56,7 +56,7 @@ public interface TenantService {
 	 *
 	 * @return the default tenant
 	 */
-	Tenant getDefaultTenant();
+	public Tenant getDefaultTenant();
 
 	/**
 	 * Gets a tenant by name.
@@ -67,7 +67,7 @@ public interface TenantService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Tenant getTenant(String name);
+	public Tenant getTenant(String name);
 
 	/**
 	 * Gets a tenant by ID.
@@ -78,7 +78,7 @@ public interface TenantService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Tenant getTenant(UUID id);
+	public Tenant getTenant(UUID id);
 
 	/**
 	 * Gets all tenants.
@@ -87,7 +87,7 @@ public interface TenantService {
 	 * @return list of all tenants
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	List<Tenant> getTenants();
+	public List<Tenant> getTenants();
 
 	/**
 	 * Updates a tenant's name.
@@ -100,6 +100,6 @@ public interface TenantService {
 	 * @throws com.easybase.common.exception.ConflictException if name already exists
 	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
 	 */
-	Tenant updateTenant(UUID id, String name);
+	public Tenant updateTenant(UUID id, String name);
 
 }
