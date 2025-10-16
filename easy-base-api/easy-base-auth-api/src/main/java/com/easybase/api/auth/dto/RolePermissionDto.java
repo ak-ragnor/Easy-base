@@ -5,12 +5,9 @@
 
 package com.easybase.api.auth.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,8 +17,42 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Consolidated DTO for RolePermission operations using user-friendly action keys.
- * Handles grant, revoke, set, and read operations with a single DTO.
+ * Consolidated DTO for RolePermission operations.
+ * Contains roleId and a list of permissions for different resource types.
+ *
+ * Request Example (grant permissions):
+ * {
+ *   "roleId": "uuid",
+ *   "permissions": [
+ *     {
+ *       "resourceType": "USER",
+ *       "actions": ["create", "read", "update"]
+ *     },
+ *     {
+ *       "resourceType": "PERMISSION",
+ *       "actions": ["view", "manage"]
+ *     }
+ *   ]
+ * }
+ *
+ * Response Example (get all permissions):
+ * {
+ *   "roleId": "uuid",
+ *   "permissions": [
+ *     {
+ *       "resourceType": "USER",
+ *       "actions": ["create", "read", "update", "delete"]
+ *     },
+ *     {
+ *       "resourceType": "PERMISSION",
+ *       "actions": ["view", "manage"]
+ *     },
+ *     {
+ *       "resourceType": "DATA",
+ *       "actions": ["read", "write"]
+ *     }
+ *   ]
+ * }
  *
  * @author Akhash R
  */
@@ -31,44 +62,16 @@ import lombok.NoArgsConstructor;
 public class RolePermissionDto {
 
 	/**
-	 * Validation group for grant operations.
+	 * List of permissions for different resource types.
+	 * Each PermissionDto represents permissions for one resource type.
 	 */
-	public interface Grant {
-	}
+	@NotEmpty
+	@Valid
+	private List<PermissionDto> permissions;
 
 	/**
-	 * Validation group for revoke operations.
+	 * The role ID for which permissions are being managed.
 	 */
-	public interface Revoke {
-	}
-
-	/**
-	 * Validation group for set operations.
-	 */
-	public interface Set {
-	}
-
-	/**
-	 * List of action keys for write operations (grant/revoke/set).
-	 * Example: ["user.create", "user.read", "user.update"]
-	 * WRITE_ONLY - only used in request bodies, never returned.
-	 */
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@NotEmpty(groups = {Grant.class, Revoke.class})
-	private List<@NotBlank String> actions;
-
-	/**
-	 * List of granted action keys for read operations.
-	 * Example: ["user.create", "user.read"]
-	 * READ_ONLY - only returned in responses, ignored in requests.
-	 */
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	private List<String> grantedActions;
-
-	@NotBlank
-	@Size(max = 50)
-	private String resourceType;
-
 	@NotNull
 	private UUID roleId;
 

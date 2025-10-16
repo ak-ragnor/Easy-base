@@ -5,6 +5,7 @@
 
 package com.easybase.core.auth.entity;
 
+import com.easybase.core.auth.util.BitMaskUtil;
 import com.easybase.infrastructure.data.entity.CompositeKeyBaseEntity;
 
 import jakarta.persistence.Column;
@@ -60,7 +61,7 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 * @param bitValue the bit value of the permission to add
 	 */
 	public void addPermission(int bitValue) {
-		permissionsMask |= bitValue;
+		this.permissionsMask = BitMaskUtil.addBit(this.permissionsMask, bitValue);
 	}
 
 	/**
@@ -69,30 +70,14 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 * @param bitValues the bit values of the permissions to add
 	 */
 	public void addPermissions(int... bitValues) {
-		for (int bitValue : bitValues) {
-			permissionsMask |= bitValue;
-		}
+		this.permissionsMask = BitMaskUtil.addBits(this.permissionsMask, bitValues);
 	}
 
 	/**
 	 * Clear all permissions.
 	 */
 	public void clearPermissions() {
-		permissionsMask = 0L;
-	}
-
-	/**
-	 * Check if this role has a specific permission.
-	 *
-	 * @param bitValue the bit value of the permission to check
-	 * @return true if the permission is granted
-	 */
-	public boolean hasPermission(int bitValue) {
-		if ((permissionsMask & bitValue) != 0) {
-			return true;
-		}
-
-		return false;
+		this.permissionsMask = BitMaskUtil.clearMask();
 	}
 
 	/**
@@ -101,7 +86,7 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 * @param bitValue the bit value of the permission to remove
 	 */
 	public void removePermission(int bitValue) {
-		permissionsMask &= ~bitValue;
+		this.permissionsMask = BitMaskUtil.removeBit(this.permissionsMask, bitValue);
 	}
 
 	/**
@@ -110,9 +95,7 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 * @param bitValues the bit values of the permissions to remove
 	 */
 	public void removePermissions(int... bitValues) {
-		for (int bitValue : bitValues) {
-			permissionsMask &= ~bitValue;
-		}
+		this.permissionsMask = BitMaskUtil.removeBits(this.permissionsMask, bitValues);
 	}
 
 	/**

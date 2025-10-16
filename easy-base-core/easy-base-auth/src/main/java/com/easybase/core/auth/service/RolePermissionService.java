@@ -46,6 +46,20 @@ public interface RolePermissionService {
 		UUID roleId, String resourceType, int... bitValues);
 
 	/**
+	 * Check if a role has all specified permissions for a resource type.
+	 * Requires PERMISSION:VIEW permission.
+	 *
+	 * @param roleId the role ID
+	 * @param resourceType the resource type
+	 * @param actionKeys list of action keys to check
+	 * @return true if the role has ALL specified permissions
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 * @throws IllegalArgumentException if any action is invalid or inactive
+	 */
+	public boolean checkPermissions(
+		UUID roleId, String resourceType, List<String> actionKeys);
+
+	/**
 	 * Clear all permissions for a role and resource type.
 	 * Requires PERMISSION:UPDATE permission.
 	 *
@@ -144,6 +158,20 @@ public interface RolePermissionService {
 		List<UUID> roleIds, String resourceType);
 
 	/**
+	 * Grant (add) permissions to a role using action keys.
+	 * Requires PERMISSION:UPDATE permission.
+	 *
+	 * @param roleId the role ID
+	 * @param resourceType the resource type
+	 * @param actionKeys list of action keys to grant
+	 * @return the updated role permission
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 * @throws IllegalArgumentException if any action is invalid or inactive
+	 */
+	public RolePermission grantPermissionsByActionKeys(
+		UUID roleId, String resourceType, List<String> actionKeys);
+
+	/**
 	 * Check if any of the given roles has a specific permission for a resource type.
 	 * Requires PERMISSION:VIEW permission.
 	 *
@@ -168,6 +196,8 @@ public interface RolePermissionService {
 	 */
 	public boolean hasPermission(
 		UUID roleId, String resourceType, int bitValue);
+
+	// High-level action key based methods
 
 	/**
 	 * Remove a permission from a role for a specific resource type.
@@ -194,5 +224,33 @@ public interface RolePermissionService {
 	 */
 	public RolePermission removePermissions(
 		UUID roleId, String resourceType, int... bitValues);
+
+	/**
+	 * Revoke (remove) permissions from a role using action keys.
+	 * Requires PERMISSION:UPDATE permission.
+	 *
+	 * @param roleId the role ID
+	 * @param resourceType the resource type
+	 * @param actionKeys list of action keys to revoke
+	 * @return the updated role permission
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 * @throws IllegalArgumentException if any action is invalid or inactive
+	 */
+	public RolePermission revokePermissionsByActionKeys(
+		UUID roleId, String resourceType, List<String> actionKeys);
+
+	/**
+	 * Set (replace) all permissions for a role using action keys.
+	 * Requires PERMISSION:UPDATE permission.
+	 *
+	 * @param roleId the role ID
+	 * @param resourceType the resource type
+	 * @param actionKeys list of action keys to set (replaces all existing)
+	 * @return the updated role permission
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 * @throws IllegalArgumentException if any action is invalid or inactive
+	 */
+	public RolePermission setPermissionsByActionKeys(
+		UUID roleId, String resourceType, List<String> actionKeys);
 
 }

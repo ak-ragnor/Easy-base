@@ -8,6 +8,7 @@ package com.easybase.core.auth.service.impl;
 import com.easybase.core.auth.entity.RolePermission;
 import com.easybase.core.auth.repository.RolePermissionRepository;
 import com.easybase.core.auth.service.RolePermissionLocalService;
+import com.easybase.core.auth.util.BitMaskUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -149,7 +150,7 @@ public class RolePermissionLocalServiceImpl
 				roleIds, resourceType);
 
 		for (RolePermission permission : permissions) {
-			if (permission.hasPermission(bitValue)) {
+			if (BitMaskUtil.hasBit(permission.getPermissionsMask(), bitValue)) {
 				return true;
 			}
 		}
@@ -170,10 +171,10 @@ public class RolePermissionLocalServiceImpl
 			return false;
 		}
 
-		return rolePermissionOpt.get(
-		).hasPermission(
-			bitValue
-		);
+		return BitMaskUtil.hasBit(
+			rolePermissionOpt.get(
+			).getPermissionsMask(),
+			bitValue);
 	}
 
 	@Override

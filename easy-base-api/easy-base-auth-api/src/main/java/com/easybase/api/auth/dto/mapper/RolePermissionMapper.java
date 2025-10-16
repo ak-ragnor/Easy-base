@@ -5,10 +5,10 @@
 
 package com.easybase.api.auth.dto.mapper;
 
+import com.easybase.api.auth.dto.PermissionDto;
 import com.easybase.api.auth.dto.RolePermissionDto;
-import com.easybase.core.auth.entity.ResourceAction;
 import com.easybase.core.auth.entity.RolePermission;
-import com.easybase.core.auth.service.ResourceActionLocalService;
+import com.easybase.core.auth.helper.PermissionHelper;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
 import java.util.ArrayList;
@@ -34,24 +34,24 @@ public class RolePermissionMapper
 			return null;
 		}
 
+		List<String> actionKeys =
+			_permissionHelper.convertBitValuesToActionKeys(
+				entity.getResourceType(), entity.getPermissionsMask());
+
+		PermissionDto permissionDto = new PermissionDto();
+
+		permissionDto.setResourceType(entity.getResourceType());
+		permissionDto.setActions(actionKeys);
+
 		RolePermissionDto dto = new RolePermissionDto();
 
 		dto.setRoleId(entity.getRoleId());
-		dto.setResourceType(entity.getResourceType());
 
-		List<ResourceAction> actions =
-			_resourceActionLocalService.getActiveResourceActions(
-				entity.getResourceType());
+		List<PermissionDto> permissions = new ArrayList<>();
 
-		List<String> grantedActions = new ArrayList<>();
+		permissions.add(permissionDto);
 
-		for (ResourceAction action : actions) {
-			if (entity.hasPermission(action.getBitValue())) {
-				grantedActions.add(action.getActionKey());
-			}
-		}
-
-		dto.setGrantedActions(grantedActions);
+		dto.setPermissions(permissions);
 
 		return dto;
 	}
@@ -62,12 +62,20 @@ public class RolePermissionMapper
 			return null;
 		}
 
+		List<PermissionDto> permissions = dto.getPermissions();
+
+		if ((permissions == null) || permissions.isEmpty()) {
+			return null;
+		}
+
+		PermissionDto firstPermission = permissions.get(0);
+
 		RolePermission entity = new RolePermission(
-			dto.getRoleId(), dto.getResourceType());
+			dto.getRoleId(), firstPermission.getResourceType());
 
 		return entity;
 	}
 
-	private final ResourceActionLocalService _resourceActionLocalService;
+	private final PermissionHelper _permissionHelper;
 
 }

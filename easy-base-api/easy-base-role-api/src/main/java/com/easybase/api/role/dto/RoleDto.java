@@ -40,6 +40,7 @@ public class RoleDto {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private boolean isActive;
 
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private boolean isSystem;
 
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)

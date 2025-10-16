@@ -9,33 +9,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
-import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Consolidated DTO for permission checking operations.
- * Supports checking multiple actions for a specific resource type.
+ * DTO for permission operations on a specific resource type.
+ * Represents actions for a single resource type (e.g., USER, PERMISSION, etc.).
  *
- * Request Example (check permissions):
+ * Example:
  * {
- *   "roleId": "uuid",
  *   "resourceType": "user",
  *   "actions": ["create", "read", "update"]
- * }
- *
- * Response Example (with results):
- * {
- *   "roleId": "uuid",
- *   "resourceType": "user",
- *   "actions": ["create", "read", "update"],
- *   "hasPermission": true  // true if ALL actions are granted
  * }
  *
  * @author Akhash R
@@ -46,27 +35,24 @@ import lombok.NoArgsConstructor;
 public class PermissionDto {
 
 	/**
-	 * List of action IDs to check (e.g., ["create", "read", "update"]).
-	 * These are the action keys without the resourceType prefix.
+	 * List of action keys (e.g., ["create", "read", "update"]).
+	 * Used for both requests (grant/revoke/set) and responses (granted actions).
 	 */
 	@NotEmpty
 	private List<@NotBlank String> actions;
 
 	/**
 	 * Whether the role has ALL the requested permissions.
-	 * READ_ONLY - only returned in responses, ignored in requests.
+	 * READ_ONLY - only returned in check operation responses, ignored in requests.
 	 */
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private Boolean hasPermission;
 
 	/**
-	 * The resource type (e.g., "user", "data", "collection").
+	 * The resource type (e.g., "USER", "PERMISSION", "DATA").
 	 */
 	@NotBlank
 	@Size(max = 50)
 	private String resourceType;
-
-	@NotNull
-	private UUID roleId;
 
 }

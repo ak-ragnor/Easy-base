@@ -22,7 +22,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * Entity to define available actions for each resource type.
- * This allows dynamic configuration of what actions are available per resource.
  *
  * @author Akhash R
  */

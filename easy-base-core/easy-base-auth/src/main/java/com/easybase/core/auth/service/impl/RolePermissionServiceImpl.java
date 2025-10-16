@@ -8,6 +8,7 @@ package com.easybase.core.auth.service.impl;
 import com.easybase.context.api.util.PermissionChecker;
 import com.easybase.core.auth.action.PermissionActions;
 import com.easybase.core.auth.entity.RolePermission;
+import com.easybase.core.auth.helper.PermissionHelper;
 import com.easybase.core.auth.service.RolePermissionLocalService;
 import com.easybase.core.auth.service.RolePermissionService;
 
@@ -49,6 +50,27 @@ public class RolePermissionServiceImpl implements RolePermissionService {
 
 		return _rolePermissionLocalService.addPermissions(
 			roleId, resourceType, bitValues);
+	}
+
+	@Override
+	public boolean checkPermissions(
+		UUID roleId, String resourceType, List<String> actionKeys) {
+
+		_permissionChecker.check(PermissionActions.VIEW);
+
+		int[] bitValues = _permissionHelper.convertActionKeysToBitValues(
+			resourceType, actionKeys);
+
+		for (int bitValue : bitValues) {
+			boolean has = _rolePermissionLocalService.hasPermission(
+				roleId, resourceType, bitValue);
+
+			if (!has) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	@Override
@@ -130,6 +152,19 @@ public class RolePermissionServiceImpl implements RolePermissionService {
 	}
 
 	@Override
+	public RolePermission grantPermissionsByActionKeys(
+		UUID roleId, String resourceType, List<String> actionKeys) {
+
+		_permissionChecker.check(PermissionActions.UPDATE);
+
+		int[] bitValues = _permissionHelper.convertActionKeysToBitValues(
+			resourceType, actionKeys);
+
+		return _rolePermissionLocalService.addPermissions(
+			roleId, resourceType, bitValues);
+	}
+
+	@Override
 	public boolean hasPermission(
 		List<UUID> roleIds, String resourceType, int bitValue) {
 
@@ -148,6 +183,8 @@ public class RolePermissionServiceImpl implements RolePermissionService {
 		return _rolePermissionLocalService.hasPermission(
 			roleId, resourceType, bitValue);
 	}
+
+	// High-level action key based methods
 
 	@Override
 	public RolePermission removePermission(
@@ -169,7 +206,34 @@ public class RolePermissionServiceImpl implements RolePermissionService {
 			roleId, resourceType, bitValues);
 	}
 
+	@Override
+	public RolePermission revokePermissionsByActionKeys(
+		UUID roleId, String resourceType, List<String> actionKeys) {
+
+		_permissionChecker.check(PermissionActions.UPDATE);
+
+		int[] bitValues = _permissionHelper.convertActionKeysToBitValues(
+			resourceType, actionKeys);
+
+		return _rolePermissionLocalService.removePermissions(
+			roleId, resourceType, bitValues);
+	}
+
+	@Override
+	public RolePermission setPermissionsByActionKeys(
+		UUID roleId, String resourceType, List<String> actionKeys) {
+
+		_permissionChecker.check(PermissionActions.UPDATE);
+
+		long permissionsMask = _permissionHelper.calculatePermissionMask(
+			resourceType, actionKeys);
+
+		return _rolePermissionLocalService.createOrUpdateRolePermission(
+			roleId, resourceType, permissionsMask);
+	}
+
 	private final PermissionChecker _permissionChecker;
+	private final PermissionHelper _permissionHelper;
 	private final RolePermissionLocalService _rolePermissionLocalService;
 
 }

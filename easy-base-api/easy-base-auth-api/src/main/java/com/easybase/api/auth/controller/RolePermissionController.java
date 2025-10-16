@@ -8,9 +8,8 @@ package com.easybase.api.auth.controller;
 import com.easybase.api.auth.dto.PermissionDto;
 import com.easybase.api.auth.dto.RolePermissionDto;
 import com.easybase.api.auth.dto.mapper.RolePermissionMapper;
-import com.easybase.core.auth.entity.ResourceAction;
 import com.easybase.core.auth.entity.RolePermission;
-import com.easybase.core.auth.service.ResourceActionLocalService;
+import com.easybase.core.auth.helper.PermissionHelper;
 import com.easybase.core.auth.service.RolePermissionService;
 
 import jakarta.validation.Valid;
@@ -18,7 +17,6 @@ import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 
@@ -56,28 +54,11 @@ public class RolePermissionController {
 		@PathVariable UUID roleId,
 		@RequestBody @Valid PermissionDto permissionDto) {
 
-		if (!roleId.equals(permissionDto.getRoleId())) {
-			throw new IllegalArgumentException(
-				"Role ID in path does not match role ID in request body");
-		}
+		boolean hasPermission = _rolePermissionService.checkPermissions(
+			roleId, permissionDto.getResourceType(),
+			permissionDto.getActions());
 
-		int[] bitValues = _getBitValues(
-			permissionDto.getResourceType(), permissionDto.getActions());
-
-		boolean hasAllPermissions = true;
-
-		for (int bitValue : bitValues) {
-			boolean has = _rolePermissionService.hasPermission(
-				roleId, permissionDto.getResourceType(), bitValue);
-
-			if (!has) {
-				hasAllPermissions = false;
-
-				break;
-			}
-		}
-
-		permissionDto.setHasPermission(hasAllPermissions);
+		permissionDto.setHasPermission(hasPermission);
 
 		return permissionDto;
 	}
@@ -115,13 +96,41 @@ public class RolePermissionController {
 	 * @return list of role permissions
 	 */
 	@GetMapping
-	public List<RolePermissionDto> getAllPermissions(
-		@PathVariable UUID roleId) {
-
+	public RolePermissionDto getAllPermissions(@PathVariable UUID roleId) {
 		List<RolePermission> permissions =
 			_rolePermissionService.getPermissionsForRole(roleId);
 
-		return _rolePermissionMapper.toDto(permissions);
+		if ((permissions == null) || permissions.isEmpty()) {
+			RolePermissionDto emptyDto = new RolePermissionDto();
+
+			emptyDto.setRoleId(roleId);
+			emptyDto.setPermissions(List.of());
+
+			return emptyDto;
+		}
+
+		List<PermissionDto> permissionDtos = new ArrayList<>();
+
+		for (RolePermission permission : permissions) {
+			List<String> actionKeys =
+				_permissionHelper.convertBitValuesToActionKeys(
+					permission.getResourceType(),
+					permission.getPermissionsMask());
+
+			PermissionDto permissionDto = new PermissionDto();
+
+			permissionDto.setResourceType(permission.getResourceType());
+			permissionDto.setActions(actionKeys);
+
+			permissionDtos.add(permissionDto);
+		}
+
+		RolePermissionDto dto = new RolePermissionDto();
+
+		dto.setRoleId(roleId);
+		dto.setPermissions(permissionDtos);
+
+		return dto;
 	}
 
 	/**
@@ -150,12 +159,12 @@ public class RolePermissionController {
 	}
 
 	/**
-	 * Grant (add) specific permissions to a role for a resource type.
+	 * Grant (add) specific permissions to a role for one or more resource types.
 	 * Adds to existing permissions without removing any.
 	 *
 	 * @param roleId the role ID
-	 * @param dto the grant permissions DTO
-	 * @return the updated role permission
+	 * @param dto the role permission DTO
+	 * @return the updated permissions
 	 */
 	@PostMapping(":grant")
 	public RolePermissionDto grantPermissions(
@@ -166,25 +175,24 @@ public class RolePermissionController {
 				"Role ID in path does not match role ID in request body");
 		}
 
-		int[] bitValues = _getBitValues(
-			dto.getResourceType(), dto.getActions());
+		for (PermissionDto permission : dto.getPermissions()) {
+			_rolePermissionService.grantPermissionsByActionKeys(
+				roleId, permission.getResourceType(), permission.getActions());
+		}
 
-		RolePermission rolePermission = _rolePermissionService.addPermissions(
-			roleId, dto.getResourceType(), bitValues);
-
-		return _rolePermissionMapper.toDto(rolePermission);
+		return getAllPermissions(roleId);
 	}
 
 	/**
-	 * Revoke (remove) specific permissions from a role for a resource type.
+	 * Revoke (remove) specific permissions from a role for one or more resource types.
 	 * Removes specified permissions while keeping others.
 	 *
 	 * @param roleId the role ID
-	 * @param dto the revoke permissions DTO
-	 * @return the updated role permission
+	 * @param dto the role permission DTO
+	 * @return the updated permissions
 	 */
 	@PostMapping(":revoke")
-	public ResponseEntity<RolePermissionDto> revokePermissions(
+	public RolePermissionDto revokePermissions(
 		@PathVariable UUID roleId, @RequestBody @Valid RolePermissionDto dto) {
 
 		if (!roleId.equals(dto.getRoleId())) {
@@ -192,102 +200,41 @@ public class RolePermissionController {
 				"Role ID in path does not match role ID in request body");
 		}
 
-		int[] bitValues = _getBitValues(
-			dto.getResourceType(), dto.getActions());
-
-		RolePermission rolePermission =
-			_rolePermissionService.removePermissions(
-				roleId, dto.getResourceType(), bitValues);
-
-		if (rolePermission == null) {
-			ResponseEntity.HeadersBuilder<?> responseBuilder =
-				ResponseEntity.notFound();
-
-			return responseBuilder.build();
+		for (PermissionDto permission : dto.getPermissions()) {
+			_rolePermissionService.revokePermissionsByActionKeys(
+				roleId, permission.getResourceType(), permission.getActions());
 		}
 
-		return ResponseEntity.ok(_rolePermissionMapper.toDto(rolePermission));
+		return getAllPermissions(roleId);
 	}
 
 	/**
-	 * Set (replace) all permissions for a role and resource type.
-	 * Replaces all existing permissions with the new set.
+	 * Set (replace) all permissions for a role and specific resource type.
+	 * Replaces all existing permissions for that resource type with the new set.
 	 *
 	 * @param roleId the role ID
 	 * @param resourceType the resource type
-	 * @param dto the set permissions DTO
-	 * @return the updated role permission
+	 * @param permissionDto the permission DTO
+	 * @return the updated permission for that resource type
 	 */
 	@PutMapping("/{resourceType}")
 	public RolePermissionDto setPermissions(
 		@PathVariable UUID roleId, @PathVariable String resourceType,
-		@RequestBody @Valid RolePermissionDto dto) {
+		@RequestBody @Valid PermissionDto permissionDto) {
 
-		if (!roleId.equals(dto.getRoleId())) {
-			throw new IllegalArgumentException(
-				"Role ID in path does not match role ID in request body");
-		}
-
-		if (!resourceType.equals(dto.getResourceType())) {
+		if (!resourceType.equals(permissionDto.getResourceType())) {
 			throw new IllegalArgumentException(
 				"Resource type in path does not match resource type in request body");
 		}
 
-		long permissionsMask = 0L;
-
-		List<String> actions = dto.getActions();
-
-		if ((actions != null) && !actions.isEmpty()) {
-			int[] bitValues = _getBitValues(resourceType, actions);
-
-			for (int bitValue : bitValues) {
-				permissionsMask |= bitValue;
-			}
-		}
-
 		RolePermission rolePermission =
-			_rolePermissionService.createOrUpdateRolePermission(
-				roleId, resourceType, permissionsMask);
+			_rolePermissionService.setPermissionsByActionKeys(
+				roleId, resourceType, permissionDto.getActions());
 
 		return _rolePermissionMapper.toDto(rolePermission);
 	}
 
-	/**
-	 * Convert action keys to bit values by looking up ResourceActions.
-	 *
-	 * @param resourceType the resource type
-	 * @param actionKeys list of action keys
-	 * @return array of bit values
-	 */
-	private int[] _getBitValues(String resourceType, List<String> actionKeys) {
-		List<Integer> bitValues = new ArrayList<>();
-
-		for (String actionKey : actionKeys) {
-			ResourceAction action =
-				_resourceActionLocalService.getResourceAction(
-					resourceType, actionKey);
-
-			if (action == null) {
-				throw new IllegalArgumentException(
-					"Unknown action: " + resourceType + "." + actionKey);
-			}
-
-			if (!action.isActive()) {
-				throw new IllegalArgumentException(
-					"Action is not active: " + resourceType + "." + actionKey);
-			}
-
-			bitValues.add(action.getBitValue());
-		}
-
-		Stream<Integer> bitValuesStream = bitValues.stream();
-
-		return bitValuesStream.mapToInt(
-			Integer::intValue
-		).toArray();
-	}
-
-	private final ResourceActionLocalService _resourceActionLocalService;
+	private final PermissionHelper _permissionHelper;
 	private final RolePermissionMapper _rolePermissionMapper;
 	private final RolePermissionService _rolePermissionService;
 

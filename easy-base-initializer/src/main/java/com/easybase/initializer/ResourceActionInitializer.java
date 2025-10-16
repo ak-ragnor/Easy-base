@@ -7,6 +7,7 @@ package com.easybase.initializer;
 
 import com.easybase.core.auth.entity.ResourceAction;
 import com.easybase.core.auth.entity.RolePermission;
+import com.easybase.core.auth.helper.PermissionHelper;
 import com.easybase.core.auth.repository.ResourceActionRepository;
 import com.easybase.core.auth.repository.RolePermissionRepository;
 import com.easybase.infrastructure.auth.annotation.ActionDefinition;
@@ -76,30 +77,6 @@ public class ResourceActionInitializer implements ApplicationRunner {
 		}
 
 		return maxBitValue << 1;
-	}
-
-	private long _calculatePermissionsMask(
-		Set<String> actionKeys, String resourceType) {
-
-		long mask = 0L;
-
-		for (String actionKey : actionKeys) {
-			Optional<ResourceAction> actionOpt =
-				_resourceActionRepository.findByResourceTypeAndActionKey(
-					resourceType, actionKey);
-
-			if (actionOpt.isPresent()) {
-				mask |= actionOpt.get(
-				).getBitValue();
-			}
-			else {
-				log.warn(
-					"Action '{}' not found for resource '{}'. Skipping.",
-					actionKey, resourceType);
-			}
-		}
-
-		return mask;
 	}
 
 	private void _discoverAndRegisterActions() {
@@ -310,8 +287,8 @@ public class ResourceActionInitializer implements ApplicationRunner {
 
 			Set<String> actionKeys = entry.getValue();
 
-			long permissionsMask = _calculatePermissionsMask(
-				actionKeys, resourceType);
+			long permissionsMask = _permissionHelper.calculatePermissionMask(
+				resourceType, new ArrayList<>(actionKeys));
 
 			Optional<RolePermission> rolePermissionOptional =
 				_rolePermissionRepository.findByRoleIdAndResourceType(
@@ -352,6 +329,7 @@ public class ResourceActionInitializer implements ApplicationRunner {
 	}
 
 	private final EntityManager _entityManager;
+	private final PermissionHelper _permissionHelper;
 	private final ResourceActionRepository _resourceActionRepository;
 	private final RolePermissionRepository _rolePermissionRepository;
 
