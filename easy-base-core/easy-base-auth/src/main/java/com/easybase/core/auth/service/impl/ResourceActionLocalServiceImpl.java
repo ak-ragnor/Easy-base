@@ -145,7 +145,7 @@ public class ResourceActionLocalServiceImpl
 		return actionOptional.orElseThrow(
 			() -> new ResourceNotFoundException(
 				"Resource action not found: " + resourceType + ":" +
-						actionKey));
+					actionKey));
 	}
 
 	/**

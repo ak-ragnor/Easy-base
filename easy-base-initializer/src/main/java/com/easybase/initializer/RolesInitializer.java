@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Initializer for creating default system roles.
- * Runs second, after default tenant.
  *
  * @author Akhash R
  */

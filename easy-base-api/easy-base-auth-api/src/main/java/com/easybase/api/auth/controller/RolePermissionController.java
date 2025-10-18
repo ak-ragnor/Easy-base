@@ -70,7 +70,9 @@ public class RolePermissionController {
 	 */
 	@DeleteMapping
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deleteAllPermissionsForRole(@PathVariable("roleId") UUID roleId) {
+	public void deleteAllPermissionsForRole(
+		@PathVariable("roleId") UUID roleId) {
+
 		_rolePermissionService.deleteAllPermissionsForRole(roleId);
 	}
 
@@ -83,7 +85,8 @@ public class RolePermissionController {
 	@DeleteMapping("/{resourceType}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deletePermissionsForResourceType(
-		@PathVariable("roleId") UUID roleId, @PathVariable("resourceType") String resourceType) {
+		@PathVariable("roleId") UUID roleId,
+		@PathVariable("resourceType") String resourceType) {
 
 		_rolePermissionService.deletePermissionsForRoleAndResource(
 			roleId, resourceType);
@@ -96,7 +99,9 @@ public class RolePermissionController {
 	 * @return list of role permissions
 	 */
 	@GetMapping
-	public RolePermissionDto getAllPermissions(@PathVariable("roleId") UUID roleId) {
+	public RolePermissionDto getAllPermissions(
+		@PathVariable("roleId") UUID roleId) {
+
 		List<RolePermission> permissions =
 			_rolePermissionService.getPermissionsForRole(roleId);
 
@@ -142,7 +147,8 @@ public class RolePermissionController {
 	 */
 	@GetMapping("/{resourceType}")
 	public ResponseEntity<RolePermissionDto> getPermissionsForResourceType(
-		@PathVariable("roleId") UUID roleId, @PathVariable("resourceType") String resourceType) {
+		@PathVariable("roleId") UUID roleId,
+		@PathVariable("resourceType") String resourceType) {
 
 		RolePermission permission =
 			_rolePermissionService.getPermissionsForRoleAndResource(
@@ -168,7 +174,8 @@ public class RolePermissionController {
 	 */
 	@PostMapping("/grant")
 	public RolePermissionDto grantPermissions(
-		@PathVariable("roleId") UUID roleId, @RequestBody @Valid RolePermissionDto dto) {
+		@PathVariable("roleId") UUID roleId,
+		@RequestBody @Valid RolePermissionDto dto) {
 
 		if (!roleId.equals(dto.getRoleId())) {
 			throw new IllegalArgumentException(
@@ -193,7 +200,8 @@ public class RolePermissionController {
 	 */
 	@PostMapping("/revoke")
 	public RolePermissionDto revokePermissions(
-		@PathVariable("roleId") UUID roleId, @RequestBody @Valid RolePermissionDto dto) {
+		@PathVariable("roleId") UUID roleId,
+		@RequestBody @Valid RolePermissionDto dto) {
 
 		if (!roleId.equals(dto.getRoleId())) {
 			throw new IllegalArgumentException(
@@ -219,7 +227,8 @@ public class RolePermissionController {
 	 */
 	@PutMapping("/{resourceType}")
 	public RolePermissionDto setPermissions(
-		@PathVariable("roleId") UUID roleId, @PathVariable("resourceType") String resourceType,
+		@PathVariable("roleId") UUID roleId,
+		@PathVariable("resourceType") String resourceType,
 		@RequestBody @Valid PermissionDto permissionDto) {
 
 		if (!resourceType.equals(permissionDto.getResourceType())) {

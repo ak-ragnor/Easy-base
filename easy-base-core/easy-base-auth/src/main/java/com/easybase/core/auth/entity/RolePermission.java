@@ -61,7 +61,8 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 * @param bitValue the bit value of the permission to add
 	 */
 	public void addPermission(int bitValue) {
-		this.permissionsMask = BitMaskUtil.addBit(this.permissionsMask, bitValue);
+		this.permissionsMask = BitMaskUtil.addBit(
+			this.permissionsMask, bitValue);
 	}
 
 	/**
@@ -70,7 +71,8 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 * @param bitValues the bit values of the permissions to add
 	 */
 	public void addPermissions(int... bitValues) {
-		this.permissionsMask = BitMaskUtil.addBits(this.permissionsMask, bitValues);
+		this.permissionsMask = BitMaskUtil.addBits(
+			this.permissionsMask, bitValues);
 	}
 
 	/**
@@ -86,7 +88,8 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 * @param bitValue the bit value of the permission to remove
 	 */
 	public void removePermission(int bitValue) {
-		this.permissionsMask = BitMaskUtil.removeBit(this.permissionsMask, bitValue);
+		this.permissionsMask = BitMaskUtil.removeBit(
+			this.permissionsMask, bitValue);
 	}
 
 	/**
@@ -95,7 +98,8 @@ public class RolePermission extends CompositeKeyBaseEntity {
 	 * @param bitValues the bit values of the permissions to remove
 	 */
 	public void removePermissions(int... bitValues) {
-		this.permissionsMask = BitMaskUtil.removeBits(this.permissionsMask, bitValues);
+		this.permissionsMask = BitMaskUtil.removeBits(
+			this.permissionsMask, bitValues);
 	}
 
 	/**

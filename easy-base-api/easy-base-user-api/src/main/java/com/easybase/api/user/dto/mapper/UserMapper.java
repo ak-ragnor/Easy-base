@@ -52,12 +52,14 @@ public class UserMapper implements BaseMapper<User, UserDto> {
 
 				if (createdAtInstant != null) {
 					setCreatedAt(
-						LocalDateTime.ofInstant(createdAtInstant, ZoneId.systemDefault()));
+						LocalDateTime.ofInstant(
+							createdAtInstant, ZoneId.systemDefault()));
 				}
 
 				if (updatedAtInstant != null) {
 					setUpdatedAt(
-						LocalDateTime.ofInstant(updatedAtInstant, ZoneId.systemDefault()));
+						LocalDateTime.ofInstant(
+							updatedAtInstant, ZoneId.systemDefault()));
 				}
 			}
 		};

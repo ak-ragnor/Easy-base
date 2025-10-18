@@ -43,7 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Initializer for discovering and registering actions from annotated classes.
- * Runs after default roles are created.
  *
  * @author Akhash R
  */

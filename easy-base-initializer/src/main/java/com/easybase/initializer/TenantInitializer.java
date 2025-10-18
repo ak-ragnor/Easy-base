@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Initializer for creating default tenant.
- * Runs first in the initialization sequence.
  *
  * @author Akhash R
  */

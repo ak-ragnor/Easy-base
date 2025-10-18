@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -88,8 +87,8 @@ public class RoleController {
 	 */
 	@GetMapping
 	public List<RoleDto> getRoles() {
-
-		List<Role> roles = _roleService.getAvailableRoles(_serviceContext.tenantId());
+		List<Role> roles = _roleService.getAvailableRoles(
+			_serviceContext.tenantId());
 
 		return _roleMapper.toDto(roles);
 	}
@@ -144,7 +143,8 @@ public class RoleController {
 		}
 
 		UserRole userRole = _roleService.assignRoleToUser(
-			dto.getUserId(), roleId, _serviceContext.tenantId(), dto.getExpiresAt());
+			dto.getUserId(), roleId, _serviceContext.tenantId(),
+			dto.getExpiresAt());
 
 		return _userRoleAssignmentMapper.toDto(userRole);
 	}
@@ -166,8 +166,8 @@ public class RoleController {
 	}
 
 	private final RoleMapper _roleMapper;
-	private final ServiceContext _serviceContext;
 	private final RoleService _roleService;
+	private final ServiceContext _serviceContext;
 	private final UserRoleAssignmentMapper _userRoleAssignmentMapper;
 
 }

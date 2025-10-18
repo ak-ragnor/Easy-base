@@ -28,9 +28,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 /**
  * Initializer for creating default admin user.
- * Runs fourth, after action discovery.
  *
  * @author Akhash R
  */
@@ -45,111 +46,98 @@ public class UserInitializer implements ApplicationRunner {
 	public void run(ApplicationArguments args) {
 		log.info("=== Step 4: Default User Initialization ===");
 
-		_createAdminUser();
-		_createGuestUser();
-	}
-
-	private void _createAdminUser() {
-		log.info("Checking for default admin user...");
-
 		Tenant defaultTenant = _tenantLocalService.getDefaultTenant();
 
-		User adminUser = null;
-		boolean userExists = _userRepository.existsByEmailAndTenantId(
-			_adminEmail, defaultTenant.getId());
-
-		if (userExists) {
-			log.info("Default admin user already exists: {}", _adminEmail);
-			adminUser = _userRepository.findByEmailAndTenantId(
-				_adminEmail, defaultTenant.getId()).orElseThrow();
-		}
-
-		if (!userExists) {
-			try {
-				adminUser = _userService.createUser(
-					_adminEmail, "Admin", "User", "Administrator",
-					defaultTenant.getId());
-
-				_userService.updatePasswordCredential(
-					adminUser.getId(), _adminPassword);
-
-				log.info("Created default admin user: {}", _adminEmail);
-			}
-			catch (ConflictException conflictException) {
-				log.info(
-					"Default admin user was created concurrently: {}", _adminEmail);
-				adminUser = _userRepository.findByEmailAndTenantId(
-					_adminEmail, defaultTenant.getId()).orElseThrow();
-			}
-			catch (Exception exception) {
-				log.error("Failed to create default admin user", exception);
-				throw exception;
-			}
-		}
-
-		// Ensure admin user has ADMIN role assigned
-		try {
-			Role adminRole = _roleLocalService.getRoleByName(
-				SystemRoles.ADMIN, defaultTenant.getId());
-
-			boolean hasAdminRole = _userRoleRepository.existsByUserIdAndRoleId(
-				adminUser.getId(), adminRole.getId());
-
-			if (!hasAdminRole) {
-				UserRole userRole = new UserRole(
-					adminUser.getId(), adminRole.getId(), defaultTenant.getId());
-
-				_userRoleRepository.save(userRole);
-
-				log.info(
-					"Assigned ADMIN role to user: {}", _adminEmail);
-			}
-			else {
-				log.info("Admin user already has ADMIN role: {}", _adminEmail);
-			}
-		}
-		catch (Exception exception) {
-			log.error("Failed to assign ADMIN role to admin user", exception);
-			throw exception;
-		}
+		_createAdminUser(defaultTenant);
+		_createGuestUser(defaultTenant);
 
 		log.info("Default user initialization completed");
 	}
 
-	private void _createGuestUser() {
+	private void _createAdminUser(Tenant defaultTenant) {
+		log.info("Checking for default admin user...");
+
+		User adminUser = _getOrCreateUser(
+				_adminEmail, "Admin", "User", "Administrator", defaultTenant, true);
+
+		_assignRoleIfAbsent(
+				adminUser, SystemRoles.ADMIN, defaultTenant, "ADMIN");
+	}
+
+	private void _createGuestUser(Tenant defaultTenant) {
 		log.info("Checking for default guest user...");
 
-		Tenant defaultTenant = _tenantLocalService.getDefaultTenant();
+		User guestUser = _getOrCreateUser(
+			_guestEmail, "Guest", "User", "Guest", defaultTenant, false);
 
-		if (_userRepository.existsByEmailAndTenantId(
-				_guestEmail, defaultTenant.getId())) {
-
-			log.info("Default guest user already exists: {}", _guestEmail);
-
-			return;
+		if (guestUser != null) {
+			_assignRoleIfAbsent(
+				guestUser, SystemRoles.GUEST, defaultTenant, "GUEST");
 		}
+	}
+
+	private void _assignRoleIfAbsent(
+		User user, String roleName, Tenant tenant, String roleDisplayName) {
 
 		try {
-			User guestUser = _userService.createUser(
-				_guestEmail, "Guest", "User", "Guest", defaultTenant.getId());
 
-			Role guestRole = _roleLocalService.getRoleByName(
-				SystemRoles.GUEST, null);
+			Role role = _roleLocalService.getRoleByName(roleName, tenant.getId());
+
+			if (_userRoleRepository.existsByUserIdAndRoleId(
+					user.getId(), role.getId())) {
+
+				log.info(
+					"User already has {} role: {}", roleDisplayName,
+					user.getEmail());
+
+				return;
+			}
 
 			UserRole userRole = new UserRole(
-				guestUser.getId(), guestRole.getId(), defaultTenant.getId());
+				user.getId(), role.getId(), tenant.getId());
 
 			_userRoleRepository.save(userRole);
 
 			log.info(
-				"Created default guest user: {} with GUEST role", _guestEmail);
-		}
-		catch (ConflictException conflictException) {
-			log.info(
-				"Default guest user was created concurrently: {}", _guestEmail);
+				"Assigned {} role to user: {}", roleDisplayName,
+				user.getEmail());
 		}
 		catch (Exception exception) {
-			log.error("Failed to create default guest user", exception);
+			log.error(
+				"Failed to assign {} role to user: {}", roleDisplayName,
+				user.getEmail(), exception);
+
+			throw exception;
+		}
+	}
+
+	private User _getOrCreateUser(
+		String email, String firstName, String lastName, String screenName,
+		Tenant tenant, boolean setPassword) {
+
+		if (_userRepository.existsByEmailAndTenantId(email, tenant.getId())) {
+			log.info("Default user already exists: {}", email);
+
+			return _userRepository.findByEmailAndTenantId(
+				email, tenant.getId()
+			).orElseThrow();
+		}
+
+		try {
+			User user = _userLocalService.createUser(
+				email, firstName, lastName, screenName, tenant.getId());
+
+			if (setPassword) {
+				_userLocalService.updatePasswordCredential(
+					user.getId(), _adminPassword);
+			}
+
+			log.info("Created default user: {}", email);
+
+			return user;
+		}
+		catch (Exception exception) {
+			log.error("Failed to create default user: {}", email, exception);
 
 			throw exception;
 		}
@@ -168,6 +156,6 @@ public class UserInitializer implements ApplicationRunner {
 	private final TenantLocalService _tenantLocalService;
 	private final UserRepository _userRepository;
 	private final UserRoleRepository _userRoleRepository;
-	private final UserLocalService _userService;
+	private final UserLocalService _userLocalService;
 
 }
