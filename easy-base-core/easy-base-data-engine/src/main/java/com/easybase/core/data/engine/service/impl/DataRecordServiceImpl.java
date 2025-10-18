@@ -6,7 +6,7 @@
 package com.easybase.core.data.engine.service.impl;
 
 import com.easybase.context.api.util.PermissionChecker;
-import com.easybase.core.data.engine.action.DataEngineActions;
+import com.easybase.core.data.engine.action.CollectionActions;
 import com.easybase.core.data.engine.entity.DataRecord;
 import com.easybase.core.data.engine.service.DataRecordLocalService;
 import com.easybase.core.data.engine.service.DataRecordService;
@@ -36,28 +36,28 @@ public class DataRecordServiceImpl implements DataRecordService {
 	public DataRecord createRecord(
 		UUID tenantId, String table, Map<String, Object> data) {
 
-		_permissionChecker.check(DataEngineActions.RECORD_CREATE);
+		_permissionChecker.check(CollectionActions.RECORD_CREATE);
 
 		return _dataRecordLocalService.createRecord(tenantId, table, data);
 	}
 
 	@Override
 	public void deleteRecord(UUID tenantId, String table, UUID id) {
-		_permissionChecker.check(DataEngineActions.RECORD_DELETE);
+		_permissionChecker.check(CollectionActions.RECORD_DELETE);
 
 		_dataRecordLocalService.deleteRecord(tenantId, table, id);
 	}
 
 	@Override
 	public DataRecord getRecord(UUID tenantId, String table, UUID id) {
-		_permissionChecker.check(DataEngineActions.RECORD_VIEW);
+		_permissionChecker.check(CollectionActions.RECORD_VIEW);
 
 		return _dataRecordLocalService.getRecord(tenantId, table, id);
 	}
 
 	@Override
 	public List<DataRecord> getRecords(UUID tenantId, String table) {
-		_permissionChecker.check(DataEngineActions.RECORD_LIST);
+		_permissionChecker.check(CollectionActions.RECORD_LIST);
 
 		return _dataRecordLocalService.getRecords(tenantId, table);
 	}
@@ -66,7 +66,7 @@ public class DataRecordServiceImpl implements DataRecordService {
 	public DataRecord updateRecord(
 		UUID tenantId, String table, UUID id, Map<String, Object> data) {
 
-		_permissionChecker.check(DataEngineActions.RECORD_UPDATE);
+		_permissionChecker.check(CollectionActions.RECORD_UPDATE);
 
 		return _dataRecordLocalService.updateRecord(tenantId, table, id, data);
 	}

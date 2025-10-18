@@ -5,12 +5,15 @@
 
 package com.easybase.core.data.engine.action;
 
+import com.easybase.infrastructure.auth.annotation.ActionDefinition;
+
 /**
  * Action constants for data engine permissions.
  *
  * @author Akhash R
  */
-public final class DataEngineActions {
+@ActionDefinition(resourceType = "COLLECTION")
+public final class CollectionActions {
 
 	public static final String COLLECTION_CREATE = "COLLECTION:CREATE";
 
@@ -32,15 +35,7 @@ public final class DataEngineActions {
 
 	public static final String RECORD_VIEW = "RECORD:VIEW";
 
-	public static final String SCHEMA_CREATE = "SCHEMA:CREATE";
-
-	public static final String SCHEMA_DELETE = "SCHEMA:DELETE";
-
-	public static final String SCHEMA_UPDATE = "SCHEMA:UPDATE";
-
-	public static final String SCHEMA_VIEW = "SCHEMA:VIEW";
-
-	private DataEngineActions() {
+	private CollectionActions() {
 		throw new UnsupportedOperationException("Constants class");
 	}
 

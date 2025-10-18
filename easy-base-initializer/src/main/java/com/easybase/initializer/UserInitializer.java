@@ -54,41 +54,62 @@ public class UserInitializer implements ApplicationRunner {
 
 		Tenant defaultTenant = _tenantLocalService.getDefaultTenant();
 
-		if (_userRepository.existsByEmailAndTenantId(
-				_adminEmail, defaultTenant.getId())) {
+		User adminUser = null;
+		boolean userExists = _userRepository.existsByEmailAndTenantId(
+			_adminEmail, defaultTenant.getId());
 
+		if (userExists) {
 			log.info("Default admin user already exists: {}", _adminEmail);
-			log.info("Default user initialization completed");
-
-			return;
+			adminUser = _userRepository.findByEmailAndTenantId(
+				_adminEmail, defaultTenant.getId()).orElseThrow();
 		}
 
+		if (!userExists) {
+			try {
+				adminUser = _userService.createUser(
+					_adminEmail, "Admin", "User", "Administrator",
+					defaultTenant.getId());
+
+				_userService.updatePasswordCredential(
+					adminUser.getId(), _adminPassword);
+
+				log.info("Created default admin user: {}", _adminEmail);
+			}
+			catch (ConflictException conflictException) {
+				log.info(
+					"Default admin user was created concurrently: {}", _adminEmail);
+				adminUser = _userRepository.findByEmailAndTenantId(
+					_adminEmail, defaultTenant.getId()).orElseThrow();
+			}
+			catch (Exception exception) {
+				log.error("Failed to create default admin user", exception);
+				throw exception;
+			}
+		}
+
+		// Ensure admin user has ADMIN role assigned
 		try {
-			User adminUser = _userService.createUser(
-				_adminEmail, "Admin", "User", "Administrator",
-				defaultTenant.getId());
-
-			_userService.updatePasswordCredential(
-				adminUser.getId(), _adminPassword);
-
 			Role adminRole = _roleLocalService.getRoleByName(
 				SystemRoles.ADMIN, defaultTenant.getId());
 
-			UserRole userRole = new UserRole(
-				adminUser.getId(), adminRole.getId(), defaultTenant.getId());
+			boolean hasAdminRole = _userRoleRepository.existsByUserIdAndRoleId(
+				adminUser.getId(), adminRole.getId());
 
-			_userRoleRepository.save(userRole);
+			if (!hasAdminRole) {
+				UserRole userRole = new UserRole(
+					adminUser.getId(), adminRole.getId(), defaultTenant.getId());
 
-			log.info(
-				"Created default admin user: {} with ADMIN role", _adminEmail);
-		}
-		catch (ConflictException conflictException) {
-			log.info(
-				"Default admin user was created concurrently: {}", _adminEmail);
+				_userRoleRepository.save(userRole);
+
+				log.info(
+					"Assigned ADMIN role to user: {}", _adminEmail);
+			}
+			else {
+				log.info("Admin user already has ADMIN role: {}", _adminEmail);
+			}
 		}
 		catch (Exception exception) {
-			log.error("Failed to create default admin user", exception);
-
+			log.error("Failed to assign ADMIN role to admin user", exception);
 			throw exception;
 		}
 

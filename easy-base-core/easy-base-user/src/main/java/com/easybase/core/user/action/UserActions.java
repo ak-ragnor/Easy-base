@@ -5,11 +5,14 @@
 
 package com.easybase.core.user.action;
 
+import com.easybase.infrastructure.auth.annotation.ActionDefinition;
+
 /**
  * Action constants for user-related permissions.
  *
  * @author Akhash R
  */
+@ActionDefinition(resourceType = "USER")
 public final class UserActions {
 
 	public static final String ACTIVATE = "USER:ACTIVATE";

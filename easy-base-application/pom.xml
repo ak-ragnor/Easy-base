@@ -66,6 +66,12 @@
 
 		<dependency>
 			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-role-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-user-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>

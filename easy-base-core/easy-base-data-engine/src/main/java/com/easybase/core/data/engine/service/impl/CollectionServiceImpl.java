@@ -6,7 +6,7 @@
 package com.easybase.core.data.engine.service.impl;
 
 import com.easybase.context.api.util.PermissionChecker;
-import com.easybase.core.data.engine.action.DataEngineActions;
+import com.easybase.core.data.engine.action.CollectionActions;
 import com.easybase.core.data.engine.entity.Attribute;
 import com.easybase.core.data.engine.entity.Collection;
 import com.easybase.core.data.engine.service.CollectionLocalService;
@@ -38,7 +38,7 @@ public class CollectionServiceImpl implements CollectionService {
 	public Collection createCollection(
 		UUID tenantId, String collectionName, List<Attribute> attributes) {
 
-		_permissionChecker.check(DataEngineActions.COLLECTION_CREATE);
+		_permissionChecker.check(CollectionActions.COLLECTION_CREATE);
 
 		return _collectionLocalService.createCollection(
 			tenantId, collectionName, attributes);
@@ -46,28 +46,28 @@ public class CollectionServiceImpl implements CollectionService {
 
 	@Override
 	public void deleteCollection(UUID collectionId) {
-		_permissionChecker.check(DataEngineActions.COLLECTION_DELETE);
+		_permissionChecker.check(CollectionActions.COLLECTION_DELETE);
 
 		_collectionLocalService.deleteCollection(collectionId);
 	}
 
 	@Override
 	public Collection getCollection(UUID collectionId) {
-		_permissionChecker.check(DataEngineActions.COLLECTION_VIEW);
+		_permissionChecker.check(CollectionActions.COLLECTION_VIEW);
 
 		return _collectionLocalService.getCollection(collectionId);
 	}
 
 	@Override
 	public Collection getCollection(UUID tenantId, String collectionName) {
-		_permissionChecker.check(DataEngineActions.COLLECTION_VIEW);
+		_permissionChecker.check(CollectionActions.COLLECTION_VIEW);
 
 		return _collectionLocalService.getCollection(tenantId, collectionName);
 	}
 
 	@Override
 	public Page<Collection> getCollections(UUID tenantId, Pageable pageable) {
-		_permissionChecker.check(DataEngineActions.COLLECTION_LIST);
+		_permissionChecker.check(CollectionActions.COLLECTION_LIST);
 
 		return _collectionLocalService.getCollections(tenantId, pageable);
 	}
@@ -76,7 +76,7 @@ public class CollectionServiceImpl implements CollectionService {
 	public Collection updateCollection(
 		UUID collectionId, List<Attribute> newAttributes) {
 
-		_permissionChecker.check(DataEngineActions.COLLECTION_UPDATE);
+		_permissionChecker.check(CollectionActions.COLLECTION_UPDATE);
 
 		return _collectionLocalService.updateCollection(
 			collectionId, newAttributes);

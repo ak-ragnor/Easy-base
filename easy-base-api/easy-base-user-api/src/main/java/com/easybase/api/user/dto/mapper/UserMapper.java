@@ -10,7 +10,9 @@ import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.user.entity.User;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import java.util.UUID;
 
@@ -45,17 +47,17 @@ public class UserMapper implements BaseMapper<User, UserDto> {
 
 				setTenantId(tenantId);
 
-				ZonedDateTime createdAt = ZonedDateTime.from(
-					user.getCreatedAt());
-				ZonedDateTime updatedAt = ZonedDateTime.from(
-					user.getUpdatedAt());
+				Instant createdAtInstant = user.getCreatedAt();
+				Instant updatedAtInstant = user.getUpdatedAt();
 
-				if (createdAt != null) {
-					setCreatedAt(createdAt.toLocalDateTime());
+				if (createdAtInstant != null) {
+					setCreatedAt(
+						LocalDateTime.ofInstant(createdAtInstant, ZoneId.systemDefault()));
 				}
 
-				if (updatedAt != null) {
-					setUpdatedAt(updatedAt.toLocalDateTime());
+				if (updatedAtInstant != null) {
+					setUpdatedAt(
+						LocalDateTime.ofInstant(updatedAtInstant, ZoneId.systemDefault()));
 				}
 			}
 		};
