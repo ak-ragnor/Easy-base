@@ -8,6 +8,7 @@ package com.easybase.api.auth.controller;
 import com.easybase.api.auth.dto.PermissionDto;
 import com.easybase.api.auth.dto.RolePermissionDto;
 import com.easybase.api.auth.dto.mapper.RolePermissionMapper;
+import com.easybase.common.util.ListUtil;
 import com.easybase.core.auth.entity.RolePermission;
 import com.easybase.core.auth.helper.PermissionHelper;
 import com.easybase.core.auth.service.RolePermissionService;
@@ -105,7 +106,7 @@ public class RolePermissionController {
 		List<RolePermission> permissions =
 			_rolePermissionService.getPermissionsForRole(roleId);
 
-		if ((permissions == null) || permissions.isEmpty()) {
+		if (ListUtil.isEmpty(permissions)) {
 			RolePermissionDto emptyDto = new RolePermissionDto();
 
 			emptyDto.setRoleId(roleId);

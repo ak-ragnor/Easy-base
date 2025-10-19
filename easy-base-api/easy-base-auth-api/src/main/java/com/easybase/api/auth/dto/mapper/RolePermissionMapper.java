@@ -7,11 +7,11 @@ package com.easybase.api.auth.dto.mapper;
 
 import com.easybase.api.auth.dto.PermissionDto;
 import com.easybase.api.auth.dto.RolePermissionDto;
+import com.easybase.common.util.ListUtil;
 import com.easybase.core.auth.entity.RolePermission;
 import com.easybase.core.auth.helper.PermissionHelper;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -46,12 +46,7 @@ public class RolePermissionMapper
 		RolePermissionDto dto = new RolePermissionDto();
 
 		dto.setRoleId(entity.getRoleId());
-
-		List<PermissionDto> permissions = new ArrayList<>();
-
-		permissions.add(permissionDto);
-
-		dto.setPermissions(permissions);
+		dto.setPermissions(ListUtil.fromArray(permissionDto));
 
 		return dto;
 	}
@@ -64,7 +59,7 @@ public class RolePermissionMapper
 
 		List<PermissionDto> permissions = dto.getPermissions();
 
-		if ((permissions == null) || permissions.isEmpty()) {
+		if (ListUtil.isEmpty(permissions)) {
 			return null;
 		}
 
