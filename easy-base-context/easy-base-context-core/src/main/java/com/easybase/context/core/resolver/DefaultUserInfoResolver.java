@@ -8,11 +8,13 @@ package com.easybase.context.core.resolver;
 import com.easybase.context.api.domain.UserInfo;
 import com.easybase.context.api.port.AbstractDefaultResolver;
 import com.easybase.context.api.port.UserInfoResolver;
+import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.service.TenantLocalService;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
@@ -39,14 +41,21 @@ public class DefaultUserInfoResolver
 
 	@Override
 	protected UserInfo createAnonymousInstance() {
-		User guestUser = _userRepository.findActiveByEmailAndTenantId(
-			_guestEmail,
-			_tenantLocalService.getDefaultTenant(
-			).getId()
-		).orElseThrow(
-			() -> new IllegalStateException(
-				"Guest user not found. Ensure UserInitializer ran successfully.")
-		);
+		Tenant tenant = _tenantLocalService.getDefaultTenant();
+
+		Optional<User> optionalGuestUser =
+			_userRepository.findActiveByEmailAndTenantId(
+				_guestEmail, tenant.getId());
+
+		User guestUser;
+
+		if (optionalGuestUser.isPresent()) {
+			guestUser = optionalGuestUser.get();
+		}
+		else {
+			throw new IllegalStateException(
+				"Guest user not found. Ensure UserInitializer ran successfully.");
+		}
 
 		return toInfo(guestUser);
 	}

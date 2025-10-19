@@ -30,15 +30,15 @@ import lombok.NoArgsConstructor;
 public class UserRoleAssignmentDto {
 
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	private boolean active;
+
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private Instant assignedAt;
 
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private UUID assignedBy;
 
 	private Instant expiresAt;
-
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	private boolean isActive;
 
 	@NotNull
 	private UUID roleId;

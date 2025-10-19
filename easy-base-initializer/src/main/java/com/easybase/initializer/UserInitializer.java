@@ -5,7 +5,6 @@
 
 package com.easybase.initializer;
 
-import com.easybase.common.exception.ConflictException;
 import com.easybase.core.role.entity.Role;
 import com.easybase.core.role.entity.UserRole;
 import com.easybase.core.role.repository.UserRoleRepository;
@@ -27,8 +26,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 /**
  * Initializer for creating default admin user.
@@ -54,34 +51,12 @@ public class UserInitializer implements ApplicationRunner {
 		log.info("Default user initialization completed");
 	}
 
-	private void _createAdminUser(Tenant defaultTenant) {
-		log.info("Checking for default admin user...");
-
-		User adminUser = _getOrCreateUser(
-				_adminEmail, "Admin", "User", "Administrator", defaultTenant, true);
-
-		_assignRoleIfAbsent(
-				adminUser, SystemRoles.ADMIN, defaultTenant, "ADMIN");
-	}
-
-	private void _createGuestUser(Tenant defaultTenant) {
-		log.info("Checking for default guest user...");
-
-		User guestUser = _getOrCreateUser(
-			_guestEmail, "Guest", "User", "Guest", defaultTenant, false);
-
-		if (guestUser != null) {
-			_assignRoleIfAbsent(
-				guestUser, SystemRoles.GUEST, defaultTenant, "GUEST");
-		}
-	}
-
 	private void _assignRoleIfAbsent(
 		User user, String roleName, Tenant tenant, String roleDisplayName) {
 
 		try {
-
-			Role role = _roleLocalService.getRoleByName(roleName, tenant.getId());
+			Role role = _roleLocalService.getRoleByName(
+				roleName, tenant.getId());
 
 			if (_userRoleRepository.existsByUserIdAndRoleId(
 					user.getId(), role.getId())) {
@@ -108,6 +83,28 @@ public class UserInitializer implements ApplicationRunner {
 				user.getEmail(), exception);
 
 			throw exception;
+		}
+	}
+
+	private void _createAdminUser(Tenant defaultTenant) {
+		log.info("Checking for default admin user...");
+
+		User adminUser = _getOrCreateUser(
+			_adminEmail, "Admin", "User", "Administrator", defaultTenant, true);
+
+		_assignRoleIfAbsent(
+			adminUser, SystemRoles.ADMIN, defaultTenant, "ADMIN");
+	}
+
+	private void _createGuestUser(Tenant defaultTenant) {
+		log.info("Checking for default guest user...");
+
+		User guestUser = _getOrCreateUser(
+			_guestEmail, "Guest", "User", "Guest", defaultTenant, false);
+
+		if (guestUser != null) {
+			_assignRoleIfAbsent(
+				guestUser, SystemRoles.GUEST, defaultTenant, "GUEST");
 		}
 	}
 
@@ -154,8 +151,8 @@ public class UserInitializer implements ApplicationRunner {
 
 	private final RoleLocalService _roleLocalService;
 	private final TenantLocalService _tenantLocalService;
+	private final UserLocalService _userLocalService;
 	private final UserRepository _userRepository;
 	private final UserRoleRepository _userRoleRepository;
-	private final UserLocalService _userLocalService;
 
 }

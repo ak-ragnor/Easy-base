@@ -11,6 +11,8 @@ import com.easybase.core.data.engine.entity.Attribute;
 import com.easybase.core.data.engine.entity.Collection;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import java.util.Collections;
@@ -38,16 +40,16 @@ public class CollectionMapper implements BaseMapper<Collection, CollectionDto> {
 			{
 				setId(collection.getId());
 				setName(collection.getName());
+
+				Instant createdAtInstant = collection.getCreatedAt();
+				Instant updatedAtInstant = collection.getUpdatedAt();
+
 				setCreatedAt(
-					collection.getCreatedAt(
-					).atZone(
-						ZoneId.systemDefault()
-					).toLocalDateTime());
+					LocalDateTime.ofInstant(
+						createdAtInstant, ZoneId.systemDefault()));
 				setUpdatedAt(
-					collection.getUpdatedAt(
-					).atZone(
-						ZoneId.systemDefault()
-					).toLocalDateTime());
+					LocalDateTime.ofInstant(
+						updatedAtInstant, ZoneId.systemDefault()));
 
 				if (collection.getAttributes() == null) {
 					setAttributes(Collections.emptyList());

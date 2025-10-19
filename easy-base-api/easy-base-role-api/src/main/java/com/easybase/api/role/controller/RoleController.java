@@ -103,9 +103,8 @@ public class RoleController {
 	public List<UserRoleAssignmentDto> getUserRoleAssignments(
 		@PathVariable UUID userId) {
 
-		List<UserRole> userRoles = _roleService.getUserRoles(userId);
-
-		return _userRoleAssignmentMapper.toDto(userRoles);
+		return _userRoleAssignmentMapper.toDto(
+			_roleService.getUserRoles(userId));
 	}
 
 	/**

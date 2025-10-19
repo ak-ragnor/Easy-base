@@ -11,6 +11,7 @@ import com.easybase.core.auth.util.BitMaskUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 
@@ -78,8 +79,9 @@ public class PermissionHelper {
 			bitValues.add(action.getBitValue());
 		}
 
-		return bitValues.stream(
-		).mapToInt(
+		Stream<Integer> bitValuesStream = bitValues.stream();
+
+		return bitValuesStream.mapToInt(
 			Integer::intValue
 		).toArray();
 	}

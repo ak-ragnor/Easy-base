@@ -29,6 +29,9 @@ import lombok.NoArgsConstructor;
 public class RoleDto {
 
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	private boolean active;
+
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private Instant createdDate;
 
 	@Size(max = 255)
@@ -38,17 +41,14 @@ public class RoleDto {
 	private UUID id;
 
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	private boolean isActive;
-
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	private boolean isSystem;
-
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private Instant lastModifiedDate;
 
 	@NotBlank
 	@Size(max = 50)
 	private String name;
+
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	private boolean system;
 
 	private UUID tenantId;
 

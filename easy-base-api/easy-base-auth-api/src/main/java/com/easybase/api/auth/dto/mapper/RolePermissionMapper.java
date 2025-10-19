@@ -70,10 +70,8 @@ public class RolePermissionMapper
 
 		PermissionDto firstPermission = permissions.get(0);
 
-		RolePermission entity = new RolePermission(
+		return new RolePermission(
 			dto.getRoleId(), firstPermission.getResourceType());
-
-		return entity;
 	}
 
 	private final PermissionHelper _permissionHelper;
