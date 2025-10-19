@@ -12,6 +12,7 @@ import com.easybase.security.api.dto.TokenClaims;
 import com.easybase.security.api.dto.TokenValidationResult;
 import com.easybase.security.api.service.SessionService;
 import com.easybase.security.api.service.TokenService;
+import com.easybase.security.core.service.PermissionContextBinding;
 import com.easybase.security.core.service.ServiceContextBinding;
 import com.easybase.security.web.authentication.JwtAuthenticationToken;
 
@@ -121,6 +122,7 @@ public class JwtSessionAuthenticationFilter extends OncePerRequestFilter {
 			securityContext.setAuthentication(_createAuthentication(principal));
 
 			_serviceContextBinding.bind(principal);
+			_permissionContextBinding.bind(principal);
 
 			filterChain.doFilter(request, response);
 		}
@@ -129,6 +131,7 @@ public class JwtSessionAuthenticationFilter extends OncePerRequestFilter {
 		}
 		finally {
 			_serviceContextBinding.clear();
+			_permissionContextBinding.clear();
 		}
 	}
 
@@ -232,6 +235,7 @@ public class JwtSessionAuthenticationFilter extends OncePerRequestFilter {
 		);
 	}
 
+	private final PermissionContextBinding _permissionContextBinding;
 	private final ServiceContextBinding _serviceContextBinding;
 	private final SessionService _sessionService;
 	private final TokenService _tokenService;

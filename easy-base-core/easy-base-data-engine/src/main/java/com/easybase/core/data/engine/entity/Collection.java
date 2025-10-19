@@ -6,7 +6,7 @@
 package com.easybase.core.data.engine.entity;
 
 import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.infrastructure.data.entity.BaseEntity;
+import com.easybase.infrastructure.data.entity.SingleKeyBaseEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -46,7 +46,7 @@ import lombok.ToString;
 	}
 )
 @ToString(exclude = {"tenant", "attributes"})
-public class Collection extends BaseEntity {
+public class Collection extends SingleKeyBaseEntity {
 
 	public void addAttribute(Attribute attribute) {
 		if (attribute == null) {

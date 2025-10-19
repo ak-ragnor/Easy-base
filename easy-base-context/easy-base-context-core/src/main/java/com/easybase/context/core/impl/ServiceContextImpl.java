@@ -14,8 +14,6 @@ import java.time.Instant;
 
 import java.util.Optional;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -24,7 +22,6 @@ import lombok.Getter;
  *
  * @author Akhash R
  */
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
 @Getter
 public class ServiceContextImpl implements ServiceContext {
 
@@ -83,9 +80,17 @@ public class ServiceContextImpl implements ServiceContext {
 		 * @return the created ServiceContext
 		 */
 		public ServiceContext build() {
-			return new ServiceContextImpl(
-				_clientIp, _correlation, _expiresAt, _issuedAt, _tenant, _user,
-				_userAgent);
+			ServiceContextImpl serviceContextImpl = new ServiceContextImpl();
+
+			serviceContextImpl._clientIp = _clientIp;
+			serviceContextImpl._correlation = _correlation;
+			serviceContextImpl._expiresAt = _expiresAt;
+			serviceContextImpl._issuedAt = _issuedAt;
+			serviceContextImpl._tenant = _tenant;
+			serviceContextImpl._user = _user;
+			serviceContextImpl._userAgent = _userAgent;
+
+			return serviceContextImpl;
 		}
 
 		/**
@@ -182,12 +187,12 @@ public class ServiceContextImpl implements ServiceContext {
 
 	}
 
-	private final Optional<String> _clientIp;
-	private final CorrelationIds _correlation;
-	private final Instant _expiresAt;
-	private final Instant _issuedAt;
-	private final TenantInfo _tenant;
-	private final UserInfo _user;
-	private final Optional<String> _userAgent;
+	private Optional<String> _clientIp;
+	private CorrelationIds _correlation;
+	private Instant _expiresAt;
+	private Instant _issuedAt;
+	private TenantInfo _tenant;
+	private UserInfo _user;
+	private Optional<String> _userAgent;
 
 }

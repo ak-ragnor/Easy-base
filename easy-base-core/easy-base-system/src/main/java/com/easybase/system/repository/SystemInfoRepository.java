@@ -5,7 +5,7 @@
 
 package com.easybase.system.repository;
 
-import com.easybase.infrastructure.data.repository.BaseRepository;
+import com.easybase.infrastructure.data.repository.SingleKeyBaseRepository;
 import com.easybase.system.entity.SystemInfo;
 
 import java.util.Optional;
@@ -20,7 +20,8 @@ import org.springframework.stereotype.Repository;
  * @author Akhash R
  */
 @Repository
-public interface SystemInfoRepository extends BaseRepository<SystemInfo> {
+public interface SystemInfoRepository
+	extends SingleKeyBaseRepository<SystemInfo> {
 
 	@Query(
 		"SELECT s FROM SystemInfo s WHERE s.status = 'ACTIVE' ORDER BY s.createdAt DESC"

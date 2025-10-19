@@ -10,6 +10,10 @@ import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.user.entity.User;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
@@ -42,8 +46,21 @@ public class UserMapper implements BaseMapper<User, UserDto> {
 				}
 
 				setTenantId(tenantId);
-				setCreatedAt(user.getCreatedAt());
-				setUpdatedAt(user.getUpdatedAt());
+
+				Instant createdAtInstant = user.getCreatedAt();
+				Instant updatedAtInstant = user.getUpdatedAt();
+
+				if (createdAtInstant != null) {
+					setCreatedAt(
+						LocalDateTime.ofInstant(
+							createdAtInstant, ZoneId.systemDefault()));
+				}
+
+				if (updatedAtInstant != null) {
+					setUpdatedAt(
+						LocalDateTime.ofInstant(
+							updatedAtInstant, ZoneId.systemDefault()));
+				}
 			}
 		};
 	}

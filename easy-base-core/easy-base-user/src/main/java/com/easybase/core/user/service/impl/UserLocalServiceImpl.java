@@ -1,0 +1,301 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
+package com.easybase.core.user.service.impl;
+
+import com.easybase.common.exception.ConflictException;
+import com.easybase.common.exception.ResourceNotFoundException;
+import com.easybase.core.tenant.entity.Tenant;
+import com.easybase.core.tenant.repository.TenantRepository;
+import com.easybase.core.user.entity.User;
+import com.easybase.core.user.entity.UserCredential;
+import com.easybase.core.user.repository.UserCredentialRepository;
+import com.easybase.core.user.repository.UserRepository;
+import com.easybase.core.user.service.UserLocalService;
+
+import java.time.LocalDateTime;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
+import lombok.RequiredArgsConstructor;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Implementation of {@link UserLocalService}.
+ * Contains all business logic, repository calls, and transaction management.
+ * Does NOT perform permission checks.
+ *
+ * @author Akhash R
+ */
+@RequiredArgsConstructor
+@Service
+@Slf4j
+public class UserLocalServiceImpl implements UserLocalService {
+
+	@Transactional
+	public void addDefaultPasswordCredential(UUID userId) {
+		addPasswordCredential(userId, _userDefaultPassword);
+	}
+
+	@Transactional
+	public void addPasswordCredential(UUID userId, String plainPassword) {
+		Optional<UserCredential> existingCredential =
+			_userCredentialRepository.findByUserIdAndType(userId, "PASSWORD");
+
+		if (existingCredential.isPresent()) {
+			throw new ConflictException("UserCredential", "type", "PASSWORD");
+		}
+
+		String passwordHash = _passwordEncoder.encode(plainPassword);
+
+		UserCredential userCredential = new UserCredential();
+
+		userCredential.setUser(_getUser(userId));
+		userCredential.setPasswordType("PASSWORD");
+		userCredential.setPasswordHash(passwordHash);
+		userCredential.setPasswordAlgo("bcrypt");
+		userCredential.setPasswordChangedAt(LocalDateTime.now());
+
+		_userCredentialRepository.save(userCredential);
+
+		log.info("Added password credential userId={}", userId);
+	}
+
+	@Transactional
+	public UserCredential addUserCredential(
+		UUID userId, String type, Map<String, Object> credentialData) {
+
+		Optional<UserCredential> existingCredential =
+			_userCredentialRepository.findByUserIdAndType(userId, type);
+
+		if (existingCredential.isPresent()) {
+			throw new ConflictException("UserCredential", "type", type);
+		}
+
+		UserCredential userCredential = new UserCredential();
+
+		userCredential.setUser(_getUser(userId));
+		userCredential.setPasswordType(type);
+		userCredential.setCredentialData(credentialData);
+
+		userCredential = _userCredentialRepository.save(userCredential);
+
+		log.info("Added credential type={} userId={}", type, userId);
+
+		return userCredential;
+	}
+
+	@Transactional(readOnly = true)
+	public User authenticateUser(String email, String password, UUID tenantId) {
+		User user;
+
+		try {
+			user = getUser(email, tenantId);
+		}
+		catch (ResourceNotFoundException resourceNotFoundException) {
+			throw new ResourceNotFoundException(
+				"Invalid credentials:" +
+					resourceNotFoundException.getMessage());
+		}
+
+		UserCredential credential = getUserCredential(user.getId(), "PASSWORD");
+
+		if (!_passwordEncoder.matches(password, credential.getPasswordHash())) {
+			throw new ResourceNotFoundException("Invalid credentials");
+		}
+
+		log.debug(
+			"Successfully authenticated user: {} for tenant: {}", email,
+			tenantId);
+
+		return user;
+	}
+
+	@Transactional
+	public User createUser(
+		String email, String firstName, String lastName, String displayName,
+		UUID tenantId) {
+
+		_validateUserEmail(email, tenantId);
+
+		User user = new User();
+
+		user.setEmail(email);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		user.setDisplayName(displayName);
+		user.setTenant(_getTenant(tenantId));
+
+		user = _userRepository.save(user);
+
+		addDefaultPasswordCredential(user.getId());
+
+		log.info(
+			"Created user with email={} id={} tenant={}", email, user.getId(),
+			tenantId);
+
+		return user;
+	}
+
+	@Transactional
+	public void deleteUser(UUID id) {
+		User user = _getUser(id);
+
+		user.setDeleted(true);
+
+		_userRepository.save(user);
+
+		log.info("Soft deleted user id={}", id);
+	}
+
+	@Transactional(readOnly = true)
+	public User getUser(String email, UUID tenantId) {
+		Optional<User> userOptional =
+			_userRepository.findActiveByEmailAndTenantId(email, tenantId);
+
+		if (userOptional.isEmpty()) {
+			throw new ResourceNotFoundException("User", "email", email);
+		}
+
+		return userOptional.get();
+	}
+
+	@Transactional(readOnly = true)
+	public User getUser(UUID id) {
+		return _getUser(id);
+	}
+
+	@Transactional(readOnly = true)
+	public UserCredential getUserCredential(
+		UUID userId, String credentialType) {
+
+		Optional<UserCredential> credentialOptional =
+			_userCredentialRepository.findByUserIdAndType(
+				userId, credentialType);
+
+		if (credentialOptional.isEmpty()) {
+			throw new ResourceNotFoundException(
+				"UserCredential", "type", credentialType);
+		}
+
+		return credentialOptional.get();
+	}
+
+	@Transactional(readOnly = true)
+	public List<UserCredential> getUserCredentials(UUID userId) {
+		return _userCredentialRepository.findByUserId(userId);
+	}
+
+	@Transactional(readOnly = true)
+	public List<User> getUsers(UUID tenantId) {
+		return _userRepository.findActiveByTenantId(tenantId);
+	}
+
+	@Transactional
+	public void removeUserCredential(UUID userId, String credentialType) {
+		Optional<UserCredential> credentialOptional =
+			_userCredentialRepository.findByUserIdAndType(
+				userId, credentialType);
+
+		if (credentialOptional.isEmpty()) {
+			throw new ResourceNotFoundException(
+				"UserCredential", "type", credentialType);
+		}
+
+		_userCredentialRepository.delete(credentialOptional.get());
+		log.info(
+			"Removed credential type={} userId={}", credentialType, userId);
+	}
+
+	@Transactional
+	public UserCredential updatePasswordCredential(
+		UUID userId, String plainPassword) {
+
+		Optional<UserCredential> credentialOptional =
+			_userCredentialRepository.findByUserIdAndType(userId, "PASSWORD");
+
+		if (credentialOptional.isEmpty()) {
+			throw new ResourceNotFoundException(
+				"UserCredential", "type", "PASSWORD");
+		}
+
+		UserCredential credential = credentialOptional.get();
+
+		credential.setPasswordHash(_passwordEncoder.encode(plainPassword));
+		credential.setPasswordAlgo("bcrypt");
+		credential.setPasswordChangedAt(LocalDateTime.now());
+
+		credential = _userCredentialRepository.save(credential);
+
+		log.info("Updated password credential userId={}", userId);
+
+		return credential;
+	}
+
+	@Transactional
+	public User updateUser(
+		UUID id, String firstName, String lastName, String displayName) {
+
+		User user = _getUser(id);
+
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		user.setDisplayName(displayName);
+
+		user = _userRepository.save(user);
+
+		log.info("Updated user id={}", id);
+
+		return user;
+	}
+
+	private Tenant _getTenant(UUID tenantId) {
+		Optional<Tenant> tenantOptional = _tenantRepository.findById(tenantId);
+
+		if (tenantOptional.isEmpty()) {
+			throw new ResourceNotFoundException("Tenant", "id", tenantId);
+		}
+
+		return tenantOptional.get();
+	}
+
+	private User _getUser(UUID id) {
+		Optional<User> userOptional = _userRepository.findById(id);
+
+		if (userOptional.isEmpty()) {
+			throw new ResourceNotFoundException("User", "id", id);
+		}
+
+		return userOptional.get();
+	}
+
+	private void _validateUserEmail(String email, UUID tenantId) {
+		boolean exists = _userRepository.existsByEmailAndTenantId(
+			email, tenantId);
+
+		if (exists) {
+			throw new ConflictException("User", "email", email);
+		}
+	}
+
+	private final PasswordEncoder _passwordEncoder;
+	private final TenantRepository _tenantRepository;
+	private final UserCredentialRepository _userCredentialRepository;
+
+	@Value("${easy-base.user.default-password:backToDust}")
+	private String _userDefaultPassword;
+
+	private final UserRepository _userRepository;
+
+}

@@ -6,7 +6,7 @@
 package com.easybase.core.data.engine.entity;
 
 import com.easybase.core.data.engine.enums.AttributeType;
-import com.easybase.infrastructure.data.entity.BaseEntity;
+import com.easybase.infrastructure.data.entity.SingleKeyBaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,7 +43,7 @@ import lombok.ToString;
 	}
 )
 @ToString(exclude = "collection")
-public class Attribute extends BaseEntity {
+public class Attribute extends SingleKeyBaseEntity {
 
 	@JoinColumn(
 		foreignKey = @ForeignKey(name = "fk_attribute_collection"),

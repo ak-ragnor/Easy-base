@@ -15,6 +15,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-auth-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-common-exception</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -27,7 +33,19 @@
 
 		<dependency>
 			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-context-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-infrastructure-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-security-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

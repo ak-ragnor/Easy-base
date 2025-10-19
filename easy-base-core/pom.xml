@@ -19,5 +19,7 @@
 		<module>easy-base-tenant</module>
 		<module>easy-base-data-engine</module>
 		<module>easy-base-user</module>
+		<module>easy-base-auth</module>
+		<module>easy-base-role</module>
 	</modules>
 </project>

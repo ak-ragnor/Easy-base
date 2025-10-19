@@ -29,6 +29,12 @@
 
 		<dependency>
 			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-infrastructure-auth</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-security-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
