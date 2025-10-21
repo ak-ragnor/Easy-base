@@ -26,6 +26,12 @@
 		</dependency>
 		<dependency>
 			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-common-util</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-context-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>

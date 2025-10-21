@@ -16,6 +16,8 @@ import com.easybase.core.user.repository.UserRepository;
 import com.easybase.core.user.service.UserLocalService;
 import com.easybase.infrastructure.auth.constants.SystemRoles;
 
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +30,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Initializer for creating default admin user.
+ * Initializer for creating default users.
  *
  * @author Akhash R
  */
@@ -43,10 +45,10 @@ public class UserInitializer implements ApplicationRunner {
 	public void run(ApplicationArguments args) {
 		log.info("=== Step 4: Default User Initialization ===");
 
-		Tenant defaultTenant = _tenantLocalService.getDefaultTenant();
+		Tenant tenant = _tenantLocalService.getDefaultTenant();
 
-		_createAdminUser(defaultTenant);
-		_createGuestUser(defaultTenant);
+		_createAdminUser(tenant);
+		_createGuestUser(tenant);
 
 		log.info("Default user initialization completed");
 	}
@@ -115,9 +117,10 @@ public class UserInitializer implements ApplicationRunner {
 		if (_userRepository.existsByEmailAndTenantId(email, tenant.getId())) {
 			log.info("Default user already exists: {}", email);
 
-			return _userRepository.findByEmailAndTenantId(
-				email, tenant.getId()
-			).orElseThrow();
+			Optional<User> user = _userRepository.findByEmailAndTenantId(
+				email, tenant.getId());
+
+			return user.orElseThrow();
 		}
 
 		try {

@@ -26,7 +26,10 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 
+import java.nio.charset.StandardCharsets;
+
 import java.security.KeyPair;
+import java.security.MessageDigest;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -113,7 +116,7 @@ public class JwtTokenServiceImpl implements TokenService {
 		).issuer(
 			_jwtProperties.getIssuer()
 		).subject(
-			"refresh"
+			SecurityConstants.REFRESH
 		).audience(
 		).add(
 			_jwtProperties.getAudience()
@@ -209,8 +212,9 @@ public class JwtTokenServiceImpl implements TokenService {
 			String tokenSessionId = claims.get(
 				SecurityConstants.JWT_CLAIM_SESSION_ID, String.class);
 
-			if (Objects.equals(sessionId, tokenSessionId) &&
-				Objects.equals("refresh", claims.getSubject())) {
+			if (_constantTimeEquals(sessionId, tokenSessionId) &&
+				_constantTimeEquals(
+					SecurityConstants.REFRESH, claims.getSubject())) {
 
 				return true;
 			}
@@ -220,6 +224,17 @@ public class JwtTokenServiceImpl implements TokenService {
 		catch (Exception exception) {
 			return false;
 		}
+	}
+
+	private boolean _constantTimeEquals(String a, String b) {
+		if ((a == null) || (b == null)) {
+			return false;
+		}
+
+		byte[] aBytes = a.getBytes(StandardCharsets.UTF_8);
+		byte[] bBytes = b.getBytes(StandardCharsets.UTF_8);
+
+		return MessageDigest.isEqual(aBytes, bBytes);
 	}
 
 	private JwtParser _createJwtParser() {
@@ -263,8 +278,6 @@ public class JwtTokenServiceImpl implements TokenService {
 			SecurityConstants.JWT_CLAIM_TENANT_ID, String.class);
 		String sessionId = claims.get(
 			SecurityConstants.JWT_CLAIM_SESSION_ID, String.class);
-
-		@SuppressWarnings("unchecked")
 		List<String> roles = claims.get(
 			SecurityConstants.JWT_CLAIM_ROLES, List.class);
 

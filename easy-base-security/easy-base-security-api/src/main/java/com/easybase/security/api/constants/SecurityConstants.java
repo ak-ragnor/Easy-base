@@ -30,6 +30,8 @@ public final class SecurityConstants {
 
 	public static final String JWT_ISSUER = "easy-base-auth";
 
+	public static final String REFRESH = "refresh";
+
 	private SecurityConstants() {
 	}
 

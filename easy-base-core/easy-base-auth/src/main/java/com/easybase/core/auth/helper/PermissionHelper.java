@@ -5,6 +5,7 @@
 
 package com.easybase.core.auth.helper;
 
+import com.easybase.common.util.ListUtil;
 import com.easybase.core.auth.entity.ResourceAction;
 import com.easybase.core.auth.service.ResourceActionLocalService;
 import com.easybase.core.auth.util.BitMaskUtil;
@@ -38,7 +39,7 @@ public class PermissionHelper {
 	public long calculatePermissionMask(
 		String resourceType, List<String> actionKeys) {
 
-		if ((actionKeys == null) || actionKeys.isEmpty()) {
+		if (ListUtil.isEmpty(actionKeys)) {
 			return 0L;
 		}
 
