@@ -3,6 +3,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# dependencies
+easy-base-admin-portal/node_modules/
+
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
