@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.easybase</groupId>
+		<artifactId>easy-base-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>easy-base-infrastructure</artifactId>
+	<packaging>pom</packaging>
+
+	<name>EasyBase Infrastructure</name>
+	<description>Infrastructure layer providing cross-cutting concerns like data access, security, and external integrations</description>
+
+	<modules>
+		<module>infrastructure-api</module>
+		<module>infrastructure-auth</module>
+		<module>infrastructure-data</module>
+		<module>infrastructure-web</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.easybase</groupId>
+				<artifactId>easy-base-infrastructure-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.easybase</groupId>
+				<artifactId>easy-base-infrastructure-auth</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.easybase</groupId>
+				<artifactId>easy-base-infrastructure-data</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.easybase</groupId>
+				<artifactId>easy-base-infrastructure-web</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>
