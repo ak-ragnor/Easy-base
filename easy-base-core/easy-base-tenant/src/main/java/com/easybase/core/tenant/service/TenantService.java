@@ -5,131 +5,101 @@
 
 package com.easybase.core.tenant.service;
 
-import com.easybase.common.exception.ConflictException;
-import com.easybase.common.exception.ResourceNotFoundException;
 import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.core.tenant.repository.TenantRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import lombok.RequiredArgsConstructor;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 /**
+ * External-facing service interface for tenant operations.
+ * Performs permission checks before delegating to TenantLocalService.
+ * Never performs persistence directly - always delegates to TenantLocalService.
+ *
  * @author Akhash R
  */
-@RequiredArgsConstructor
-@Service
-@Slf4j
-public class TenantService {
+public interface TenantService {
 
-	@Transactional
-	public Tenant createTenant(String name) {
-		boolean exists = _tenantRepository.existsByName(name);
+	/**
+	 * Creates a new tenant with the given name.
+	 * Requires TENANT:CREATE permission.
+	 *
+	 * @param name the tenant name
+	 * @return the created tenant
+	 * @throws com.easybase.common.exception.ConflictException if name already exists
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public Tenant createTenant(String name);
 
-		if (exists) {
-			throw new ConflictException("Tenant", "name", name);
-		}
+	/**
+	 * Soft deletes a tenant by ID.
+	 * Requires TENANT:DELETE permission.
+	 *
+	 * @param tenantId the tenant ID
+	 * @throws com.easybase.common.exception.ResourceNotFoundException if tenant not found
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public void deleteTenant(UUID tenantId);
 
-		Tenant tenant = new Tenant();
+	/**
+	 * Fetches a tenant by name (optional result).
+	 * No permission check - for internal use.
+	 *
+	 * @param name the tenant name
+	 * @return Optional containing the tenant if found
+	 */
+	public Optional<Tenant> fetchTenant(String name);
 
-		tenant.setName(name);
+	/**
+	 * Gets or creates the default tenant.
+	 * No permission check - for system use.
+	 *
+	 * @return the default tenant
+	 */
+	public Tenant getDefaultTenant();
 
-		return _tenantRepository.save(tenant);
-	}
+	/**
+	 * Gets a tenant by name.
+	 * Requires TENANT:VIEW permission.
+	 *
+	 * @param name the tenant name
+	 * @return the tenant
+	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public Tenant getTenant(String name);
 
-	@Transactional
-	public void deleteTenant(UUID tenantId) {
-		Optional<Tenant> tenantOptional = _tenantRepository.findById(tenantId);
+	/**
+	 * Gets a tenant by ID.
+	 * Requires TENANT:VIEW permission.
+	 *
+	 * @param id the tenant ID
+	 * @return the tenant
+	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public Tenant getTenant(UUID id);
 
-		if (tenantOptional.isEmpty()) {
-			throw new ResourceNotFoundException("Tenant", "id", tenantId);
-		}
+	/**
+	 * Gets all tenants.
+	 * Requires TENANT:LIST permission.
+	 *
+	 * @return list of all tenants
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public List<Tenant> getTenants();
 
-		Tenant tenant = tenantOptional.get();
-
-		tenant.setDeleted(true);
-
-		_tenantRepository.save(tenant);
-
-		log.info("Soft deleted tenant '{}' ({})", tenant.getName(), tenantId);
-	}
-
-	public Optional<Tenant> fetchTenant(String name) {
-		return _tenantRepository.findByName(name);
-	}
-
-	@Transactional
-	public Tenant getDefaultTenant() {
-		Optional<Tenant> tenantOptional = fetchTenant("default");
-
-		if (tenantOptional.isEmpty()) {
-			try {
-				return createTenant("default");
-			}
-			catch (ConflictException conflictException) {
-				tenantOptional = fetchTenant("default");
-
-				if (tenantOptional.isEmpty()) {
-					throw conflictException;
-				}
-			}
-		}
-
-		return tenantOptional.get();
-	}
-
-	public Tenant getTenant(String name) {
-		Optional<Tenant> tenantOptional = _tenantRepository.findByName(name);
-
-		if (tenantOptional.isEmpty()) {
-			throw new ResourceNotFoundException("Tenant", "name", name);
-		}
-
-		return tenantOptional.get();
-	}
-
-	public Tenant getTenant(UUID id) {
-		Optional<Tenant> tenantOptional = _tenantRepository.findById(id);
-
-		if (tenantOptional.isEmpty()) {
-			throw new ResourceNotFoundException("Tenant", "id", id);
-		}
-
-		return tenantOptional.get();
-	}
-
-	public List<Tenant> getTenants() {
-		return _tenantRepository.findAll();
-	}
-
-	@Transactional
-	public Tenant updateTenant(UUID id, String name) {
-		boolean exists = _tenantRepository.existsByName(name);
-
-		Tenant tenant = getTenant(id);
-
-		String tenantName = tenant.getName();
-
-		if (exists && !tenantName.equals(name)) {
-			throw new ConflictException("Tenant", "name", name);
-		}
-
-		tenant.setName(name);
-
-		tenant = _tenantRepository.save(tenant);
-
-		log.info("Updated tenant with ID {} to name '{}'", id, name);
-
-		return tenant;
-	}
-
-	private final TenantRepository _tenantRepository;
+	/**
+	 * Updates a tenant's name.
+	 * Requires TENANT:UPDATE permission.
+	 *
+	 * @param id the tenant ID
+	 * @param name the new name
+	 * @return the updated tenant
+	 * @throws com.easybase.common.exception.ResourceNotFoundException if tenant not found
+	 * @throws com.easybase.common.exception.ConflictException if name already exists
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public Tenant updateTenant(UUID id, String name);
 
 }

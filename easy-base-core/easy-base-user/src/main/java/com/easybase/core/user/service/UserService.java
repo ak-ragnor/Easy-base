@@ -5,301 +5,188 @@
 
 package com.easybase.core.user.service;
 
-import com.easybase.common.exception.ConflictException;
-import com.easybase.common.exception.ResourceNotFoundException;
-import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.core.tenant.repository.TenantRepository;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.entity.UserCredential;
-import com.easybase.core.user.repository.UserCredentialRepository;
-import com.easybase.core.user.repository.UserRepository;
-
-import java.time.LocalDateTime;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
-import lombok.RequiredArgsConstructor;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 /**
+ * External-facing service interface for user operations.
+ * Performs permission checks before delegating to UserLocalService.
+ * Never performs persistence directly - always delegates to UserLocalService.
+ *
  * @author Akhash R
  */
-@RequiredArgsConstructor
-@Service
-@Slf4j
-public class UserService {
+public interface UserService {
 
-	@Transactional
-	public void addDefaultPasswordCredential(UUID userId) {
-		addPasswordCredential(userId, _userDefaultPassword);
-	}
+	/**
+	 * Adds default password credential for a user.
+	 * Requires USER:UPDATE permission.
+	 *
+	 * @param userId the user ID
+	 * @throws com.easybase.common.exception.ConflictException if password credential already exists
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public void addDefaultPasswordCredential(UUID userId);
 
-	@Transactional
-	public void addPasswordCredential(UUID userId, String plainPassword) {
-		Optional<UserCredential> existingCredential =
-			_userCredentialRepository.findByUserIdAndType(userId, "PASSWORD");
+	/**
+	 * Adds password credential for a user.
+	 * Requires USER:UPDATE permission.
+	 *
+	 * @param userId the user ID
+	 * @param plainPassword the plain password
+	 * @throws com.easybase.common.exception.ConflictException if password credential already exists
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public void addPasswordCredential(UUID userId, String plainPassword);
 
-		if (existingCredential.isPresent()) {
-			throw new ConflictException("UserCredential", "type", "PASSWORD");
-		}
-
-		String passwordHash = _passwordEncoder.encode(plainPassword);
-
-		UserCredential userCredential = new UserCredential();
-
-		userCredential.setUser(_getUser(userId));
-		userCredential.setPasswordType("PASSWORD");
-		userCredential.setPasswordHash(passwordHash);
-		userCredential.setPasswordAlgo("bcrypt");
-		userCredential.setPasswordChangedAt(LocalDateTime.now());
-
-		_userCredentialRepository.save(userCredential);
-
-		log.info("Added password credential userId={}", userId);
-	}
-
-	@Transactional
+	/**
+	 * Adds a user credential.
+	 * Requires USER:UPDATE permission.
+	 *
+	 * @param userId the user ID
+	 * @param type the credential type
+	 * @param credentialData the credential data
+	 * @return the created credential
+	 * @throws com.easybase.common.exception.ConflictException if credential type already exists
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
 	public UserCredential addUserCredential(
-		UUID userId, String type, Map<String, Object> credentialData) {
+		UUID userId, String type, Map<String, Object> credentialData);
 
-		Optional<UserCredential> existingCredential =
-			_userCredentialRepository.findByUserIdAndType(userId, type);
+	/**
+	 * Authenticates a user with email and password.
+	 * No permission check - public authentication endpoint.
+	 *
+	 * @param email the user email
+	 * @param password the password
+	 * @param tenantId the tenant ID
+	 * @return the authenticated user
+	 * @throws com.easybase.common.exception.ResourceNotFoundException if authentication fails
+	 */
+	public User authenticateUser(String email, String password, UUID tenantId);
 
-		if (existingCredential.isPresent()) {
-			throw new ConflictException("UserCredential", "type", type);
-		}
-
-		UserCredential userCredential = new UserCredential();
-
-		userCredential.setUser(_getUser(userId));
-		userCredential.setPasswordType(type);
-		userCredential.setCredentialData(credentialData);
-
-		userCredential = _userCredentialRepository.save(userCredential);
-
-		log.info("Added credential type={} userId={}", type, userId);
-
-		return userCredential;
-	}
-
-	@Transactional(readOnly = true)
-	public User authenticateUser(String email, String password, UUID tenantId) {
-		User user;
-
-		try {
-			user = getUser(email, tenantId);
-		}
-		catch (ResourceNotFoundException resourceNotFoundException) {
-			throw new ResourceNotFoundException(
-				"Invalid credentials:" +
-					resourceNotFoundException.getMessage());
-		}
-
-		UserCredential credential = getUserCredential(user.getId(), "PASSWORD");
-
-		if (!_passwordEncoder.matches(password, credential.getPasswordHash())) {
-			throw new ResourceNotFoundException("Invalid credentials");
-		}
-
-		log.debug(
-			"Successfully authenticated user: {} for tenant: {}", email,
-			tenantId);
-
-		return user;
-	}
-
-	@Transactional
+	/**
+	 * Creates a new user.
+	 * Requires USER:CREATE permission.
+	 *
+	 * @param email the email
+	 * @param firstName the first name
+	 * @param lastName the last name
+	 * @param displayName the display name
+	 * @param tenantId the tenant ID
+	 * @return the created user
+	 * @throws com.easybase.common.exception.ConflictException if email already exists
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
 	public User createUser(
 		String email, String firstName, String lastName, String displayName,
-		UUID tenantId) {
+		UUID tenantId);
 
-		_validateUserEmail(email, tenantId);
+	/**
+	 * Soft deletes a user by ID.
+	 * Requires USER:DELETE permission.
+	 *
+	 * @param id the user ID
+	 * @throws com.easybase.common.exception.ResourceNotFoundException if user not found
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public void deleteUser(UUID id);
 
-		User user = new User();
+	/**
+	 * Gets a user by email and tenant.
+	 * Requires USER:VIEW permission.
+	 *
+	 * @param email the email
+	 * @param tenantId the tenant ID
+	 * @return the user
+	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public User getUser(String email, UUID tenantId);
 
-		user.setEmail(email);
-		user.setFirstName(firstName);
-		user.setLastName(lastName);
-		user.setDisplayName(displayName);
-		user.setTenant(_getTenant(tenantId));
+	/**
+	 * Gets a user by ID.
+	 * Requires USER:VIEW permission.
+	 *
+	 * @param id the user ID
+	 * @return the user
+	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public User getUser(UUID id);
 
-		user = _userRepository.save(user);
+	/**
+	 * Gets a user credential by type.
+	 * Requires USER:VIEW permission.
+	 *
+	 * @param userId the user ID
+	 * @param credentialType the credential type
+	 * @return the user credential
+	 * @throws com.easybase.common.exception.ResourceNotFoundException if not found
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public UserCredential getUserCredential(UUID userId, String credentialType);
 
-		addDefaultPasswordCredential(user.getId());
+	/**
+	 * Gets all user credentials.
+	 * Requires USER:VIEW permission.
+	 *
+	 * @param userId the user ID
+	 * @return list of credentials
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public List<UserCredential> getUserCredentials(UUID userId);
 
-		log.info(
-			"Created user with email={} id={} tenant={}", email, user.getId(),
-			tenantId);
+	/**
+	 * Gets all users for a tenant.
+	 * Requires USER:LIST permission.
+	 *
+	 * @param tenantId the tenant ID
+	 * @return list of users
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public List<User> getUsers(UUID tenantId);
 
-		return user;
-	}
+	/**
+	 * Removes a user credential.
+	 * Requires USER:UPDATE permission.
+	 *
+	 * @param userId the user ID
+	 * @param credentialType the credential type
+	 * @throws com.easybase.common.exception.ResourceNotFoundException if credential not found
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
+	public void removeUserCredential(UUID userId, String credentialType);
 
-	@Transactional
-	public void deleteUser(UUID id) {
-		User user = _getUser(id);
-
-		user.setDeleted(true);
-
-		_userRepository.save(user);
-
-		log.info("Soft deleted user id={}", id);
-	}
-
-	@Transactional(readOnly = true)
-	public User getUser(String email, UUID tenantId) {
-		Optional<User> userOptional =
-			_userRepository.findActiveByEmailAndTenantId(email, tenantId);
-
-		if (userOptional.isEmpty()) {
-			throw new ResourceNotFoundException("User", "email", email);
-		}
-
-		return userOptional.get();
-	}
-
-	@Transactional(readOnly = true)
-	public User getUser(UUID id) {
-		return _getUser(id);
-	}
-
-	@Transactional(readOnly = true)
-	public List<String> getUserAuthorities(UUID userId) {
-
-		// TODO: Implement proper role/authority system
-		// For now, return basic user role
-
-		return List.of("ROLE_USER");
-	}
-
-	@Transactional(readOnly = true)
-	public UserCredential getUserCredential(
-		UUID userId, String credentialType) {
-
-		Optional<UserCredential> credentialOptional =
-			_userCredentialRepository.findByUserIdAndType(
-				userId, credentialType);
-
-		if (credentialOptional.isEmpty()) {
-			throw new ResourceNotFoundException(
-				"UserCredential", "type", credentialType);
-		}
-
-		return credentialOptional.get();
-	}
-
-	@Transactional(readOnly = true)
-	public List<UserCredential> getUserCredentials(UUID userId) {
-		return _userCredentialRepository.findByUserId(userId);
-	}
-
-	@Transactional(readOnly = true)
-	public List<User> getUsers(UUID tenantId) {
-		return _userRepository.findActiveByTenantId(tenantId);
-	}
-
-	@Transactional
-	public void removeUserCredential(UUID userId, String credentialType) {
-		Optional<UserCredential> credentialOptional =
-			_userCredentialRepository.findByUserIdAndType(
-				userId, credentialType);
-
-		if (credentialOptional.isEmpty()) {
-			throw new ResourceNotFoundException(
-				"UserCredential", "type", credentialType);
-		}
-
-		_userCredentialRepository.delete(credentialOptional.get());
-		log.info(
-			"Removed credential type={} userId={}", credentialType, userId);
-	}
-
-	@Transactional
+	/**
+	 * Updates a password credential.
+	 * Requires USER:CHANGE_PASSWORD permission.
+	 *
+	 * @param userId the user ID
+	 * @param plainPassword the new password
+	 * @return the updated credential
+	 * @throws com.easybase.common.exception.ResourceNotFoundException if credential not found
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
 	public UserCredential updatePasswordCredential(
-		UUID userId, String plainPassword) {
+		UUID userId, String plainPassword);
 
-		Optional<UserCredential> credentialOptional =
-			_userCredentialRepository.findByUserIdAndType(userId, "PASSWORD");
-
-		if (credentialOptional.isEmpty()) {
-			throw new ResourceNotFoundException(
-				"UserCredential", "type", "PASSWORD");
-		}
-
-		UserCredential credential = credentialOptional.get();
-
-		credential.setPasswordHash(_passwordEncoder.encode(plainPassword));
-		credential.setPasswordAlgo("bcrypt");
-		credential.setPasswordChangedAt(LocalDateTime.now());
-
-		credential = _userCredentialRepository.save(credential);
-
-		log.info("Updated password credential userId={}", userId);
-
-		return credential;
-	}
-
-	@Transactional
+	/**
+	 * Updates user information.
+	 * Requires USER:UPDATE permission.
+	 *
+	 * @param id the user ID
+	 * @param firstName the first name
+	 * @param lastName the last name
+	 * @param displayName the display name
+	 * @return the updated user
+	 * @throws com.easybase.common.exception.ResourceNotFoundException if user not found
+	 * @throws com.easybase.common.exception.ForbiddenException if permission denied
+	 */
 	public User updateUser(
-		UUID id, String firstName, String lastName, String displayName) {
-
-		User user = _getUser(id);
-
-		user.setFirstName(firstName);
-		user.setLastName(lastName);
-		user.setDisplayName(displayName);
-
-		user = _userRepository.save(user);
-
-		log.info("Updated user id={}", id);
-
-		return user;
-	}
-
-	private Tenant _getTenant(UUID tenantId) {
-		Optional<Tenant> tenantOptional = _tenantRepository.findById(tenantId);
-
-		if (tenantOptional.isEmpty()) {
-			throw new ResourceNotFoundException("Tenant", "id", tenantId);
-		}
-
-		return tenantOptional.get();
-	}
-
-	private User _getUser(UUID id) {
-		Optional<User> userOptional = _userRepository.findById(id);
-
-		if (userOptional.isEmpty()) {
-			throw new ResourceNotFoundException("User", "id", id);
-		}
-
-		return userOptional.get();
-	}
-
-	private void _validateUserEmail(String email, UUID tenantId) {
-		boolean exists = _userRepository.existsByEmailAndTenantId(
-			email, tenantId);
-
-		if (exists) {
-			throw new ConflictException("User", "email", email);
-		}
-	}
-
-	private final PasswordEncoder _passwordEncoder;
-	private final TenantRepository _tenantRepository;
-	private final UserCredentialRepository _userCredentialRepository;
-
-	@Value("${easy-base.user.default-password:backToDust}")
-	private String _userDefaultPassword;
-
-	private final UserRepository _userRepository;
+		UUID id, String firstName, String lastName, String displayName);
 
 }

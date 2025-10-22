@@ -8,14 +8,18 @@ package com.easybase.context.core.resolver;
 import com.easybase.context.api.domain.UserInfo;
 import com.easybase.context.api.port.AbstractDefaultResolver;
 import com.easybase.context.api.port.UserInfoResolver;
+import com.easybase.core.tenant.entity.Tenant;
+import com.easybase.core.tenant.service.TenantLocalService;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +28,8 @@ import org.springframework.stereotype.Component;
  * from the database using UserRepository. Uses AbstractDefaultResolver template
  * to eliminate code duplication.
  *
- * <p>This resolver provides lazy loading of user roles and scopes and handles
- * anonymous users when no user data is found.</p>
+ * <p>This resolver provides lazy loading of user roles and scopes and returns
+ * the guest user when no user data is found.</p>
  *
  * @author Akhash R
  */
@@ -37,7 +41,23 @@ public class DefaultUserInfoResolver
 
 	@Override
 	protected UserInfo createAnonymousInstance() {
-		return UserInfo.anonymous();
+		Tenant tenant = _tenantLocalService.getDefaultTenant();
+
+		Optional<User> optionalGuestUser =
+			_userRepository.findActiveByEmailAndTenantId(
+				_guestEmail, tenant.getId());
+
+		User guestUser;
+
+		if (optionalGuestUser.isPresent()) {
+			guestUser = optionalGuestUser.get();
+		}
+		else {
+			throw new IllegalStateException(
+				"Guest user not found. Ensure UserInitializer ran successfully.");
+		}
+
+		return toInfo(guestUser);
 	}
 
 	@Override
@@ -75,6 +95,10 @@ public class DefaultUserInfoResolver
 		return List.of();
 	}
 
+	@Value("${easy-base.guest.email:guest@easybase.com}")
+	private String _guestEmail;
+
+	private final TenantLocalService _tenantLocalService;
 	private final UserRepository _userRepository;
 
 }

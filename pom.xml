@@ -18,6 +18,7 @@
 		<module>easy-base-security</module>
 		<module>easy-base-context</module>
 		<module>easy-base-infrastructure</module>
+		<module>easy-base-initializer</module>
 	</modules>
 
 	<properties>
@@ -27,6 +28,8 @@
 		<maven.compiler.target>17</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<liferay.source.formatter.version>1.0.1193</liferay.source.formatter.version>
+		<skipTests>true</skipTests>
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
 
 	<dependencyManagement>
@@ -91,6 +94,20 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>format-sources-build</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<parameters>true</parameters>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

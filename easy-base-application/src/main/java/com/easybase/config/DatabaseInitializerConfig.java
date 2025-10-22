@@ -6,9 +6,9 @@
 package com.easybase.config;
 
 import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.core.tenant.service.TenantService;
+import com.easybase.core.tenant.service.TenantLocalService;
 import com.easybase.core.user.entity.User;
-import com.easybase.core.user.service.UserService;
+import com.easybase.core.user.service.UserLocalService;
 
 import jakarta.annotation.PostConstruct;
 
@@ -38,7 +38,7 @@ public class DatabaseInitializerConfig {
 	@PostConstruct
 	public void initializeDefaultData() {
 		try {
-			Tenant tenant = _tenantService.getDefaultTenant();
+			Tenant tenant = _tenantLocalService.getDefaultTenant();
 
 			log.info("Default tenant initialized: {}", tenant.getName());
 
@@ -81,7 +81,7 @@ public class DatabaseInitializerConfig {
 	@Value("${easy-base.initialization.admin-user.password:admin123}")
 	private String _adminPassword;
 
-	private final TenantService _tenantService;
-	private final UserService _userService;
+	private final TenantLocalService _tenantLocalService;
+	private final UserLocalService _userService;
 
 }

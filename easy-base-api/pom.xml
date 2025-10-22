@@ -17,5 +17,7 @@
 		<module>easy-base-data-engine-api</module>
 		<module>easy-base-system-api</module>
 		<module>easy-base-user-api</module>
+		<module>easy-base-auth-api</module>
+		<module>easy-base-role-api</module>
 	</modules>
 </project>

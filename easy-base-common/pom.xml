@@ -16,5 +16,6 @@
 
 	<modules>
 		<module>easy-base-common-exception</module>
+		<module>easy-base-common-util</module>
 	</modules>
 </project>
