@@ -1,8 +1,8 @@
-import { Layers } from 'lucide-react';
+import { Layers } from 'lucide-react'
 
-import { LoginForm } from './components/login-form';
+import { LoginForm } from './components/login-form'
 
-import './App.css';
+import './App.css'
 
 const App = () => {
   return (
@@ -23,7 +23,7 @@ const App = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
