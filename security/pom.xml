@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.easybase</groupId>
+		<artifactId>easy-base-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>easy-base-security</artifactId>
+	<packaging>pom</packaging>
+
+	<name>EasyBase Security</name>
+	<description>Security and authentication module for EasyBase Platform</description>
+
+	<modules>
+		<module>security-api</module>
+		<module>security-core</module>
+		<module>security-jwt</module>
+		<module>security-session</module>
+		<module>security-web</module>
+		<module>security-starter</module>
+		<module>security-test</module>
+	</modules>
+</project>
