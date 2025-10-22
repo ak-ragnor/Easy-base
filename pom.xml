@@ -11,14 +11,13 @@
 	<description>Parent POM for EasyBase Platform</description>
 
 	<modules>
-		<module>easy-base-core</module>
-		<module>easy-base-api</module>
-		<module>easy-base-application</module>
-		<module>easy-base-common</module>
-		<module>easy-base-security</module>
-		<module>easy-base-context</module>
-		<module>easy-base-infrastructure</module>
-		<module>easy-base-initializer</module>
+		<module>core</module>
+		<module>headless</module>
+		<module>application</module>
+		<module>commons</module>
+		<module>security</module>
+		<module>context</module>
+		<module>infrastructure</module>
 	</modules>
 
 	<properties>
