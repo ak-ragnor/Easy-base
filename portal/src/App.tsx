@@ -1,16 +1,14 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Layers } from 'lucide-react'
+
 import { LoginForm } from './components/login-form'
-import { GalleryVerticalEnd, Layers } from 'lucide-react'
 
-function App() {
+import './App.css'
 
+const App = () => {
   return (
     <div className="grid min-h-svh lg:grid-cols-1">
       <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex p-4 justify-center gap-2 md:justify-start">
+        <div className="flex justify-center gap-2 p-4 md:justify-start">
           <a href="#" className="flex items-center gap-2 font-medium">
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
               <Layers className="size-4" />
@@ -24,7 +22,6 @@ function App() {
           </div>
         </div>
       </div>
-      
     </div>
   )
 }
