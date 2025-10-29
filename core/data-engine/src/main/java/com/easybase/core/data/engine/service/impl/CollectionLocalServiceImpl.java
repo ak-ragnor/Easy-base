@@ -7,8 +7,10 @@ package com.easybase.core.data.engine.service.impl;
 
 import com.easybase.common.exception.ConflictException;
 import com.easybase.common.exception.ResourceNotFoundException;
+import com.easybase.core.auth.constants.ResourceActionConstants;
 import com.easybase.core.auth.entity.ResourceAction;
 import com.easybase.core.auth.service.ResourceActionLocalService;
+import com.easybase.core.auth.util.ActionKeyUtil;
 import com.easybase.core.data.engine.entity.Attribute;
 import com.easybase.core.data.engine.entity.Collection;
 import com.easybase.core.data.engine.repository.CollectionRepository;
@@ -244,11 +246,11 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 	private void _createResourceActions(String collectionName) {
 		String resourceType = collectionName.toUpperCase();
 
-		String[] actions = {"CREATE", "READ", "UPDATE", "DELETE"};
 		int bitValue = 1;
 
-		for (String action : actions) {
-			String actionKey = resourceType + ":" + action;
+		for (String action : ResourceActionConstants.CRUD_ACTIONS) {
+
+			String actionKey = ActionKeyUtil.getActionKey(resourceType, action);;
 
 			if (!_resourceActionLocalService.resourceActionExists(
 					resourceType, actionKey)) {
