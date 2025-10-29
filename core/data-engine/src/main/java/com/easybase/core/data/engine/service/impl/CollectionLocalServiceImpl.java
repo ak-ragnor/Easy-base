@@ -7,6 +7,10 @@ package com.easybase.core.data.engine.service.impl;
 
 import com.easybase.common.exception.ConflictException;
 import com.easybase.common.exception.ResourceNotFoundException;
+import com.easybase.core.auth.constants.ResourceActionConstants;
+import com.easybase.core.auth.entity.ResourceAction;
+import com.easybase.core.auth.service.ResourceActionLocalService;
+import com.easybase.core.auth.util.ActionKeyUtil;
 import com.easybase.core.data.engine.entity.Attribute;
 import com.easybase.core.data.engine.entity.Collection;
 import com.easybase.core.data.engine.repository.CollectionRepository;
@@ -38,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Implementation of {@link CollectionLocalService}.
  * Contains all business logic, repository calls, and transaction management.
- * Does NOT perform permission checks.
  *
  * @author Akhash R
  */
@@ -89,6 +92,8 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 			}
 		}
 
+		_createResourceActions(collectionName);
+
 		log.info(
 			"Created collection name={} tenant={}", collectionName, tenantId);
 
@@ -100,6 +105,8 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 		Collection collection = _getCollection(collectionId);
 
 		Tenant tenant = collection.getTenant();
+
+		_deleteResourceActions(collection.getName());
 
 		_tableManager.dropTableIfExists(
 			TenantSchemaUtil.getSchema(tenant.getId()),
@@ -236,6 +243,46 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 		return collection;
 	}
 
+	private void _createResourceActions(String collectionName) {
+		String resourceType = collectionName.toUpperCase();
+
+		int bitValue = 1;
+
+		for (String action : ResourceActionConstants.CRUD_ACTIONS) {
+			String actionKey = ActionKeyUtil.getActionKey(resourceType, action);
+
+			if (!_resourceActionLocalService.resourceActionExists(
+					resourceType, actionKey)) {
+
+				_resourceActionLocalService.createResourceAction(
+					resourceType, actionKey, action, bitValue,
+					action + " permission for " + collectionName +
+						" collection");
+
+				log.debug(
+					"Created resource action: {} with bit value: {}", actionKey,
+					bitValue);
+			}
+
+			bitValue = bitValue << 1;
+		}
+	}
+
+	private void _deleteResourceActions(String collectionName) {
+		String resourceType = collectionName.toUpperCase();
+
+		List<ResourceAction> resourceActions =
+			_resourceActionLocalService.getResourceActions(resourceType);
+
+		for (ResourceAction resourceAction : resourceActions) {
+			_resourceActionLocalService.deleteResourceAction(
+				resourceAction.getId());
+
+			log.debug(
+				"Deleted resource action: {}", resourceAction.getActionKey());
+		}
+	}
+
 	private Collection _getCollection(UUID collectionId) {
 		var collectionOptional = _collectionRepository.findById(collectionId);
 
@@ -275,6 +322,7 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 
 	private final CollectionRepository _collectionRepository;
 	private final IndexManager _indexManager;
+	private final ResourceActionLocalService _resourceActionLocalService;
 	private final TableManager _tableManager;
 	private final TenantRepository _tenantRepository;
 

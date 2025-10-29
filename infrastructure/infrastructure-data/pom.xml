@@ -15,13 +15,6 @@
 	<description>Data infrastructure layer providing common repository patterns, database configuration, and data access abstractions</description>
 
 	<dependencies>
-		<!-- Base entity from common-data -->
-		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-common-data</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- Spring Data JPA -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
