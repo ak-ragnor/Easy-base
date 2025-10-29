@@ -36,28 +36,33 @@ public class DataRecordServiceImpl implements DataRecordService {
 	@Override
 	public DataRecord createRecord(
 		UUID tenantId, String table, Map<String, Object> data) {
-		_permissionChecker.check(ActionKeyUtil.getActionKey(table, ResourceActionConstants.CREATE));
+
+		_permissionChecker.check(
+			ActionKeyUtil.getActionKey(table, ResourceActionConstants.CREATE));
 
 		return _dataRecordLocalService.createRecord(tenantId, table, data);
 	}
 
 	@Override
 	public void deleteRecord(UUID tenantId, String table, UUID id) {
-		_permissionChecker.check(ActionKeyUtil.getActionKey(table, ResourceActionConstants.DELETE));
+		_permissionChecker.check(
+			ActionKeyUtil.getActionKey(table, ResourceActionConstants.DELETE));
 
 		_dataRecordLocalService.deleteRecord(tenantId, table, id);
 	}
 
 	@Override
 	public DataRecord getRecord(UUID tenantId, String table, UUID id) {
-		_permissionChecker.check(ActionKeyUtil.getActionKey(table, ResourceActionConstants.READ));
+		_permissionChecker.check(
+			ActionKeyUtil.getActionKey(table, ResourceActionConstants.READ));
 
 		return _dataRecordLocalService.getRecord(tenantId, table, id);
 	}
 
 	@Override
 	public List<DataRecord> getRecords(UUID tenantId, String table) {
-		_permissionChecker.check(ActionKeyUtil.getActionKey(table, ResourceActionConstants.READ));
+		_permissionChecker.check(
+			ActionKeyUtil.getActionKey(table, ResourceActionConstants.READ));
 
 		return _dataRecordLocalService.getRecords(tenantId, table);
 	}
@@ -65,7 +70,9 @@ public class DataRecordServiceImpl implements DataRecordService {
 	@Override
 	public DataRecord updateRecord(
 		UUID tenantId, String table, UUID id, Map<String, Object> data) {
-		_permissionChecker.check(ActionKeyUtil.getActionKey(table, ResourceActionConstants.UPDATE));
+
+		_permissionChecker.check(
+			ActionKeyUtil.getActionKey(table, ResourceActionConstants.UPDATE));
 
 		return _dataRecordLocalService.updateRecord(tenantId, table, id, data);
 	}

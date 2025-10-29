@@ -249,8 +249,7 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 		int bitValue = 1;
 
 		for (String action : ResourceActionConstants.CRUD_ACTIONS) {
-
-			String actionKey = ActionKeyUtil.getActionKey(resourceType, action);;
+			String actionKey = ActionKeyUtil.getActionKey(resourceType, action);
 
 			if (!_resourceActionLocalService.resourceActionExists(
 					resourceType, actionKey)) {
