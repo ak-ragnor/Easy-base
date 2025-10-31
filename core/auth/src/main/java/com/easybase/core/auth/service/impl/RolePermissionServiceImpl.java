@@ -184,8 +184,6 @@ public class RolePermissionServiceImpl implements RolePermissionService {
 			roleId, resourceType, bitValue);
 	}
 
-	// High-level action key based methods
-
 	@Override
 	public RolePermission removePermission(
 		UUID roleId, String resourceType, int bitValue) {
