@@ -18,7 +18,8 @@
 		<module>security</module>
 		<module>context</module>
 		<module>infrastructure</module>
-	</modules>
+		<module>file-system</module>
+    </modules>
 
 	<properties>
 		<java.version>17</java.version>
