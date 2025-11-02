@@ -21,10 +21,8 @@ import org.xml.sax.SAXException;
  */
 public class DefaultFileProcessor implements BaseFileProcessor {
 
-	BaseDataExtractor dataExtractor;
-
-	public DefaultFileProcessor(BaseDataExtractor _dataExtractor) {
-		this.dataExtractor = _dataExtractor;
+	public DefaultFileProcessor(BaseDataExtractor dataExtractor) {
+		this.dataExtractor = dataExtractor;
 	}
 
 	@Override
@@ -33,5 +31,7 @@ public class DefaultFileProcessor implements BaseFileProcessor {
 
 		dataExtractor.extract(file.getInputStream());
 	}
+
+	private BaseDataExtractor dataExtractor;
 
 }

@@ -7,10 +7,15 @@ package com.easybase.fs.api.processor.stategy.asset;
 
 import com.easybase.fs.api.processor.base.BaseAssetCreator;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import java.util.Objects;
 
@@ -44,7 +49,7 @@ public class ImageThumbnailCreator implements BaseAssetCreator {
 			io.transferTo(out);
 		}
 
-		BufferedImage preview = resizeImage(originalImage, 800);
+		BufferedImage preview = _resizeImage(originalImage, 800);
 
 		try (OutputStream previewFile = new FileOutputStream(
 				path + "/" + file.getName() + "_preview.png")) {
@@ -52,7 +57,7 @@ public class ImageThumbnailCreator implements BaseAssetCreator {
 			ImageIO.write(preview, "png", previewFile);
 		}
 
-		BufferedImage thumbnail = resizeImage(originalImage, 150);
+		BufferedImage thumbnail = _resizeImage(originalImage, 150);
 
 		try (OutputStream thumbnailFile = new FileOutputStream(
 				path + "/" + file.getName() + "_thumbnail.png")) {
@@ -61,8 +66,12 @@ public class ImageThumbnailCreator implements BaseAssetCreator {
 		}
 	}
 
-	private BufferedImage resizeImage(BufferedImage original, int targetWidth) {
-		double aspectRatio = (double)original.getHeight() / original.getWidth();
+	private BufferedImage _resizeImage(
+		BufferedImage originalImage, int targetWidth) {
+
+		double aspectRatio =
+			(double)originalImage.getHeight() / originalImage.getWidth();
+
 		int targetHeight = (int)(targetWidth * aspectRatio);
 
 		BufferedImage resized = new BufferedImage(
@@ -78,7 +87,7 @@ public class ImageThumbnailCreator implements BaseAssetCreator {
 		g2d.setRenderingHint(
 			RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		g2d.drawImage(original, 0, 0, targetWidth, targetHeight, null);
+		g2d.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
 		g2d.dispose();
 
 		return resized;

@@ -22,14 +22,11 @@ import org.xml.sax.SAXException;
  */
 public class RegularFileProcessor implements BaseFileProcessor {
 
-	BaseDataExtractor dataExtractor;
-	BaseAssetCreator assetCreator;
-
 	public RegularFileProcessor(
-		BaseDataExtractor _dataExtractor, BaseAssetCreator _assetCreator) {
+		BaseDataExtractor dataExtractor, BaseAssetCreator assetCreator) {
 
-		this.assetCreator = _assetCreator;
-		this.dataExtractor = _dataExtractor;
+		this.dataExtractor = dataExtractor;
+		this.assetCreator = assetCreator;
 	}
 
 	@Override
@@ -39,5 +36,8 @@ public class RegularFileProcessor implements BaseFileProcessor {
 		dataExtractor.extract(file.getInputStream());
 		assetCreator.createAsset(file, path);
 	}
+
+	private BaseAssetCreator assetCreator;
+	private BaseDataExtractor dataExtractor;
 
 }

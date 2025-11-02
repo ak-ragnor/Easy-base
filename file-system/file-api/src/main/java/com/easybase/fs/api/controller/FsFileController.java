@@ -16,7 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.tika.exception.TikaException;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.xml.sax.SAXException;
@@ -37,13 +41,11 @@ public class FsFileController {
 				id)
 		throws IOException, SAXException, TikaException {
 
-		//Extract path from the folder id
-		String path = "/file_system";
-		//perform all necessary checks
-		//save to db and return back the id
-		long fileId = 12345;
 		BaseFileProcessor fileProcessor = FileProcessorFactory.getFileProcessor(
 			file);
+
+		String path = "/file_system";
+		long fileId = 12345;
 
 		fileProcessor.process(file, path + "/" + fileId);
 	}

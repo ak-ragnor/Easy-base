@@ -33,10 +33,10 @@ public class DataExtractor implements BaseDataExtractor {
 		throws IOException, SAXException, TikaException {
 
 		AutoDetectParser parser = new AutoDetectParser();
-		BodyContentHandler handler = new BodyContentHandler();
+
 		Metadata metadata = new Metadata();
 
-		parser.parse(io, handler, metadata);
+		parser.parse(io, new BodyContentHandler(), metadata);
 
 		Map<String, String> data = new HashMap<>(
 			(int)(metadata.size() / 0.75) + 1);

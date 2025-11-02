@@ -18,56 +18,57 @@
 	<description>Authorization and RBAC API for Easy Base</description>
 
 	<dependencies>
-		<!-- EasyBase Dependencies -->
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-auth</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-common-exception</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-context-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-infrastructure-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-common-util</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-security-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Spring Web -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
-		<!-- Jakarta Validation -->
 		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>
 		</dependency>
 
-		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
-			<groupId>com.easybase</groupId>
-			<artifactId>easy-base-common-util</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-			<scope>compile</scope>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 	</dependencies>
 
