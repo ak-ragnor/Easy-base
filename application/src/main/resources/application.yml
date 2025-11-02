@@ -31,7 +31,7 @@ spring:
         driver-class-name: org.postgresql.Driver
         password: root
         url: jdbc:postgresql://localhost:5432/easybase
-        username: postgres
+        username: root
     jackson:
         deserialization:
             fail-on-unknown-properties: false
