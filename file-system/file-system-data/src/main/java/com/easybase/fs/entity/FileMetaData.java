@@ -1,9 +1,12 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 package com.easybase.fs.entity;
 
 /**
  * @author Saura
- * Date:02/11/25
- * Time:12:34 pm
  */
 public class FileMetaData {
 }

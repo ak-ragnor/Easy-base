@@ -1,3 +1,8 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 package com.easybase.fs.api.processor.factory;
 
 import com.easybase.fs.api.processor.DefaultFileProcessor;
@@ -11,8 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Saura
- * Date:01/11/25
- * Time:7:19 pm
  */
 public class FileProcessorFactory {
     public static BaseFileProcessor getFileProcessor(MultipartFile file){

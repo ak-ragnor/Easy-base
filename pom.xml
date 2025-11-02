@@ -19,7 +19,7 @@
 		<module>context</module>
 		<module>infrastructure</module>
 		<module>file-system</module>
-    </modules>
+	</modules>
 
 	<properties>
 		<java.version>17</java.version>
