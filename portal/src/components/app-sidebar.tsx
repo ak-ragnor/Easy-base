@@ -31,41 +31,27 @@ import {
 const data = {
   navMain: [
     {
-      title: "Playground",
-      url: "#",
+      title: "Dashboard",
+      url: "/dashboard",
       icon: SquareTerminal,
       isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
     },
     {
-      title: "Models",
-      url: "#",
-      icon: Bot,
+      title: "Settings",
+      url: "/settings",
+      icon: Settings2,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "General",
+          url: "/settings",
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "Team",
+          url: "/settings/team",
         },
         {
-          title: "Quantum",
-          url: "#",
+          title: "Billing",
+          url: "/settings/billing",
         },
       ],
     },
@@ -83,34 +69,7 @@ const data = {
           url: "#",
         },
         {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
+          title: "API Reference",
           url: "#",
         },
       ],
