@@ -6,6 +6,8 @@
 package com.easybase.security.core.service;
 
 import com.easybase.core.role.service.RoleLocalService;
+import com.easybase.core.tenant.entity.Tenant;
+import com.easybase.core.tenant.service.TenantLocalService;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.service.UserService;
 import com.easybase.security.api.dto.AuthenticatedPrincipalData;
@@ -105,14 +107,21 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 	public AuthenticatedPrincipalData authenticateCredentials(
 		LoginRequest loginRequest) {
 
+		UUID tenantId = loginRequest.getTenantId();
+
+		if (tenantId == null) {
+			Tenant defaultTenant = _tenantLocalService.getDefaultTenant();
+
+			tenantId = defaultTenant.getId();
+		}
+
 		User user = _userService.authenticateUser(
-			loginRequest.getUserName(), loginRequest.getPassword(),
-			loginRequest.getTenantId());
+			loginRequest.getUserName(), loginRequest.getPassword(), tenantId);
 
 		CreateSessionRequest sessionRequest = new CreateSessionRequest();
 
 		sessionRequest.setUserId(user.getId());
-		sessionRequest.setTenantId(loginRequest.getTenantId());
+		sessionRequest.setTenantId(tenantId);
 		sessionRequest.setTtl(_sessionProperties.getDefaultTtl());
 		sessionRequest.setClientIp(loginRequest.getClientIp());
 		sessionRequest.setUserAgent(loginRequest.getUserAgent());
@@ -205,6 +214,7 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 	private final RoleLocalService _roleLocalService;
 	private final SessionProperties _sessionProperties;
 	private final SessionService _sessionService;
+	private final TenantLocalService _tenantLocalService;
 	private final TokenService _tokenService;
 	private final UserService _userService;
 

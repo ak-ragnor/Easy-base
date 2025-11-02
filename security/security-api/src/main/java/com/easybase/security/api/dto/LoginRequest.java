@@ -82,7 +82,6 @@ public class LoginRequest {
 	@NotBlank
 	private String password;
 
-	@NotNull
 	private UUID tenantId;
 
 	private String userAgent;
