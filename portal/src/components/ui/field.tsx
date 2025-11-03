@@ -1,10 +1,10 @@
-import { useMemo } from 'react'
+import { useMemo } from 'react';
 
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority';
 
-import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 
 const FieldSet = ({ className, ...props }: React.ComponentProps<'fieldset'>) => {
   return (
@@ -17,8 +17,8 @@ const FieldSet = ({ className, ...props }: React.ComponentProps<'fieldset'>) => 
       )}
       {...props}
     />
-  )
-}
+  );
+};
 
 const FieldLegend = ({
   className,
@@ -37,8 +37,8 @@ const FieldLegend = ({
       )}
       {...props}
     />
-  )
-}
+  );
+};
 
 const FieldGroup = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
@@ -50,8 +50,8 @@ const FieldGroup = ({ className, ...props }: React.ComponentProps<'div'>) => {
       )}
       {...props}
     />
-  )
-}
+  );
+};
 
 const fieldVariants = cva('group/field flex w-full gap-3 data-[invalid=true]:text-destructive', {
   variants: {
@@ -72,7 +72,7 @@ const fieldVariants = cva('group/field flex w-full gap-3 data-[invalid=true]:tex
   defaultVariants: {
     orientation: 'vertical',
   },
-})
+});
 
 const Field = ({
   className,
@@ -87,8 +87,8 @@ const Field = ({
       className={cn(fieldVariants({ orientation }), className)}
       {...props}
     />
-  )
-}
+  );
+};
 
 const FieldContent = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
@@ -97,8 +97,8 @@ const FieldContent = ({ className, ...props }: React.ComponentProps<'div'>) => {
       className={cn('group/field-content flex flex-1 flex-col gap-1.5 leading-snug', className)}
       {...props}
     />
-  )
-}
+  );
+};
 
 const FieldLabel = ({ className, ...props }: React.ComponentProps<typeof Label>) => {
   return (
@@ -112,8 +112,8 @@ const FieldLabel = ({ className, ...props }: React.ComponentProps<typeof Label>)
       )}
       {...props}
     />
-  )
-}
+  );
+};
 
 const FieldTitle = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
@@ -125,8 +125,8 @@ const FieldTitle = ({ className, ...props }: React.ComponentProps<'div'>) => {
       )}
       {...props}
     />
-  )
-}
+  );
+};
 
 const FieldDescription = ({ className, ...props }: React.ComponentProps<'p'>) => {
   return (
@@ -140,15 +140,15 @@ const FieldDescription = ({ className, ...props }: React.ComponentProps<'p'>) =>
       )}
       {...props}
     />
-  )
-}
+  );
+};
 
 const FieldSeparator = ({
   children,
   className,
   ...props
 }: React.ComponentProps<'div'> & {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }) => {
   return (
     <div
@@ -170,8 +170,8 @@ const FieldSeparator = ({
         </span>
       )}
     </div>
-  )
-}
+  );
+};
 
 const FieldError = ({
   className,
@@ -179,30 +179,30 @@ const FieldError = ({
   errors,
   ...props
 }: React.ComponentProps<'div'> & {
-  errors?: Array<{ message?: string } | undefined>
+  errors?: Array<{ message?: string } | undefined>;
 }) => {
   const content = useMemo(() => {
     if (children) {
-      return children
+      return children;
     }
 
     if (!errors?.length) {
-      return null
+      return null;
     }
 
     if (errors?.length === 1) {
-      return errors[0]?.message
+      return errors[0]?.message;
     }
 
     return (
       <ul className="ml-4 flex list-disc flex-col gap-1">
         {errors.map((error, index) => error?.message && <li key={index}>{error.message}</li>)}
       </ul>
-    )
-  }, [children, errors])
+    );
+  }, [children, errors]);
 
   if (!content) {
-    return null
+    return null;
   }
 
   return (
@@ -214,8 +214,8 @@ const FieldError = ({
     >
       {content}
     </div>
-  )
-}
+  );
+};
 
 export {
   Field,
@@ -228,4 +228,4 @@ export {
   FieldSeparator,
   FieldSet,
   FieldTitle,
-}
+};

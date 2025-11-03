@@ -1,9 +1,11 @@
-import axios, { AxiosError } from 'axios';
+import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
+
 import type { AuthError } from '../types/auth';
 
 // Create axios instance with base configuration
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL as string,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,14 +14,14 @@ const apiClient = axios.create({
 
 // Request interceptor - attach access token to all requests
 apiClient.interceptors.request.use(
-  (config: any) => {
+  (config: InternalAxiosRequestConfig) => {
     // Get token from localStorage (Zustand persists it there)
     const authStorage = localStorage.getItem('auth-storage');
 
     if (authStorage) {
       try {
-        const { state } = JSON.parse(authStorage);
-        const accessToken = state?.accessToken;
+        const parsed = JSON.parse(authStorage) as { state?: { accessToken?: string } };
+        const accessToken = parsed.state?.accessToken;
 
         if (accessToken && config.headers) {
           config.headers.Authorization = `Bearer ${accessToken}`;
@@ -29,34 +31,18 @@ apiClient.interceptors.request.use(
       }
     }
 
-    // Log requests in development
-    if (import.meta.env.DEV) {
-      console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`, config.data);
-    }
-
     return config;
   },
-  (error) => {
+  error => {
     console.error('[API] Request error:', error);
-    return Promise.reject(error);
+    return Promise.reject(new Error(String(error)));
   }
 );
 
 // Response interceptor - handle errors globally
 apiClient.interceptors.response.use(
-  (response) => {
-    // Log responses in development
-    if (import.meta.env.DEV) {
-      console.log(`[API] Response ${response.status}:`, response.data);
-    }
-    return response;
-  },
+  response => response,
   (error: AxiosError<AuthError>) => {
-    // Log errors in development
-    if (import.meta.env.DEV) {
-      console.error('[API] Response error:', error.response?.data || error.message);
-    }
-
     // Handle 401 Unauthorized - will be handled by Zustand store
     if (error.response?.status === 401) {
       // Don't auto-logout here - let the store handle it
@@ -70,17 +56,17 @@ apiClient.interceptors.response.use(
         message: 'Network error - please check your connection',
         code: 'NETWORK_ERROR',
       };
-      return Promise.reject(networkError);
+      return Promise.reject(new Error(networkError.message));
     }
 
     // Handle other errors
     const authError: AuthError = {
-      message: error.response.data?.message || error.message || 'An error occurred',
+      message: error.response.data?.message ?? error.message ?? 'An error occurred',
       code: error.response.data?.code,
       status: error.response.status,
     };
 
-    return Promise.reject(authError);
+    return Promise.reject(new Error(authError.message));
   }
 );
 

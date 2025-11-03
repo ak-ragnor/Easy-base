@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
+
 import { AppSidebar } from '@/components/app-sidebar';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 /**
  * MainLayout - Layout with sidebar for authenticated pages

@@ -1,5 +1,3 @@
-import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Separator } from '@/components/ui/separator';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,7 +5,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+} from '@/components/ui/breadcrumb.tsx';
+import { Separator } from '@/components/ui/separator.tsx';
+import { SidebarTrigger } from '@/components/ui/sidebar.tsx';
 
 interface BreadcrumbItem {
   label: string;
@@ -37,9 +37,7 @@ export const PageHeader = ({ breadcrumbs }: PageHeaderProps) => {
                   {index === breadcrumbs.length - 1 ? (
                     <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
                   ) : (
-                    <BreadcrumbLink href={crumb.href || '#'}>
-                      {crumb.label}
-                    </BreadcrumbLink>
+                    <BreadcrumbLink href={crumb.href ?? '#'}>{crumb.label}</BreadcrumbLink>
                   )}
                 </BreadcrumbItem>
               </div>

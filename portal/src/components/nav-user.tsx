@@ -1,18 +1,7 @@
-import { useNavigate } from "react-router-dom"
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react"
+import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,46 +10,48 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { useAuthStore } from "@/stores/auth-store"
+} from '@/components/ui/sidebar';
+import { useAuthStore } from '@/pages/auth/stores/auth-store';
 
-export function NavUser() {
-  const { isMobile } = useSidebar()
-  const navigate = useNavigate()
-  const user = useAuthStore((state) => state.user)
-  const logout = useAuthStore((state) => state.logout)
+export const NavUser = () => {
+  const { isMobile } = useSidebar();
+  const navigate = useNavigate();
+  const user = useAuthStore(state => state.user);
+  const logout = useAuthStore(state => state.logout);
 
   // Fallback if user is not available
   if (!user) {
-    return null
+    return null;
   }
 
   // Get initials for avatar fallback
   const initials = user.userName
     ? user.userName
         .split(' ')
-        .map((n) => n[0])
+        .map(n => n[0])
         .join('')
         .toUpperCase()
         .slice(0, 2)
-    : user.email.slice(0, 2).toUpperCase()
+    : user.email.slice(0, 2).toUpperCase();
 
-  const handleLogout = async () => {
-    try {
-      await logout()
-      navigate('/login')
-    } catch (error) {
-      console.error('Logout error:', error)
-      // Navigate to login anyway
-      navigate('/login')
-    }
-  }
+  const handleLogout = () => {
+    void (async () => {
+      try {
+        await logout();
+        navigate('/login');
+      } catch (error) {
+        console.error('Logout error:', error);
+        // Navigate to login anyway
+        navigate('/login');
+      }
+    })();
+  };
 
   return (
     <SidebarMenu>
@@ -83,7 +74,7 @@ export function NavUser() {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
+            side={isMobile ? 'bottom' : 'right'}
             align="end"
             sideOffset={4}
           >
@@ -129,5 +120,5 @@ export function NavUser() {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
-}
+  );
+};

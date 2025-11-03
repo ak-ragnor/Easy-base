@@ -1,12 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import authService from '../services/auth-service';
-import {
-  getUserFromToken,
-  isTokenExpired,
-  isTokenExpiringSoon,
-} from '../lib/token-storage';
-import type { User, AuthError, TokenResponse } from '../types/auth';
+
+import { getUserFromToken, isTokenExpired, isTokenExpiringSoon } from '../../../lib/token-storage.ts';
+import authService from '@/pages/auth/services/auth-service.ts';
+import type { AuthError, TokenResponse, User } from '../../../types/auth.ts';
 
 interface AuthState {
   // State
@@ -168,9 +165,11 @@ export const useAuthStore = create<AuthState>()(
         if (isTokenExpired(accessToken)) {
           // Try to refresh if refresh token is available
           if (refreshToken && !isTokenExpired(refreshToken)) {
-            get().refreshTokens().catch(() => {
-              get().clearAuth();
-            });
+            get()
+              .refreshTokens()
+              .catch(() => {
+                get().clearAuth();
+              });
           } else {
             get().clearAuth();
           }
@@ -181,25 +180,27 @@ export const useAuthStore = create<AuthState>()(
         if (isTokenExpiringSoon(accessToken, 300)) {
           // Refresh in background if expiring within 5 minutes
           if (refreshToken && !isTokenExpired(refreshToken)) {
-            get().refreshTokens().catch((error) => {
-              console.error('Background token refresh failed:', error);
-            });
+            get()
+              .refreshTokens()
+              .catch(error => {
+                console.error('Background token refresh failed:', error);
+              });
           }
         }
       },
     }),
     {
       name: 'auth-storage', // localStorage key
-      partialize: (state) => ({
+      partialize: state => ({
         // Only persist these fields
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
         sessionId: state.sessionId,
         user: state.user,
       }),
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => state => {
         // After rehydrating from localStorage, set isAuthenticated based on tokens
-        if (state && state.accessToken && state.refreshToken) {
+        if (state?.accessToken && state.refreshToken) {
           state.isAuthenticated = true;
         }
       },
@@ -213,7 +214,10 @@ if (typeof window !== 'undefined') {
   useAuthStore.getState().checkAuth();
 
   // Check auth every 5 minutes
-  setInterval(() => {
-    useAuthStore.getState().checkAuth();
-  }, 5 * 60 * 1000);
+  setInterval(
+    () => {
+      useAuthStore.getState().checkAuth();
+    },
+    5 * 60 * 1000
+  );
 }

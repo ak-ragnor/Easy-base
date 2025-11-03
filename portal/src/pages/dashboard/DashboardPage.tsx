@@ -1,4 +1,4 @@
-import { PageHeader } from '@/components/layout/PageHeader';
+import { PageHeader } from '@/layouts/PageHeader.tsx';
 
 /**
  * DashboardPage - Main dashboard page
@@ -8,10 +8,7 @@ export const DashboardPage = () => {
   return (
     <>
       <PageHeader
-        breadcrumbs={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Overview' },
-        ]}
+        breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Overview' }]}
       />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <div className="grid auto-rows-min gap-4 md:grid-cols-3">

@@ -8,46 +8,46 @@ The portal follows a modern React application structure with **layout-based rout
 
 ```
 portal/src/
-├── layouts/                    # Layout components
-│   ├── MainLayout.tsx          # Layout with sidebar (authenticated pages)
-│   └── AuthLayout.tsx          # Layout without sidebar (login, public pages)
+├── layouts/ # Layout components
+│ ├── MainLayout.tsx # Layout with sidebar (authenticated pages)
+│ └── AuthLayout.tsx # Layout without sidebar (login, public pages)
 │
-├── pages/                      # Page components organized by feature
-│   ├── auth/
-│   │   └── LoginPage.tsx       # Login page
-│   ├── dashboard/
-│   │   └── DashboardPage.tsx   # Main dashboard
-│   ├── settings/
-│   │   └── SettingsPage.tsx    # Settings page (example)
-│   └── NotFoundPage.tsx        # 404 page
+├── pages/ # Page components organized by feature
+│ ├── auth/
+│ │ └── LoginPage.tsx # Login page
+│ ├── dashboard/
+│ │ └── DashboardPage.tsx # Main dashboard
+│ ├── settings/
+│ │ └── SettingsPage.tsx # Settings page (example)
+│ └── NotFoundPage.tsx # 404 page
 │
 ├── components/
-│   ├── ui/                     # shadcn/ui components (auto-generated)
-│   ├── layout/                 # Layout-specific reusable components
-│   │   └── PageHeader.tsx      # Reusable header with breadcrumbs
-│   ├── app-sidebar.tsx         # Sidebar navigation
-│   ├── nav-user.tsx            # User dropdown menu
-│   ├── login-form.tsx          # Login form
-│   └── ProtectedRoute.tsx      # Route guard for authenticated routes
+│ ├── ui/ # shadcn/ui components (auto-generated)
+│ ├── layout/ # Layout-specific reusable components
+│ │ └── PageHeader.tsx # Reusable header with breadcrumbs
+│ ├── app-sidebar.tsx # Sidebar navigation
+│ ├── nav-user.tsx # User dropdown menu
+│ ├── login-form.tsx # Login form
+│ └── ProtectedRoute.tsx # Route guard for authenticated routes
 │
 ├── stores/
-│   └── auth-store.ts           # Zustand auth state management
+│ └── auth-store.ts # Zustand auth state management
 │
 ├── services/
-│   └── auth-service.ts         # Authentication API calls
+│ └── auth-service.ts # Authentication API calls
 │
 ├── lib/
-│   ├── api-client.ts           # Axios instance with interceptors
-│   └── token-storage.ts        # Token utilities
+│ ├── api-client.ts # Axios instance with interceptors
+│ └── token-storage.ts # Token utilities
 │
 ├── types/
-│   └── auth.ts                 # TypeScript types
+│ └── auth.ts # TypeScript types
 │
 ├── hooks/
-│   └── use-mobile.ts           # Custom hooks
+│ └── use-mobile.ts # Custom hooks
 │
-├── App.tsx                     # Main app with routes
-└── main.tsx                    # Entry point
+├── App.tsx # Main app with routes
+└── main.tsx # Entry point
 ```
 
 ---
@@ -93,10 +93,10 @@ Pages are organized by **feature/domain**:
 
 ```
 pages/
-├── auth/           # Authentication pages
-├── dashboard/      # Dashboard-related pages
-├── settings/       # Settings pages
-└── ...             # More features as needed
+├── auth/ # Authentication pages
+├── dashboard/ # Dashboard-related pages
+├── settings/ # Settings pages
+└── ... # More features as needed
 ```
 
 #### Example Page Component:
@@ -199,7 +199,7 @@ import { UsersPage } from './pages/users/UsersPage'
 <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
   <Route path="/dashboard" element={<DashboardPage />} />
   <Route path="/settings" element={<SettingsPage />} />
-  <Route path="/users" element={<UsersPage />} />  {/* NEW */}
+  <Route path="/users" element={<UsersPage />} /> {/* NEW */}
 </Route>
 ```
 
@@ -210,7 +210,7 @@ import { UsersPage } from './pages/users/UsersPage'
 const data = {
   navMain: [
     { title: "Dashboard", url: "/dashboard", icon: SquareTerminal },
-    { title: "Users", url: "/users", icon: Users },  // NEW
+    { title: "Users", url: "/users", icon: Users }, // NEW
     { title: "Settings", url: "/settings", icon: Settings2 },
   ],
   // ...
@@ -230,7 +230,7 @@ Provides consistent header with sidebar trigger and breadcrumbs.
 interface PageHeaderProps {
   breadcrumbs: Array<{
     label: string;
-    href?: string;  // Last breadcrumb should not have href
+    href?: string; // Last breadcrumb should not have href
   }>;
 }
 ```
@@ -240,7 +240,7 @@ interface PageHeaderProps {
 <PageHeader
   breadcrumbs={[
     { label: 'Settings', href: '/settings' },
-    { label: 'General' },  // Last item = current page
+    { label: 'General' }, // Last item = current page
   ]}
 />
 ```
@@ -265,7 +265,7 @@ const data = {
       title: "Settings",
       url: "/settings",
       icon: Settings2,
-      items: [          // Optional submenu
+      items: [ // Optional submenu
         { title: "General", url: "/settings" },
         { title: "Team", url: "/settings/team" },
       ],
@@ -289,7 +289,7 @@ const data = {
    - `/login` uses `AuthLayout` (no sidebar)
    - After login → Redirected to `/dashboard`
 
-2. **Authenticated User:**
+1. **Authenticated User:**
    - Visits `/` → Redirected to `/dashboard`
    - `/dashboard` uses `MainLayout` (with sidebar)
    - Sidebar persists across all protected routes
@@ -351,9 +351,13 @@ const data = {
 ## Next Steps
 
 1. **Add more pages** following the structure above
-2. **Customize sidebar** navigation in `app-sidebar.tsx`
-3. **Create sub-layouts** for complex features (e.g., Settings)
-4. **Add page-specific components** in their respective folders
-5. **Implement real features** in place of placeholder content
+
+1. **Customize sidebar** navigation in `app-sidebar.tsx`
+
+1. **Create sub-layouts** for complex features (e.g., Settings)
+
+1. **Add page-specific components** in their respective folders
+
+1. **Implement real features** in place of placeholder content
 
 This structure is production-ready and scales well as your application grows!

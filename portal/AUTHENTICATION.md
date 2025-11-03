@@ -16,32 +16,37 @@ This application uses a modern authentication system with **Zustand** for state 
 ```
 portal/src/
 ├── types/
-│   └── auth.ts                    # TypeScript interfaces
+│ └── auth.ts # TypeScript interfaces
 ├── lib/
-│   ├── api-client.ts              # Axios instance + interceptors
-│   └── token-storage.ts           # Token utilities
+│ ├── api-client.ts # Axios instance + interceptors
+│ └── token-storage.ts # Token utilities
 ├── services/
-│   └── auth-service.ts            # Auth API calls
+│ └── auth-service.ts # Auth API calls
 ├── stores/
-│   └── auth-store.ts              # Zustand auth store
+│ └── auth-store.ts # Zustand auth store
 ├── pages/
-│   ├── Login.tsx                  # Login page
-│   └── Dashboard.tsx              # Protected dashboard
+│ ├── Login.tsx # Login page
+│ └── Dashboard.tsx # Protected dashboard
 ├── components/
-│   ├── ProtectedRoute.tsx         # Route guard
-│   ├── login-form.tsx             # Login form
-│   └── nav-user.tsx               # User dropdown
-└── App.tsx                        # Router setup
+│ ├── ProtectedRoute.tsx # Route guard
+│ ├── login-form.tsx # Login form
+│ └── nav-user.tsx # User dropdown
+└── App.tsx # Router setup
 ```
 
 ## How It Works
 
 ### 1. Login Flow
+
 1. User enters credentials in login form (`/src/components/login-form.tsx`)
-2. Formik validates input (email format, password length)
-3. On submit, `useAuthStore().login()` is called
-4. Auth service makes POST request to `/auth/login`
-5. On success:
+
+1. Formik validates input (email format, password length)
+
+1. On submit, `useAuthStore().login()` is called
+
+1. Auth service makes POST request to `/auth/login`
+
+1. On success:
    - Tokens are saved to Zustand store
    - Zustand persist middleware auto-saves to localStorage
    - User data is extracted from JWT
@@ -59,12 +64,18 @@ portal/src/
 - **Expiry Check:** Tokens are validated before each request
 
 ### 4. Logout Flow
+
 1. User clicks "Log out" in nav-user dropdown
-2. `useAuthStore().logout()` is called
-3. Backend API is called to invalidate session
-4. Zustand store is cleared
-5. localStorage is cleared (via persist middleware)
-6. User is redirected to `/login`
+
+1. `useAuthStore().logout()` is called
+
+1. Backend API is called to invalidate session
+
+1. Zustand store is cleared
+
+1. localStorage is cleared (via persist middleware)
+
+1. User is redirected to `/login`
 
 ## API Endpoints
 
@@ -129,13 +140,20 @@ npm run dev
 ```
 
 ### Testing the Auth Flow
+
 1. Start the backend server (http://localhost:8080)
-2. Start the frontend dev server (npm run dev)
-3. Navigate to http://localhost:5174/
-4. Login with valid credentials
-5. Check that you're redirected to dashboard
-6. Verify user info appears in nav dropdown
-7. Test logout functionality
+
+1. Start the frontend dev server (npm run dev)
+
+1. Navigate to http://localhost:5174/
+
+1. Login with valid credentials
+
+1. Check that you're redirected to dashboard
+
+1. Verify user info appears in nav dropdown
+
+1. Test logout functionality
 
 ### Development Tips
 - Check browser console for API logs (dev mode only)
@@ -146,20 +164,30 @@ npm run dev
 ## Security Features
 
 1. **JWT Tokens:** Secure token-based authentication
-2. **Auto Token Refresh:** Prevents session expiry
-3. **Protected Routes:** Unauthorized users can't access dashboard
-4. **HTTPS Ready:** Configure VITE_API_BASE_URL for production
-5. **Password Security:** Auto-complete disabled, secure input
-6. **Session Management:** Backend tracks all active sessions
+
+1. **Auto Token Refresh:** Prevents session expiry
+
+1. **Protected Routes:** Unauthorized users can't access dashboard
+
+1. **HTTPS Ready:** Configure VITE_API_BASE_URL for production
+
+1. **Password Security:** Auto-complete disabled, secure input
+
+1. **Session Management:** Backend tracks all active sessions
 
 ## Future Enhancements
 
 1. **Remember Me:** Optional persistent login
-2. **Password Reset:** Forgot password flow
-3. **2FA:** Two-factor authentication
-4. **Session Timeout:** Configurable timeout warnings
-5. **Multi-Tenant:** Support tenant selection in login
-6. **Social Login:** OAuth providers (Google, GitHub, etc.)
+
+1. **Password Reset:** Forgot password flow
+
+1. **2FA:** Two-factor authentication
+
+1. **Session Timeout:** Configurable timeout warnings
+
+1. **Multi-Tenant:** Support tenant selection in login
+
+1. **Social Login:** OAuth providers (Google, GitHub, etc.)
 
 ## Troubleshooting
 

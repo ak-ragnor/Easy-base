@@ -1,5 +1,5 @@
-import { Outlet } from 'react-router-dom';
 import { Layers } from 'lucide-react';
+import { Outlet } from 'react-router-dom';
 
 /**
  * AuthLayout - Layout for authentication pages (login, register, etc.)

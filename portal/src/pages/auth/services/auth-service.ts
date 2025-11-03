@@ -1,11 +1,11 @@
-import apiClient from '../lib/api-client';
+import apiClient from '../../../lib/api-client.ts';
 import type {
   LoginRequest,
-  TokenResponse,
-  RefreshTokenRequest,
   LogoutRequest,
+  RefreshTokenRequest,
   Session,
-} from '../types/auth';
+  TokenResponse,
+} from '../../../types/auth.ts';
 
 /**
  * Authentication service - handles all auth-related API calls
@@ -22,10 +22,7 @@ class AuthService {
       password,
     };
 
-    const response = await apiClient.post<TokenResponse>(
-      `${this.BASE_PATH}/login`,
-      payload
-    );
+    const response = await apiClient.post<TokenResponse>(`${this.BASE_PATH}/login`, payload);
 
     return response.data;
   }
@@ -38,10 +35,7 @@ class AuthService {
       refreshToken,
     };
 
-    const response = await apiClient.post<TokenResponse>(
-      `${this.BASE_PATH}/refresh`,
-      payload
-    );
+    const response = await apiClient.post<TokenResponse>(`${this.BASE_PATH}/refresh`, payload);
 
     return response.data;
   }

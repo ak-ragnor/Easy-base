@@ -1,55 +1,55 @@
-import { useNavigate } from 'react-router-dom'
-import { Formik, Form as FormikForm } from 'formik'
-import * as Yup from 'yup'
-import { Button } from '@/components/ui/button'
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
-import { useAuthStore } from '@/stores/auth-store'
+import { Form as FormikForm, Formik } from 'formik';
+import { useNavigate } from 'react-router-dom';
+import * as Yup from 'yup';
+
+import { Button } from '@/components/ui/button';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/pages/auth/stores/auth-store';
 
 // Validation schema
 const loginSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
+  email: Yup.string().email('Invalid email address').required('Email is required'),
   password: Yup.string()
     .min(6, 'Password must be at least 6 characters')
     .required('Password is required'),
-})
+});
 
 interface LoginFormValues {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 export const LoginForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
-  const navigate = useNavigate()
-  const { login, isLoading, error, clearError } = useAuthStore()
+  const navigate = useNavigate();
+  const { login, isLoading, error, clearError } = useAuthStore();
 
   const initialValues: LoginFormValues = {
     email: '',
     password: '',
-  }
+  };
 
   const handleSubmit = async (values: LoginFormValues) => {
     try {
-      clearError()
-      await login(values.email, values.password)
+      clearError();
+      await login(values.email, values.password);
       // Navigate to dashboard on successful login
-      navigate('/dashboard')
+      navigate('/dashboard');
     } catch (err) {
       // Error is already set in the store
-      console.error('Login failed:', err)
+      console.error('Login failed:', err);
     }
-  }
+  };
+
+  const handleForgotPassword = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // TODO: Implement forgot password
+  };
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={loginSchema}
-        onSubmit={handleSubmit}
-      >
+      <Formik initialValues={initialValues} validationSchema={loginSchema} onSubmit={handleSubmit}>
         {({ values, errors, touched, handleChange, handleBlur }) => (
           <FormikForm className="flex flex-col gap-6">
             <FieldGroup>
@@ -62,7 +62,7 @@ export const LoginForm = ({ className, ...props }: React.ComponentProps<'div'>) 
 
               {/* Display API error */}
               {error && (
-                <div className="rounded-md bg-red-50 p-3 text-sm text-red-800 border border-red-200">
+                <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
                   {error.message}
                 </div>
               )}
@@ -81,16 +81,20 @@ export const LoginForm = ({ className, ...props }: React.ComponentProps<'div'>) 
                   className={touched.email && errors.email ? 'border-red-500' : ''}
                 />
                 {touched.email && errors.email && (
-                  <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
                 )}
               </Field>
 
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a href="#" className="ml-auto text-sm underline-offset-4 hover:underline">
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="ml-auto text-sm underline-offset-4 hover:underline"
+                  >
                     Forgot your password?
-                  </a>
+                  </button>
                 </div>
                 <Input
                   id="password"
@@ -104,7 +108,7 @@ export const LoginForm = ({ className, ...props }: React.ComponentProps<'div'>) 
                   className={touched.password && errors.password ? 'border-red-500' : ''}
                 />
                 {touched.password && errors.password && (
-                  <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+                  <p className="mt-1 text-sm text-red-600">{errors.password}</p>
                 )}
               </Field>
 
@@ -113,7 +117,7 @@ export const LoginForm = ({ className, ...props }: React.ComponentProps<'div'>) 
                   {isLoading ? (
                     <span className="flex items-center gap-2">
                       <svg
-                        className="animate-spin h-4 w-4"
+                        className="h-4 w-4 animate-spin"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -144,5 +148,5 @@ export const LoginForm = ({ className, ...props }: React.ComponentProps<'div'>) 
         )}
       </Formik>
     </div>
-  )
-}
+  );
+};
