@@ -18,6 +18,7 @@
 		<module>system</module>
 		<module>tenant</module>
 		<module>data-engine</module>
+		<module>docu-media-store</module>
 		<module>user</module>
 		<module>auth</module>
 		<module>role</module>
