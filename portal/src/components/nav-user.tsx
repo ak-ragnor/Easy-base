@@ -1,3 +1,8 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

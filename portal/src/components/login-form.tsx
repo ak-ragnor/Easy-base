@@ -1,3 +1,8 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 import { Form as FormikForm, Formik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';

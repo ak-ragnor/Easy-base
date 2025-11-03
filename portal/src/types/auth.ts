@@ -1,4 +1,7 @@
-// Authentication request/response types
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
 
 export interface LoginRequest {
   userName: string;

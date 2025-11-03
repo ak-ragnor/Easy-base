@@ -1,3 +1,8 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
