@@ -5,6 +5,8 @@
 
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
+import { useAuthStore } from '@/pages/auth/stores/auth-store';
+
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AuthLayout } from './layouts/AuthLayout';
 import { MainLayout } from './layouts/MainLayout';
@@ -12,7 +14,6 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { SettingsPage } from './pages/settings/SettingsPage';
-import { useAuthStore } from '@/pages/auth/stores/auth-store';
 
 import './App.css';
 

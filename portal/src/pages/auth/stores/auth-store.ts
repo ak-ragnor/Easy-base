@@ -6,8 +6,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { getUserFromToken, isTokenExpired, isTokenExpiringSoon } from '../../../lib/token-storage.ts';
 import authService from '@/pages/auth/services/auth-service.ts';
+
+import {
+  getUserFromToken,
+  isTokenExpired,
+  isTokenExpiringSoon,
+} from '../../../lib/token-storage.ts';
 import type { AuthError, TokenResponse, User } from '../../../types/auth.ts';
 
 interface AuthState {
