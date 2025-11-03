@@ -1,17 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.easybase</groupId>
-        <artifactId>easy-base-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<groupId>com.easybase</groupId>
+		<artifactId>easy-base-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
 
-    <artifactId>file-system-data</artifactId>
-    <packaging>jar</packaging>
+	<artifactId>file-system-data</artifactId>
+	<packaging>jar</packaging>
 
-    <name>File System Tables</name>
-    <description>This will contain all the necessary tables for file system</description>
+	<name>File System Tables</name>
+	<description>This will contain all the necessary tables for file system</description>
 
 </project>

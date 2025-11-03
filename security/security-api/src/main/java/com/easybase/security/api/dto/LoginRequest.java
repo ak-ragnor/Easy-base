@@ -6,7 +6,6 @@
 package com.easybase.security.api.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 import java.util.Map;
 import java.util.UUID;
@@ -83,7 +82,6 @@ public class LoginRequest {
 	private String password;
 
 	private UUID tenantId;
-
 	private String userAgent;
 
 	@NotBlank
