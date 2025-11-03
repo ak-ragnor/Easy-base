@@ -1,4 +1,12 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 package com.easybase.infrastructure.web.config;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -6,19 +14,17 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * CORS (Cross-Origin Resource Sharing) configuration
- * Allows frontend applications to make requests to the backend API
+ *
+ * @author Akhash R
  */
 @Configuration
 public class CorsConfig {
 
-    @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
+	@Bean
+	public CorsFilter corsFilter() {
+		CorsConfiguration config = new CorsConfiguration();
 
         // Allow requests from frontend development servers
         config.setAllowedOrigins(Arrays.asList(
@@ -27,36 +33,36 @@ public class CorsConfig {
             "http://localhost:3000"   // Common React/Next.js port
         ));
 
-        // Allow all HTTP methods
-        config.setAllowedMethods(Arrays.asList(
-            "GET",
-            "POST",
-            "PUT",
-            "DELETE",
-            "OPTIONS",
-            "PATCH"
-        ));
+		// Allow all HTTP methods
 
-        // Allow all headers
-        config.setAllowedHeaders(List.of("*"));
+		config.setAllowedMethods(
+			Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 
-        // Allow credentials (cookies, authorization headers with Bearer tokens)
-        config.setAllowCredentials(true);
+		// Allow all headers
 
-        // Expose these headers to the frontend
-        config.setExposedHeaders(Arrays.asList(
-            "Authorization",
-            "Content-Type",
-            "X-Total-Count"
-        ));
+		config.setAllowedHeaders(List.of("*"));
 
-        // How long (in seconds) the browser can cache preflight responses
-        config.setMaxAge(3600L);
+		// Allow credentials (cookies, authorization headers with Bearer tokens)
 
-        // Register CORS configuration for all endpoints
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+		config.setAllowCredentials(true);
 
-        return new CorsFilter(source);
-    }
+		// Expose these headers to the frontend
+
+		config.setExposedHeaders(
+			Arrays.asList("Authorization", "Content-Type", "X-Total-Count"));
+
+		// How long (in seconds) the browser can cache preflight responses
+
+		config.setMaxAge(3600L);
+
+		// Register CORS configuration for all endpoints
+
+		UrlBasedCorsConfigurationSource source =
+			new UrlBasedCorsConfigurationSource();
+
+		source.registerCorsConfiguration("/**", config);
+
+		return new CorsFilter(source);
+	}
+
 }
