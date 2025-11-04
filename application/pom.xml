@@ -36,6 +36,12 @@
 
 		<dependency>
 			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-docu-media-store-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-infrastructure-data</artifactId>
 			<version>${project.version}</version>
 		</dependency>

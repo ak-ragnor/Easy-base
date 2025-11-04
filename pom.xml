@@ -18,7 +18,7 @@
 		<module>security</module>
 		<module>context</module>
 		<module>infrastructure</module>
-		<module>file-system</module>
+		<module>store</module>
 	</modules>
 
 	<properties>
