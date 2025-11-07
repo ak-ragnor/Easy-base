@@ -5,6 +5,7 @@
 
 package com.easybase.store.processor.base;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface BaseAssetCreator {
 
-	public void createAsset(MultipartFile file, String path) throws IOException;
+	public void createAsset(File file, String path) throws IOException;
 
 }

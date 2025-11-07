@@ -20,16 +20,22 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.sax.BodyContentHandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
 /**
  * @author Saura
  */
 @Slf4j
+@Component
 public class DataExtractor implements BaseDataExtractor {
 
 	@Override
-	public Map<String, String> extract(InputStream io)
+	@Async("globalExecutor")
+	public void extract(InputStream io)
 		throws IOException, SAXException, TikaException {
 
 		AutoDetectParser parser = new AutoDetectParser();
@@ -42,11 +48,11 @@ public class DataExtractor implements BaseDataExtractor {
 			(int)(metadata.size() / 0.75) + 1);
 
 		for (String name : metadata.names()) {
-			log.info(name + ": " + metadata.get(name));
+			log.info("data is "+ name+" : "+metadata.get(name));
 			data.put(name, metadata.get(name));
 		}
 
-		return data;
 	}
+	private static final Logger log = LoggerFactory.getLogger(DataExtractor.class.getName());
 
 }

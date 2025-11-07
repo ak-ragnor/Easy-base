@@ -8,11 +8,11 @@ package com.easybase.store.processor;
 import com.easybase.store.processor.base.BaseDataExtractor;
 import com.easybase.store.processor.base.BaseFileProcessor;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.apache.tika.exception.TikaException;
-
-import org.springframework.web.multipart.MultipartFile;
 
 import org.xml.sax.SAXException;
 
@@ -26,10 +26,10 @@ public class DefaultFileProcessor implements BaseFileProcessor {
 	}
 
 	@Override
-	public void process(MultipartFile file, String path)
+	public void process(File file, String path)
 		throws IOException, SAXException, TikaException {
 
-		dataExtractor.extract(file.getInputStream());
+		dataExtractor.extract(new FileInputStream(file));
 	}
 
 	private BaseDataExtractor dataExtractor;

@@ -8,8 +8,6 @@ package com.easybase.store.processor.base;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.util.Map;
-
 import org.apache.tika.exception.TikaException;
 
 import org.xml.sax.SAXException;
@@ -19,7 +17,7 @@ import org.xml.sax.SAXException;
  */
 public interface BaseDataExtractor {
 
-	public Map<String, String> extract(InputStream io)
+	public void extract(InputStream io)
 		throws IOException, SAXException, TikaException;
 
 }

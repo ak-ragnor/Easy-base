@@ -7,6 +7,12 @@ easy-base:
             last-name: User
             password: admin123
         enabled: true
+    docmediastore:
+        root:
+            folder: file_system
+        file:
+            included: png,jpeg,jpg
+            size: 500000000
 logging:
     level:
         com.easybase: DEBUG
@@ -31,7 +37,7 @@ spring:
         driver-class-name: org.postgresql.Driver
         password: root
         url: jdbc:postgresql://localhost:5432/easybase
-        username: root
+        username: postgres
     jackson:
         deserialization:
             fail-on-unknown-properties: false
@@ -49,3 +55,7 @@ spring:
         show-sql: true
     profiles:
         active: development
+    servlet:
+        multipart:
+            max-file-size: 100MB
+            max-request-size: 100MB

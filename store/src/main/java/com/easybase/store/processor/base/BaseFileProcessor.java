@@ -5,6 +5,7 @@
 
 package com.easybase.store.processor.base;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.tika.exception.TikaException;
@@ -18,7 +19,7 @@ import org.xml.sax.SAXException;
  */
 public interface BaseFileProcessor {
 
-	public void process(MultipartFile file, String path)
+	public void process(File file, String path)
 		throws IOException, SAXException, TikaException;
 
 }
