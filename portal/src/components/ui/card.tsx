@@ -1,6 +1,6 @@
-import * as React from 'react'
+import * as React from 'react';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 const Card = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
@@ -12,8 +12,8 @@ const Card = ({ className, ...props }: React.ComponentProps<'div'>) => {
       )}
       {...props}
     />
-  )
-}
+  );
+};
 
 const CardHeader = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
@@ -25,8 +25,8 @@ const CardHeader = ({ className, ...props }: React.ComponentProps<'div'>) => {
       )}
       {...props}
     />
-  )
-}
+  );
+};
 
 const CardTitle = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
@@ -35,8 +35,8 @@ const CardTitle = ({ className, ...props }: React.ComponentProps<'div'>) => {
       className={cn('leading-none font-semibold', className)}
       {...props}
     />
-  )
-}
+  );
+};
 
 const CardDescription = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
@@ -45,8 +45,8 @@ const CardDescription = ({ className, ...props }: React.ComponentProps<'div'>) =
       className={cn('text-muted-foreground text-sm', className)}
       {...props}
     />
-  )
-}
+  );
+};
 
 const CardAction = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
@@ -55,12 +55,12 @@ const CardAction = ({ className, ...props }: React.ComponentProps<'div'>) => {
       className={cn('col-start-2 row-span-2 row-start-1 self-start justify-self-end', className)}
       {...props}
     />
-  )
-}
+  );
+};
 
 const CardContent = ({ className, ...props }: React.ComponentProps<'div'>) => {
-  return <div data-slot="card-content" className={cn('px-6', className)} {...props} />
-}
+  return <div data-slot="card-content" className={cn('px-6', className)} {...props} />;
+};
 
 const CardFooter = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
@@ -69,7 +69,7 @@ const CardFooter = ({ className, ...props }: React.ComponentProps<'div'>) => {
       className={cn('flex items-center px-6 [.border-t]:pt-6', className)}
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
+export { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle };
