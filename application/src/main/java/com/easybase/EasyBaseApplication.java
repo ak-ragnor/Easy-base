@@ -12,12 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * @author Akhash R
  */
 @EnableScheduling
+@EnableAsync
 @Import(EasyBaseSecurityAutoConfiguration.class)
 @Slf4j
 @SpringBootApplication(scanBasePackages = "com.easybase")

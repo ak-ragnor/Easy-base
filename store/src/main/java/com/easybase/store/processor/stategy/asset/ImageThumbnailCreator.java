@@ -5,92 +5,125 @@
 
 package com.easybase.store.processor.stategy.asset;
 
+import com.easybase.store.StoreUtil;
 import com.easybase.store.processor.base.BaseAssetCreator;
-
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-
-import org.springframework.web.multipart.MultipartFile;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * @author Saura
  */
+@Slf4j
+@Service
+@AllArgsConstructor
 public class ImageThumbnailCreator implements BaseAssetCreator {
 
+	private static final int PREVIEW_WIDTH = 800;
+	private static final int THUMBNAIL_WIDTH = 150;
+
 	@Override
-	public void createAsset(MultipartFile file, String path)
-		throws IOException {
+	@Async("globalExecutor")
+	public void createAsset(File file, String path) throws IOException {
+		try {
+			String fileOriginalName = Objects.requireNonNull(file.getName());
+			String extension = _storeUtil.extractExtension(fileOriginalName);
+			String fileBaseName = fileOriginalName.substring(0, fileOriginalName.lastIndexOf('.'));
 
-		InputStream io = file.getInputStream();
+			BufferedImage originalImage;
+			try (InputStream io = new FileInputStream(file)) {
+				originalImage = ImageIO.read(io);
+			}
 
-		BufferedImage originalImage = ImageIO.read(io);
+			if (originalImage == null) {
+				throw new IOException("Unsupported or corrupted image format for file: " + fileOriginalName);
+			}
 
-		File dir = new File(path);
+			Path baseDir = Paths.get(System.getProperty("user.home"), path);
+			Files.createDirectories(baseDir);
 
-		if (!dir.exists()) {
-			dir.mkdirs();
-		}
+			BufferedImage preview = _resizeImage(originalImage, PREVIEW_WIDTH);
+			_writeImage(preview, extension, baseDir.resolve(fileBaseName + "_preview." + extension).toFile());
 
-		File destination = new File(
-			dir, Objects.requireNonNull(file.getOriginalFilename()));
+			BufferedImage thumbnail = _resizeImage(originalImage, THUMBNAIL_WIDTH);
+			_writeImage(thumbnail, extension, baseDir.resolve(fileBaseName + "_thumbnail." + extension).toFile());
 
-		try (OutputStream out = new FileOutputStream(destination)) {
-			io.transferTo(out);
-		}
-
-		BufferedImage preview = _resizeImage(originalImage, 800);
-
-		try (OutputStream previewFile = new FileOutputStream(
-				path + "/" + file.getName() + "_preview.png")) {
-
-			ImageIO.write(preview, "png", previewFile);
-		}
-
-		BufferedImage thumbnail = _resizeImage(originalImage, 150);
-
-		try (OutputStream thumbnailFile = new FileOutputStream(
-				path + "/" + file.getName() + "_thumbnail.png")) {
-
-			ImageIO.write(thumbnail, "png", thumbnailFile);
+			log.info("Assets created successfully for {}", fileOriginalName);
+		} catch (IOException exception) {
+			log.error("Failed to process image file: {}", file.getName(), exception);
+			throw exception;
+		} finally {
+			if (!file.delete()) {
+				log.warn("Failed to delete temp file: {}", file.getAbsolutePath());
+				file.deleteOnExit();
+			}
 		}
 	}
 
-	private BufferedImage _resizeImage(
-		BufferedImage originalImage, int targetWidth) {
+	private BufferedImage _resizeImage(BufferedImage original, int targetWidth) {
+		if (original == null) {
+			throw new IllegalArgumentException("Original image is null");
+		}
 
-		double aspectRatio =
-			(double)originalImage.getHeight() / originalImage.getWidth();
+		double aspectRatio = (double) original.getHeight() / original.getWidth();
+		int targetHeight = (int) (targetWidth * aspectRatio);
 
-		int targetHeight = (int)(targetWidth * aspectRatio);
-
-		BufferedImage resized = new BufferedImage(
-			targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+		// choose type based on source
+		int imageType = original.getType() == 0 ? BufferedImage.TYPE_INT_RGB : original.getType();
+		BufferedImage resized = new BufferedImage(targetWidth, targetHeight, imageType);
 
 		Graphics2D g2d = resized.createGraphics();
-
-		g2d.setRenderingHint(
-			RenderingHints.KEY_INTERPOLATION,
-			RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		g2d.setRenderingHint(
-			RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		g2d.setRenderingHint(
-			RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-		g2d.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.drawImage(original, 0, 0, targetWidth, targetHeight, null);
 		g2d.dispose();
 
 		return resized;
 	}
 
+	private void _writeImage(BufferedImage image, String extension, File outFile) throws IOException {
+		outFile.getParentFile().mkdirs();
+
+		String format = _normalizeFormat(extension);
+		boolean written = ImageIO.write(image, format, outFile);
+
+		if (!written) {
+			log.warn("No ImageWriter found for {} — writing as PNG instead", format);
+			ImageIO.write(image, "png", outFile);
+		}
+	}
+
+
+	private String _normalizeFormat(String extension) {
+		switch (extension.toLowerCase(Locale.ROOT)) {
+			case "jpeg":
+			case "jpg":
+				return "jpg";
+			case "png":
+			case "bmp":
+			case "gif":
+			case "wbmp":
+			case "tif":
+			case "tiff":
+				return extension.toLowerCase(Locale.ROOT);
+			case "webp":
+				return "webp";
+			default:
+				return "png";
+		}
+	}
+	private final StoreUtil _storeUtil;
 }

@@ -9,6 +9,7 @@ import com.easybase.store.processor.DefaultFileProcessor;
 import com.easybase.store.processor.FileCategory;
 import com.easybase.store.processor.RegularFileProcessor;
 import com.easybase.store.processor.base.BaseAssetCreator;
+import com.easybase.store.processor.base.BaseDataExtractor;
 import com.easybase.store.processor.base.BaseFileProcessor;
 import com.easybase.store.processor.stategy.asset.DocumentThumbnailCreator;
 import com.easybase.store.processor.stategy.asset.ExcelThumbnailCreator;
@@ -17,49 +18,51 @@ import com.easybase.store.processor.stategy.asset.PdfThumbnailCreator;
 import com.easybase.store.processor.stategy.asset.VideoThumbnailCreator;
 import com.easybase.store.processor.stategy.data.DataExtractor;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Saura
  */
+
+@Component
+@RequiredArgsConstructor
 public class FileProcessorFactory {
 
-	public static BaseFileProcessor getFileProcessor(MultipartFile file) {
+	public BaseFileProcessor getFileProcessor(MultipartFile file) {
 		String mimeType = file.getContentType();
 
 		return _createFileProcessor(_getAssetCreator(mimeType));
 	}
 
-	private static BaseFileProcessor _createFileProcessor(
-		BaseAssetCreator assetCreator) {
+	private BaseFileProcessor _createFileProcessor(
+			BaseAssetCreator assetCreator) {
 
 		if (assetCreator == null) {
-			return new DefaultFileProcessor(new DataExtractor());
+			return new DefaultFileProcessor(dataExtractor);
 		}
 
-		return new RegularFileProcessor(new DataExtractor(), assetCreator);
+		return new RegularFileProcessor(dataExtractor, assetCreator);
 	}
 
-	private static BaseAssetCreator _getAssetCreator(String mimeType) {
+	private BaseAssetCreator _getAssetCreator(String mimeType) {
 		FileCategory category = FileCategory.fromMimeType(mimeType);
-
-		if (category == FileCategory.IMAGE) {
-			return new ImageThumbnailCreator();
-		}
-		else if (category == FileCategory.VIDEO) {
-			return new VideoThumbnailCreator();
-		}
-		else if (category == FileCategory.PDF) {
-			return new PdfThumbnailCreator();
-		}
-		else if (category == FileCategory.DOCUMENT) {
-			return new DocumentThumbnailCreator();
-		}
-		else if (category == FileCategory.SPREADSHEET) {
-			return new ExcelThumbnailCreator();
-		}
-
-		return null;
+		return switch (category) {
+			case IMAGE -> imageThumbnailCreator;
+			case VIDEO -> videoThumbnailCreator;
+			case PDF -> pdfThumbnailCreator;
+			case DOCUMENT -> documentThumbnailCreator;
+			case SPREADSHEET -> excelThumbnailCreator;
+			default -> null;
+		};
 	}
+
+	private final ImageThumbnailCreator imageThumbnailCreator;
+	private final VideoThumbnailCreator videoThumbnailCreator;
+	private final PdfThumbnailCreator pdfThumbnailCreator;
+	private final DocumentThumbnailCreator documentThumbnailCreator;
+	private final ExcelThumbnailCreator excelThumbnailCreator;
+	private final BaseDataExtractor dataExtractor;
 
 }
