@@ -17,16 +17,12 @@ import org.apache.tika.exception.TikaException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import org.xml.sax.SAXException;
 
 /**
  * @author Saura
  */
-
 public class RegularFileProcessor implements BaseFileProcessor {
 
 	public RegularFileProcessor(
@@ -39,12 +35,19 @@ public class RegularFileProcessor implements BaseFileProcessor {
 	@Override
 	public void process(File file, String path)
 		throws IOException, SAXException, TikaException {
-		log.info("it is stared "+Thread.currentThread().getName());
+
+		_log.info(
+			"it is stared " +
+				Thread.currentThread(
+				).getName());
+
 		dataExtractor.extract(new FileInputStream(file));
 		assetCreator.createAsset(file, path);
 	}
 
-	private BaseAssetCreator assetCreator;
-	private BaseDataExtractor dataExtractor;
-	private Logger log = LoggerFactory.getLogger(RegularFileProcessor.class.getName());
+	private final Logger _log = LoggerFactory.getLogger(
+		RegularFileProcessor.class.getName());
+	private final BaseAssetCreator assetCreator;
+	private final BaseDataExtractor dataExtractor;
+
 }
