@@ -29,13 +29,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class StoreUtil {
 
 	public String extractExtension(String fileName) {
-		int i = fileName.lastIndexOf('.');
+		fileName = fileName.substring(fileName.lastIndexOf('.') + 1);
 
-		return fileName.substring(
-			i + 1
-		).toLowerCase(
-			Locale.ROOT
-		);
+		return fileName.toLowerCase(Locale.ROOT);
 	}
 
 	public void perFormChecks(
@@ -60,9 +56,9 @@ public class StoreUtil {
 
 		Files.createDirectories(baseDir);
 
-		File destination = baseDir.resolve(
-			file.getOriginalFilename()
-		).toFile();
+		Path resolved = baseDir.resolve(file.getOriginalFilename());
+
+		File destination = resolved.toFile();
 
 		try (OutputStream os = new FileOutputStream(destination);
 			InputStream is = file.getInputStream()) {

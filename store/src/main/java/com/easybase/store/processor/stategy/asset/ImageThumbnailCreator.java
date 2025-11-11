@@ -8,10 +8,14 @@ package com.easybase.store.processor.stategy.asset;
 import com.easybase.store.StoreUtil;
 import com.easybase.store.processor.base.BaseAssetCreator;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -63,35 +67,35 @@ public class ImageThumbnailCreator implements BaseAssetCreator {
 
 			Files.createDirectories(baseDir);
 
-			BufferedImage preview = _resizeImage(originalImage, PREVIEW_WIDTH);
+			BufferedImage preview = _resizeImage(originalImage, _PREVIEW_WIDTH);
 
-			_writeImage(
-				preview, extension,
-				baseDir.resolve(
-					fileBaseName + "_preview." + extension
-				).toFile());
+			Path resolvedPreview = baseDir.resolve(
+				fileBaseName + "_preview." + extension);
+
+			_writeImage(preview, extension, resolvedPreview.toFile());
 
 			BufferedImage thumbnail = _resizeImage(
-				originalImage, THUMBNAIL_WIDTH);
+				originalImage, _THUMBNAIL_WIDTH);
 
-			_writeImage(
-				thumbnail, extension,
-				baseDir.resolve(
-					fileBaseName + "_thumbnail." + extension
-				).toFile());
+			Path resolvedThumbnail = baseDir.resolve(
+				fileBaseName + "_thumbnail." + extension);
+
+			_writeImage(thumbnail, extension, resolvedThumbnail.toFile());
 
 			log.info("Assets created successfully for {}", fileOriginalName);
 		}
-		catch (IOException exception) {
+		catch (IOException ioException) {
 			log.error(
-				"Failed to process image file: {}", file.getName(), exception);
+				"Failed to process image file: {}", file.getName(),
+				ioException);
 
-			throw exception;
+			throw ioException;
 		}
 		finally {
 			if (!file.delete()) {
 				log.warn(
 					"Failed to delete temp file: {}", file.getAbsolutePath());
+
 				file.deleteOnExit();
 			}
 		}
@@ -124,12 +128,15 @@ public class ImageThumbnailCreator implements BaseAssetCreator {
 		}
 
 		double aspectRatio = (double)original.getHeight() / original.getWidth();
+
 		int targetHeight = (int)(targetWidth * aspectRatio);
 
-		// choose type based on source
+		int imageType = original.getType();
 
-		int imageType = original.getType() == 0 ? BufferedImage.TYPE_INT_RGB :
-			original.getType();
+		if (imageType == 0) {
+			imageType = BufferedImage.TYPE_INT_RGB;
+		}
+
 		BufferedImage resized = new BufferedImage(
 			targetWidth, targetHeight, imageType);
 
@@ -152,8 +159,9 @@ public class ImageThumbnailCreator implements BaseAssetCreator {
 			BufferedImage image, String extension, File outFile)
 		throws IOException {
 
-		outFile.getParentFile(
-		).mkdirs();
+		File parentFile = outFile.getParentFile();
+
+		parentFile.mkdirs();
 
 		String format = _normalizeFormat(extension);
 
@@ -162,13 +170,14 @@ public class ImageThumbnailCreator implements BaseAssetCreator {
 		if (!written) {
 			log.warn(
 				"No ImageWriter found for {} — writing as PNG instead", format);
+
 			ImageIO.write(image, "png", outFile);
 		}
 	}
 
-	private static final int PREVIEW_WIDTH = 800;
+	private static final int _PREVIEW_WIDTH = 800;
 
-	private static final int THUMBNAIL_WIDTH = 150;
+	private static final int _THUMBNAIL_WIDTH = 150;
 
 	private final StoreUtil _storeUtil;
 

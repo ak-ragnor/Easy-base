@@ -15,9 +15,6 @@ import java.io.IOException;
 
 import org.apache.tika.exception.TikaException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.xml.sax.SAXException;
 
 /**
@@ -36,17 +33,10 @@ public class RegularFileProcessor implements BaseFileProcessor {
 	public void process(File file, String path)
 		throws IOException, SAXException, TikaException {
 
-		_log.info(
-			"it is stared " +
-				Thread.currentThread(
-				).getName());
-
 		dataExtractor.extract(new FileInputStream(file));
 		assetCreator.createAsset(file, path);
 	}
 
-	private final Logger _log = LoggerFactory.getLogger(
-		RegularFileProcessor.class.getName());
 	private final BaseAssetCreator assetCreator;
 	private final BaseDataExtractor dataExtractor;
 
