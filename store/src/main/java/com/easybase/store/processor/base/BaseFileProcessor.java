@@ -10,8 +10,6 @@ import java.io.IOException;
 
 import org.apache.tika.exception.TikaException;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import org.xml.sax.SAXException;
 
 /**

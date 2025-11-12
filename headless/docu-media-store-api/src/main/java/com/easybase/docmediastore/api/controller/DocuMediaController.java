@@ -9,17 +9,13 @@ import com.easybase.store.StoreUtil;
 import com.easybase.store.processor.base.BaseFileProcessor;
 import com.easybase.store.processor.factory.FileProcessorFactory;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;
+import java.io.IOException;
 
 import lombok.RequiredArgsConstructor;
 
 import org.apache.tika.exception.TikaException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,8 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.xml.sax.SAXException;
-
-import javax.imageio.ImageIO;
 
 /**
  * @author Saura
@@ -42,31 +36,32 @@ public class DocuMediaController {
 
 	@PostMapping("/{id}")
 	public void uploadFile(
-			@RequestParam("file") MultipartFile file,
-			@PathVariable long id)
+			@RequestParam("file") MultipartFile file, @PathVariable long id)
 		throws IOException, SAXException, TikaException {
 
-		_storeUtil.perFormChecks(_allowedExtensions,_maxFileSize,file);
+		_storeUtil.perFormChecks(_allowedExtensions, _maxFileSize, file);
 
 		long fileId = 12345;
 
-		File destination = _storeUtil.saveOriginalFile(_path,file);
+		File destination = _storeUtil.saveOriginalFile(_path, file);
 
-		BaseFileProcessor fileProcessor = _fileProcessorFactory.getFileProcessor(
-				file);
+		BaseFileProcessor fileProcessor =
+			_fileProcessorFactory.getFileProcessor(file);
+
 		fileProcessor.process(destination, _path + "/" + fileId);
 	}
 
-	private final FileProcessorFactory _fileProcessorFactory;
-	private final StoreUtil _storeUtil;
-
-
-	@Value("${easy-base.docmediastore.root.folder}")
-	private String _path;
 	@Value("${easy-base.docmediastore.file.included}")
 	private String _allowedExtensions;
 
+	private final FileProcessorFactory _fileProcessorFactory;
+
 	@Value("${easy-base.docmediastore.file.size}")
 	private String _maxFileSize;
-	private static final Logger log = LoggerFactory.getLogger(DocuMediaController.class.getName());
+
+	@Value("${easy-base.docmediastore.root.folder}")
+	private String _path;
+
+	private final StoreUtil _storeUtil;
+
 }

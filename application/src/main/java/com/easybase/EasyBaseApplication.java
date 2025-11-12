@@ -18,8 +18,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * @author Akhash R
  */
-@EnableScheduling
 @EnableAsync
+@EnableScheduling
 @Import(EasyBaseSecurityAutoConfiguration.class)
 @Slf4j
 @SpringBootApplication(scanBasePackages = "com.easybase")

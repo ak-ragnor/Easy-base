@@ -16,16 +16,15 @@ import com.easybase.store.processor.stategy.asset.ExcelThumbnailCreator;
 import com.easybase.store.processor.stategy.asset.ImageThumbnailCreator;
 import com.easybase.store.processor.stategy.asset.PdfThumbnailCreator;
 import com.easybase.store.processor.stategy.asset.VideoThumbnailCreator;
-import com.easybase.store.processor.stategy.data.DataExtractor;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Saura
  */
-
 @Component
 @RequiredArgsConstructor
 public class FileProcessorFactory {
@@ -37,7 +36,7 @@ public class FileProcessorFactory {
 	}
 
 	private BaseFileProcessor _createFileProcessor(
-			BaseAssetCreator assetCreator) {
+		BaseAssetCreator assetCreator) {
 
 		if (assetCreator == null) {
 			return new DefaultFileProcessor(dataExtractor);
@@ -48,21 +47,28 @@ public class FileProcessorFactory {
 
 	private BaseAssetCreator _getAssetCreator(String mimeType) {
 		FileCategory category = FileCategory.fromMimeType(mimeType);
-		return switch (category) {
-			case IMAGE -> imageThumbnailCreator;
-			case VIDEO -> videoThumbnailCreator;
-			case PDF -> pdfThumbnailCreator;
-			case DOCUMENT -> documentThumbnailCreator;
-			case SPREADSHEET -> excelThumbnailCreator;
-			default -> null;
-		};
+
+		switch (category) {
+			case IMAGE:
+				return imageThumbnailCreator;
+			case VIDEO:
+				return videoThumbnailCreator;
+			case PDF:
+				return pdfThumbnailCreator;
+			case DOCUMENT:
+				return documentThumbnailCreator;
+			case SPREADSHEET:
+				return excelThumbnailCreator;
+			default:
+				return null;
+		}
 	}
 
-	private final ImageThumbnailCreator imageThumbnailCreator;
-	private final VideoThumbnailCreator videoThumbnailCreator;
-	private final PdfThumbnailCreator pdfThumbnailCreator;
+	private final BaseDataExtractor dataExtractor;
 	private final DocumentThumbnailCreator documentThumbnailCreator;
 	private final ExcelThumbnailCreator excelThumbnailCreator;
-	private final BaseDataExtractor dataExtractor;
+	private final ImageThumbnailCreator imageThumbnailCreator;
+	private final PdfThumbnailCreator pdfThumbnailCreator;
+	private final VideoThumbnailCreator videoThumbnailCreator;
 
 }
