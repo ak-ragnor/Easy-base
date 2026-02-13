@@ -9,7 +9,7 @@ import com.easybase.api.data.engine.dto.CollectionDto;
 import com.easybase.api.data.engine.dto.mapper.AttributeMapper;
 import com.easybase.api.data.engine.dto.mapper.CollectionMapper;
 import com.easybase.context.api.domain.ServiceContext;
-import com.easybase.core.data.engine.entity.Collection;
+import com.easybase.core.data.engine.domain.entity.Collection;
 import com.easybase.core.data.engine.service.CollectionService;
 import com.easybase.infrastructure.api.dto.response.ApiPageResponse;
 import com.easybase.infrastructure.api.dto.response.ApiResponse;

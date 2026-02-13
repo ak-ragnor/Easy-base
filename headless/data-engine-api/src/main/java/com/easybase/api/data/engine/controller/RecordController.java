@@ -8,7 +8,7 @@ package com.easybase.api.data.engine.controller;
 import com.easybase.api.data.engine.dto.DataRecordDto;
 import com.easybase.api.data.engine.dto.mapper.DataRecordMapper;
 import com.easybase.context.api.domain.ServiceContext;
-import com.easybase.core.data.engine.entity.DataRecord;
+import com.easybase.core.data.engine.domain.entity.DataRecord;
 import com.easybase.core.data.engine.service.DataRecordService;
 import com.easybase.infrastructure.api.dto.response.ApiResponse;
 

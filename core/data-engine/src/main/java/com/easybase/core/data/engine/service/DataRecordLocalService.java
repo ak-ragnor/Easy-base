@@ -5,7 +5,7 @@
 
 package com.easybase.core.data.engine.service;
 
-import com.easybase.core.data.engine.entity.DataRecord;
+import com.easybase.core.data.engine.domain.entity.DataRecord;
 
 import java.util.List;
 import java.util.Map;

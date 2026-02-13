@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.data.engine.util;
+package com.easybase.core.data.engine.service.util;
 
 import java.util.UUID;
 
@@ -17,43 +17,14 @@ public class NamingUtils {
 	/**
 	 * Generate table name with tenant prefix
 	 */
-	public static String generateTableName(
+	public static String getTableName(
 		UUID tenantId, String collectionName) {
-
-		String sanitizedCollectionName = sanitizeCollectionName(collectionName);
 
 		String tenantIdString = tenantId.toString();
 
-		String tenantIdNoDash = tenantIdString.replace("-", "");
+		String tenantUUID = tenantIdString.replace("-", "_");
 
-		String tenantPrefix = tenantIdNoDash.substring(0, 8);
-
-		return tenantPrefix + "_" + sanitizedCollectionName;
-	}
-
-	/**
-	 * Sanitize attribute name to be database-safe
-	 */
-	public static String sanitizeAttributeName(String name) {
-		if (name == null) {
-			throw new IllegalArgumentException(
-				"Attribute name cannot be null or empty");
-		}
-
-		String trimmedName = name.trim();
-
-		if (trimmedName.isEmpty()) {
-			throw new IllegalArgumentException(
-				"Attribute name cannot be null or empty");
-		}
-
-		String sanitized = trimmedName.replaceAll("[^a-zA-Z0-9_]", "");
-
-		if (!sanitized.matches("^[a-zA-Z].*")) {
-			sanitized = "attr_" + sanitized;
-		}
-
-		return sanitized;
+		return tenantUUID + "_" + sanitizeCollectionName(collectionName);
 	}
 
 	/**

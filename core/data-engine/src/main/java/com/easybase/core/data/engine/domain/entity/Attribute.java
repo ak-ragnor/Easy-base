@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.data.engine.entity;
+package com.easybase.core.data.engine.domain.entity;
 
-import com.easybase.core.data.engine.enums.AttributeType;
+import com.easybase.core.data.engine.domain.enums.AttributeType;
 import com.easybase.infrastructure.data.entity.SingleKeyBaseEntity;
 
 import jakarta.persistence.Column;
@@ -19,11 +19,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * @author Akhash R
@@ -51,6 +56,10 @@ public class Attribute extends SingleKeyBaseEntity {
 	)
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Collection collection;
+
+	@Column(columnDefinition = "jsonb", name = "config")
+	@JdbcTypeCode(SqlTypes.JSON)
+	private Map<String, Object> config;
 
 	@Column(name = "data_type", nullable = false)
 	@Enumerated(EnumType.STRING)

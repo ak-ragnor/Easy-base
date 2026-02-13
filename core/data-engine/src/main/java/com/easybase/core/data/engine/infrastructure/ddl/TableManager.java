@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.data.engine.service.ddl;
+package com.easybase.core.data.engine.infrastructure.ddl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,9 +21,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TableManager {
 
-	public void createTableIfNotExists(String schema, String table) {
+	public void createTableIfNotExists(String table) {
 		var tableBuilder = _dslContext.createTableIfNotExists(
-			DSL.name(schema, table));
+			DSL.name(table));
 
 		var idColumn = SQLDataType.UUID;
 		idColumn = idColumn.nullable(false);
@@ -46,12 +46,12 @@ public class TableManager {
 
 		tableBuilder.execute();
 
-		_triggerManager.createUpdatedAtTrigger(schema, table);
+		_triggerManager.createUpdatedAtTrigger(table);
 	}
 
-	public void dropTableIfExists(String schema, String table) {
+	public void dropTableIfExists(String table) {
 		var dropBuilder = _dslContext.dropTableIfExists(
-			DSL.name(schema, table));
+			DSL.name(table));
 
 		dropBuilder = (DropTableStep)dropBuilder.cascade();
 

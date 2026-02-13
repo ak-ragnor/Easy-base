@@ -11,14 +11,15 @@ import com.easybase.core.auth.constants.ResourceActionConstants;
 import com.easybase.core.auth.entity.ResourceAction;
 import com.easybase.core.auth.service.ResourceActionLocalService;
 import com.easybase.core.auth.util.ActionKeyUtil;
-import com.easybase.core.data.engine.entity.Attribute;
-import com.easybase.core.data.engine.entity.Collection;
-import com.easybase.core.data.engine.repository.CollectionRepository;
+import com.easybase.core.data.engine.domain.entity.Attribute;
+import com.easybase.core.data.engine.domain.entity.Collection;
+import com.easybase.core.data.engine.domain.type.AttributeTypeDefinition;
+import com.easybase.core.data.engine.domain.type.AttributeTypeDefinitionRegistry;
+import com.easybase.core.data.engine.infrastructure.ddl.IndexManager;
+import com.easybase.core.data.engine.infrastructure.ddl.TableManager;
+import com.easybase.core.data.engine.infrastructure.persistence.CollectionRepository;
 import com.easybase.core.data.engine.service.CollectionLocalService;
-import com.easybase.core.data.engine.service.ddl.IndexManager;
-import com.easybase.core.data.engine.service.ddl.TableManager;
-import com.easybase.core.data.engine.util.NamingUtils;
-import com.easybase.core.data.engine.util.TenantSchemaUtil;
+import com.easybase.core.data.engine.service.util.NamingUtils;
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.repository.TenantRepository;
 
@@ -76,18 +77,23 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 
 		collection = _collectionRepository.save(collection);
 
-		String schema = TenantSchemaUtil.getSchema(tenantId);
-		String tableName = NamingUtils.generateTableName(
+		String tableName = NamingUtils.getTableName(
 			tenantId, collectionName);
 
-		_tableManager.createTableIfNotExists(schema, tableName);
-		_indexManager.createGinIndexIfNotExists(schema, tableName);
+		_tableManager.createTableIfNotExists(tableName);
+		_indexManager.createGinIndexIfNotExists(tableName);
 
 		if (attributes != null) {
 			for (Attribute attr : attributes) {
 				if (Boolean.TRUE.equals(attr.getIndexed())) {
+					AttributeTypeDefinition attributeTypeDefinition =
+						_attributeTypeDefinitionRegistry.getDescriptor(
+							attr.getDataType());
+
 					_indexManager.createAttributeIndexIfNotExists(
-						schema, tableName, attr.getName(), attr.getDataType());
+						tableName, attr.getName(),
+						attributeTypeDefinition.resolvePostgresType(
+							attr.getConfig()));
 				}
 			}
 		}
@@ -109,8 +115,7 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 		_deleteResourceActions(collection.getName());
 
 		_tableManager.dropTableIfExists(
-			TenantSchemaUtil.getSchema(tenant.getId()),
-			NamingUtils.generateTableName(
+			NamingUtils.getTableName(
 				tenant.getId(), collection.getName()));
 
 		_collectionRepository.delete(collection);
@@ -155,8 +160,7 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 
 		Tenant tenant = collection.getTenant();
 
-		String schema = TenantSchemaUtil.getSchema(tenant.getId());
-		String tableName = NamingUtils.generateTableName(
+		String tableName = NamingUtils.getTableName(
 			tenant.getId(), collection.getName());
 
 		List<Attribute> currentAttributes = collection.getAttributes();
@@ -188,7 +192,7 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 
 			if (Boolean.TRUE.equals(oldAttr.getIndexed())) {
 				_indexManager.dropAttributeIndexIfExists(
-					schema, tableName, attrName);
+					tableName, attrName);
 			}
 
 			collection.removeAttribute(oldAttr);
@@ -202,8 +206,14 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 			collection.addAttribute(newAttr);
 
 			if (Boolean.TRUE.equals(newAttr.getIndexed())) {
+				AttributeTypeDefinition attributeTypeDefinition =
+					_attributeTypeDefinitionRegistry.getDescriptor(
+						newAttr.getDataType());
+
 				_indexManager.createAttributeIndexIfNotExists(
-					schema, tableName, attrName, newAttr.getDataType());
+					tableName, attrName,
+					attributeTypeDefinition.resolvePostgresType(
+						newAttr.getConfig()));
 			}
 		}
 
@@ -221,17 +231,25 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 			if (indexChanged || typeChanged) {
 				if (Boolean.TRUE.equals(currentAttr.getIndexed())) {
 					_indexManager.dropAttributeIndexIfExists(
-						schema, tableName, attrName);
+						tableName, attrName);
 				}
 
 				currentAttr.setDataType(newAttr.getDataType());
 				currentAttr.setIndexed(newAttr.getIndexed());
 
 				if (Boolean.TRUE.equals(newAttr.getIndexed())) {
+					AttributeTypeDefinition attributeTypeDefinition =
+						_attributeTypeDefinitionRegistry.getDescriptor(
+							newAttr.getDataType());
+
 					_indexManager.createAttributeIndexIfNotExists(
-						schema, tableName, attrName, newAttr.getDataType());
+						tableName, attrName,
+						attributeTypeDefinition.resolvePostgresType(
+							newAttr.getConfig()));
 				}
 			}
+
+			currentAttr.setConfig(newAttr.getConfig());
 		}
 
 		collection = _collectionRepository.save(collection);
@@ -320,6 +338,8 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 		return map;
 	}
 
+	private final AttributeTypeDefinitionRegistry
+		_attributeTypeDefinitionRegistry;
 	private final CollectionRepository _collectionRepository;
 	private final IndexManager _indexManager;
 	private final ResourceActionLocalService _resourceActionLocalService;

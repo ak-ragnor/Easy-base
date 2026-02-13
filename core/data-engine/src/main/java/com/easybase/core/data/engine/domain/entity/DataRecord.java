@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.data.engine.entity;
+package com.easybase.core.data.engine.domain.entity;
 
 import java.time.LocalDateTime;
 

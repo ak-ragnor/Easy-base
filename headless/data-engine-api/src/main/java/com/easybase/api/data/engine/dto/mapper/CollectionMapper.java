@@ -7,8 +7,8 @@ package com.easybase.api.data.engine.dto.mapper;
 
 import com.easybase.api.data.engine.dto.AttributeDto;
 import com.easybase.api.data.engine.dto.CollectionDto;
-import com.easybase.core.data.engine.entity.Attribute;
-import com.easybase.core.data.engine.entity.Collection;
+import com.easybase.core.data.engine.domain.entity.Attribute;
+import com.easybase.core.data.engine.domain.entity.Collection;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
 import java.time.Instant;

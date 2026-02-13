@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.data.engine.repository;
+package com.easybase.core.data.engine.infrastructure.persistence;
 
 import com.easybase.common.exception.ResourceNotFoundException;
-import com.easybase.core.data.engine.entity.DataRecord;
-import com.easybase.core.data.engine.util.TenantSchemaUtil;
+import com.easybase.core.data.engine.domain.entity.DataRecord;
+import com.easybase.core.data.engine.service.util.NamingUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,7 +59,7 @@ public class DataRecordRepository {
 
 	public void delete(UUID tenantId, String table, UUID id) {
 		Table<?> dynamicTable = DSL.table(
-			TenantSchemaUtil.tableName(tenantId, table));
+			DSL.name(NamingUtils.getTableName(tenantId, table)));
 
 		DeleteUsingStep<?> deleteUsingStep = _dslContext.deleteFrom(
 			dynamicTable);
@@ -76,7 +76,7 @@ public class DataRecordRepository {
 
 	public boolean exists(UUID tenantId, String table, UUID id) {
 		Table<?> dynamicTable = DSL.table(
-			TenantSchemaUtil.tableName(tenantId, table));
+			DSL.name(NamingUtils.getTableName(tenantId, table)));
 
 		SelectWhereStep<?> selectFromStep = _dslContext.selectFrom(
 			dynamicTable);
@@ -93,7 +93,7 @@ public class DataRecordRepository {
 
 	public List<DataRecord> findAll(UUID tenantId, String table) {
 		Table<?> dynamicTable = DSL.table(
-			TenantSchemaUtil.tableName(tenantId, table));
+			DSL.name(NamingUtils.getTableName(tenantId, table)));
 
 		SelectWhereStep<?> selectFromStep = _dslContext.selectFrom(
 			dynamicTable);
@@ -109,7 +109,7 @@ public class DataRecordRepository {
 
 	public Optional<DataRecord> findById(UUID tenantId, String table, UUID id) {
 		Table<?> dynamicTable = DSL.table(
-			TenantSchemaUtil.tableName(tenantId, table));
+			DSL.name(NamingUtils.getTableName(tenantId, table)));
 
 		SelectWhereStep<?> selectFromStep = _dslContext.selectFrom(
 			dynamicTable);
@@ -128,7 +128,7 @@ public class DataRecordRepository {
 		UUID tenantId, String table, UUID id, Object data) {
 
 		Table<?> dynamicTable = DSL.table(
-			TenantSchemaUtil.tableName(tenantId, table));
+			DSL.name(NamingUtils.getTableName(tenantId, table)));
 
 		InsertSetStep<?> insertSetStep = _dslContext.insertInto(dynamicTable);
 
@@ -154,7 +154,7 @@ public class DataRecordRepository {
 		UUID tenantId, String table, UUID id, Map<String, Object> data) {
 
 		Table<?> dynamicTable = DSL.table(
-			TenantSchemaUtil.tableName(tenantId, table));
+			DSL.name(NamingUtils.getTableName(tenantId, table)));
 
 		UpdateSetStep<?> updateSetStep = _dslContext.update(dynamicTable);
 

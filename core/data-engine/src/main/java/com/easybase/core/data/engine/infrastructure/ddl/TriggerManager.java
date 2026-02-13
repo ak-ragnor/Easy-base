@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.data.engine.service.ddl;
+package com.easybase.core.data.engine.infrastructure.ddl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TriggerManager {
 
-	public void createUpdatedAtTrigger(String schema, String table) {
+	public void createUpdatedAtTrigger(String table) {
 		String functionSql =
 			"CREATE OR REPLACE FUNCTION update_updated_at_column() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ LANGUAGE 'plpgsql';";
 
@@ -29,11 +29,11 @@ public class TriggerManager {
 
 		_dslContext.execute(
 			"DROP TRIGGER IF EXISTS {0} ON {1}", DSL.name(triggerName),
-			DSL.table(DSL.name(schema, table)));
+			DSL.table(DSL.name(table)));
 
 		_dslContext.execute(
 			"CREATE TRIGGER {0} BEFORE UPDATE ON {1} FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
-			DSL.name(triggerName), DSL.table(DSL.name(schema, table)));
+			DSL.name(triggerName), DSL.table(DSL.name(table)));
 	}
 
 	private final DSLContext _dslContext;
