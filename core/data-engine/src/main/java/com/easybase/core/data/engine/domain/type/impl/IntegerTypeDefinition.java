@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -77,7 +77,9 @@ public class IntegerTypeDefinition implements AttributeTypeDefinition {
 		Object value = config.get(key);
 
 		if (value instanceof Number) {
-			return ((Number)value).longValue();
+			Number number = (Number)value;
+
+			return number.longValue();
 		}
 
 		return null;
@@ -88,15 +90,17 @@ public class IntegerTypeDefinition implements AttributeTypeDefinition {
 			return;
 		}
 
-		if (value instanceof Byte || value instanceof Short ||
-			value instanceof Integer || value instanceof Long ||
+		if (value instanceof Byte || value instanceof Integer ||
+			value instanceof Short || value instanceof Long ||
 			value instanceof BigInteger) {
 
 			return;
 		}
 
 		if (value instanceof Number) {
-			double doubleValue = ((Number)value).doubleValue();
+			Number number = (Number)value;
+
+			double doubleValue = number.doubleValue();
 
 			if ((doubleValue % 1) == 0) {
 				return;
@@ -113,7 +117,7 @@ public class IntegerTypeDefinition implements AttributeTypeDefinition {
 
 				return;
 			}
-			catch (NumberFormatException ignored) {
+			catch (NumberFormatException numberFormatException) {
 			}
 		}
 

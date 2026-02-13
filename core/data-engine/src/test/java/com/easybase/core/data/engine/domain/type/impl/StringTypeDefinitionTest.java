@@ -73,7 +73,7 @@ class StringTypeDefinitionTest {
 	}
 
 	@Test
-	public void testValidateNonStringFails() {
+	public void testValidateNotStringFails() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _definition.validate("field", 123, Collections.emptyMap()));

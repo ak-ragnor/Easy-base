@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 class RequiredValidatorTest {
 
 	@Test
-	public void testNonNullValueWithRequiredTrue() {
+	public void testNotNullValueWithRequiredTrue() {
 		_validator.validate("field", "value", Map.of("required", Boolean.TRUE));
 	}
 

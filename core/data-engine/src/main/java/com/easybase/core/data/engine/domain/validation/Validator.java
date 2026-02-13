@@ -12,6 +12,7 @@ import java.util.Map;
  */
 public interface Validator {
 
-	void validate(String fieldName, Object value, Map<String, Object> config);
+	public void validate(
+		String fieldName, Object value, Map<String, Object> config);
 
 }

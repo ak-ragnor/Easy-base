@@ -43,7 +43,9 @@ public class StringLengthValidator implements Validator {
 		}
 
 		if (value instanceof Number) {
-			return ((Number)value).intValue();
+			Number number = (Number)value;
+
+			return number.intValue();
 		}
 
 		return Integer.valueOf(value.toString());

@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AttributeDto {
 
+	@SuppressWarnings("unused")
 	private Map<String, Object> config;
 
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)

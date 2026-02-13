@@ -43,8 +43,9 @@ public class TemporalTypeDefinition implements AttributeTypeDefinition {
 			return "timestamp";
 		}
 
-		String formatStr = format.toString(
-		).toUpperCase();
+		String formatStr = format.toString();
+
+		formatStr = formatStr.toUpperCase();
 
 		switch (formatStr) {
 			case "DATE":
@@ -81,7 +82,7 @@ public class TemporalTypeDefinition implements AttributeTypeDefinition {
 
 			return;
 		}
-		catch (Exception ignored) {
+		catch (Exception exception) {
 		}
 
 		try {
@@ -89,7 +90,7 @@ public class TemporalTypeDefinition implements AttributeTypeDefinition {
 
 			return;
 		}
-		catch (Exception ignored) {
+		catch (Exception exception) {
 		}
 
 		try {
@@ -97,7 +98,7 @@ public class TemporalTypeDefinition implements AttributeTypeDefinition {
 
 			return;
 		}
-		catch (Exception ignored) {
+		catch (Exception exception) {
 		}
 
 		throw new ValidationException(

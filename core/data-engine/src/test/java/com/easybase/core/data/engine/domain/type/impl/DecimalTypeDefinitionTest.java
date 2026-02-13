@@ -45,7 +45,7 @@ class DecimalTypeDefinitionTest {
 
 	@Test
 	public void testValidateFloat() {
-		_definition.validate("field", 3.14f, Collections.emptyMap());
+		_definition.validate("field", 3.14F, Collections.emptyMap());
 	}
 
 	@Test

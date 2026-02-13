@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -72,7 +72,9 @@ public class DecimalTypeDefinition implements AttributeTypeDefinition {
 
 	private Integer _toInteger(Object value) {
 		if (value instanceof Number) {
-			return ((Number)value).intValue();
+			Number number = (Number)value;
+
+			return number.intValue();
 		}
 
 		return null;

@@ -52,7 +52,7 @@ public class UuidTypeDefinition implements AttributeTypeDefinition {
 		try {
 			UUID.fromString(value.toString());
 		}
-		catch (IllegalArgumentException exception) {
+		catch (IllegalArgumentException illegalArgumentException) {
 			throw new ValidationException(
 				fieldName, value.toString(), "expected a valid UUID");
 		}
