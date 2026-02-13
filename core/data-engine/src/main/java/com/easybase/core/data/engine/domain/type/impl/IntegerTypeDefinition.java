@@ -90,9 +90,9 @@ public class IntegerTypeDefinition implements AttributeTypeDefinition {
 			return;
 		}
 
-		if (value instanceof Byte || value instanceof Integer ||
-			value instanceof Short || value instanceof Long ||
-			value instanceof BigInteger) {
+		if (value instanceof BigInteger || value instanceof Byte ||
+			value instanceof Integer || value instanceof Long ||
+			value instanceof Short) {
 
 			return;
 		}

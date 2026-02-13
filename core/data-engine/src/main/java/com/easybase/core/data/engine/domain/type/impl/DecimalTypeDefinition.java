@@ -66,7 +66,10 @@ public class DecimalTypeDefinition implements AttributeTypeDefinition {
 		}
 		catch (NumberFormatException numberFormatException) {
 			throw new ValidationException(
-				fieldName, value.toString(), "expected a decimal value");
+				String.format(
+					"Validation failed for field '%s' with value '%s': %s",
+					fieldName, value, "expected a decimal value"),
+				numberFormatException);
 		}
 	}
 

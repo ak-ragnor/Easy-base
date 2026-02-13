@@ -56,8 +56,11 @@ public class BinaryTypeDefinition implements AttributeTypeDefinition {
 		}
 		catch (IllegalArgumentException illegalArgumentException) {
 			throw new ValidationException(
-				fieldName, value.toString(),
-				"expected a Base64-encoded binary value");
+				String.format(
+					"Validation failed for field '%s' with value '%s': %s",
+					fieldName, value.toString(),
+					"expected a Base64-encoded binary value"),
+				illegalArgumentException);
 		}
 	}
 

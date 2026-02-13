@@ -60,7 +60,10 @@ public class JsonTypeDefinition implements AttributeTypeDefinition {
 		}
 		catch (Exception exception) {
 			throw new ValidationException(
-				fieldName, value.toString(), "expected valid JSON");
+				String.format(
+					"Validation failed for field '%s' with value '%s': %s",
+					fieldName, value.toString(), "expected valid JSON"),
+				exception);
 		}
 	}
 

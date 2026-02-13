@@ -26,8 +26,8 @@ public class ValidationException extends BaseApiException {
 			HttpStatus.BAD_REQUEST, "VALIDATION_ERROR");
 	}
 
-	public ValidationException(String message, Throwable cause) {
-		super(message, cause, HttpStatus.BAD_REQUEST, "VALIDATION_ERROR");
+	public ValidationException(String message, Throwable throwable) {
+		super(message, throwable, HttpStatus.BAD_REQUEST, "VALIDATION_ERROR");
 	}
 
 }

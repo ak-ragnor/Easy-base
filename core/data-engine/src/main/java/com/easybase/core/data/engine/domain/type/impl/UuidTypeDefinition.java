@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -54,7 +54,10 @@ public class UuidTypeDefinition implements AttributeTypeDefinition {
 		}
 		catch (IllegalArgumentException illegalArgumentException) {
 			throw new ValidationException(
-				fieldName, value.toString(), "expected a valid UUID");
+				String.format(
+					"Validation failed for field '%s' with value '%s': %s",
+					fieldName, value, "expected a valid UUID"),
+				illegalArgumentException);
 		}
 	}
 
