@@ -19,37 +19,37 @@ import org.junit.jupiter.api.Test;
 class BinaryTypeDefinitionTest {
 
 	@Test
-	void testGetType() {
+	public void testGetType() {
 		Assertions.assertEquals(AttributeType.BINARY, _definition.getType());
 	}
 
 	@Test
-	void testResolvePostgresType() {
+	public void testResolvePostgresType() {
 		Assertions.assertEquals("bytea", _definition.resolvePostgresType(null));
 	}
 
 	@Test
-	void testValidateByteArray() {
+	public void testValidateByteArray() {
 		_definition.validate(
 			"field", new byte[] {1, 2, 3}, Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateValidBase64String() {
-		_definition.validate("field", "SGVsbG8=", Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateEmptyBase64String() {
+	public void testValidateEmptyBase64String() {
 		_definition.validate("field", "", Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateInvalidBase64String() {
+	public void testValidateInvalidBase64String() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _definition.validate(
 				"field", "not-valid-base64!!!", Collections.emptyMap()));
+	}
+
+	@Test
+	public void testValidateValidBase64String() {
+		_definition.validate("field", "SGVsbG8=", Collections.emptyMap());
 	}
 
 	private final BinaryTypeDefinition _definition = new BinaryTypeDefinition();

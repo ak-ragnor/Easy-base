@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -26,8 +26,8 @@ public class IndexManager {
 
 		_dslContext.execute(
 			"CREATE INDEX IF NOT EXISTS {0} ON {1} (((data->>'{2}')::{3}))",
-			DSL.name(indexName), DSL.name(table),
-			DSL.inline(attributeName), DSL.keyword(postgresType));
+			DSL.name(indexName), DSL.name(table), DSL.inline(attributeName),
+			DSL.keyword(postgresType));
 	}
 
 	public void createGinIndexIfNotExists(String table) {
@@ -38,13 +38,10 @@ public class IndexManager {
 			DSL.name(indexName), DSL.table(DSL.name(table)));
 	}
 
-	public void dropAttributeIndexIfExists(
-		String table, String attributeName) {
-
+	public void dropAttributeIndexIfExists(String table, String attributeName) {
 		String indexName = String.format("%s_%s_idx", table, attributeName);
 
-		_dslContext.execute(
-			"DROP INDEX IF EXISTS {0}", DSL.name(indexName));
+		_dslContext.execute("DROP INDEX IF EXISTS {0}", DSL.name(indexName));
 	}
 
 	private final DSLContext _dslContext;

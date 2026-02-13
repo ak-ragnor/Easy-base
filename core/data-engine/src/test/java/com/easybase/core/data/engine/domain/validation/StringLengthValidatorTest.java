@@ -19,29 +19,7 @@ import org.junit.jupiter.api.Test;
 class StringLengthValidatorTest {
 
 	@Test
-	void testNoLengthConfig() {
-		_validator.validate("field", "anything", Collections.emptyMap());
-	}
-
-	@Test
-	void testMinLengthPasses() {
-		_validator.validate("field", "abc", Map.of("minLength", 3));
-	}
-
-	@Test
-	void testMinLengthFails() {
-		Assertions.assertThrows(
-			ValidationException.class,
-			() -> _validator.validate("field", "ab", Map.of("minLength", 3)));
-	}
-
-	@Test
-	void testMaxLengthPasses() {
-		_validator.validate("field", "abcde", Map.of("maxLength", 5));
-	}
-
-	@Test
-	void testMaxLengthFails() {
+	public void testMaxLengthFails() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _validator.validate(
@@ -49,17 +27,39 @@ class StringLengthValidatorTest {
 	}
 
 	@Test
-	void testMinAndMaxLengthPasses() {
+	public void testMaxLengthPasses() {
+		_validator.validate("field", "abcde", Map.of("maxLength", 5));
+	}
+
+	@Test
+	public void testMinAndMaxLengthFailsBelowMin() {
+		Assertions.assertThrows(
+			ValidationException.class,
+			() -> _validator.validate(
+				"field", "a", Map.of("minLength", 2, "maxLength", 5)));
+	}
+
+	@Test
+	public void testMinAndMaxLengthPasses() {
 		_validator.validate(
 			"field", "abcd", Map.of("minLength", 2, "maxLength", 5));
 	}
 
 	@Test
-	void testMinAndMaxLengthFailsBelowMin() {
+	public void testMinLengthFails() {
 		Assertions.assertThrows(
 			ValidationException.class,
-			() -> _validator.validate(
-				"field", "a", Map.of("minLength", 2, "maxLength", 5)));
+			() -> _validator.validate("field", "ab", Map.of("minLength", 3)));
+	}
+
+	@Test
+	public void testMinLengthPasses() {
+		_validator.validate("field", "abc", Map.of("minLength", 3));
+	}
+
+	@Test
+	public void testNoLengthConfig() {
+		_validator.validate("field", "anything", Collections.emptyMap());
 	}
 
 	private final StringLengthValidator _validator =

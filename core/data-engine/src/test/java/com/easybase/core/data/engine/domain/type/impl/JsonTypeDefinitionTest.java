@@ -23,51 +23,29 @@ import org.junit.jupiter.api.Test;
 class JsonTypeDefinitionTest {
 
 	@Test
-	void testGetType() {
+	public void testGetType() {
 		Assertions.assertEquals(AttributeType.JSON, _definition.getType());
 	}
 
 	@Test
-	void testResolvePostgresType() {
+	public void testResolvePostgresType() {
 		Assertions.assertEquals("jsonb", _definition.resolvePostgresType(null));
 	}
 
 	@Test
-	void testValidateMap() {
-		_definition.validate(
-			"field", Map.of("key", "value"), Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateEmptyMap() {
-		_definition.validate(
-			"field", Collections.emptyMap(), Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateList() {
-		_definition.validate("field", List.of(1, 2, 3), Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateEmptyList() {
+	public void testValidateEmptyList() {
 		_definition.validate(
 			"field", Collections.emptyList(), Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateJsonObjectString() {
+	public void testValidateEmptyMap() {
 		_definition.validate(
-			"field", "{\"key\":\"value\"}", Collections.emptyMap());
+			"field", Collections.emptyMap(), Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateJsonArrayString() {
-		_definition.validate("field", "[1, 2, 3]", Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateInvalidJsonString() {
+	public void testValidateInvalidJsonString() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _definition.validate(
@@ -75,7 +53,29 @@ class JsonTypeDefinitionTest {
 	}
 
 	@Test
-	void testValidateRequiredWithValue() {
+	public void testValidateJsonArrayString() {
+		_definition.validate("field", "[1, 2, 3]", Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateJsonObjectString() {
+		_definition.validate(
+			"field", "{\"key\":\"value\"}", Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateList() {
+		_definition.validate("field", List.of(1, 2, 3), Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateMap() {
+		_definition.validate(
+			"field", Map.of("key", "value"), Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateRequiredWithValue() {
 		_definition.validate(
 			"field", Map.of("key", "value"), Map.of("required", Boolean.TRUE));
 	}

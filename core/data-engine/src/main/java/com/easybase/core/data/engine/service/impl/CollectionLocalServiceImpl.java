@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -77,8 +77,7 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 
 		collection = _collectionRepository.save(collection);
 
-		String tableName = NamingUtils.getTableName(
-			tenantId, collectionName);
+		String tableName = NamingUtils.getTableName(tenantId, collectionName);
 
 		_tableManager.createTableIfNotExists(tableName);
 		_indexManager.createGinIndexIfNotExists(tableName);
@@ -115,8 +114,7 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 		_deleteResourceActions(collection.getName());
 
 		_tableManager.dropTableIfExists(
-			NamingUtils.getTableName(
-				tenant.getId(), collection.getName()));
+			NamingUtils.getTableName(tenant.getId(), collection.getName()));
 
 		_collectionRepository.delete(collection);
 
@@ -191,8 +189,7 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 			Attribute oldAttr = currentAttributeMap.get(attrName);
 
 			if (Boolean.TRUE.equals(oldAttr.getIndexed())) {
-				_indexManager.dropAttributeIndexIfExists(
-					tableName, attrName);
+				_indexManager.dropAttributeIndexIfExists(tableName, attrName);
 			}
 
 			collection.removeAttribute(oldAttr);

@@ -24,76 +24,55 @@ import org.junit.jupiter.api.Test;
 class TemporalTypeDefinitionTest {
 
 	@Test
-	void testGetType() {
+	public void testGetType() {
 		Assertions.assertEquals(AttributeType.TEMPORAL, _definition.getType());
 	}
 
 	@Test
-	void testResolvePostgresTypeNoConfig() {
-		Assertions.assertEquals(
-			"timestamp",
-			_definition.resolvePostgresType(Collections.emptyMap()));
-	}
-
-	@Test
-	void testResolvePostgresTypeNullConfig() {
-		Assertions.assertEquals(
-			"timestamp", _definition.resolvePostgresType(null));
-	}
-
-	@Test
-	void testResolvePostgresTypeDate() {
+	public void testResolvePostgresTypeDate() {
 		Assertions.assertEquals(
 			"date", _definition.resolvePostgresType(Map.of("format", "DATE")));
 	}
 
 	@Test
-	void testResolvePostgresTypeTime() {
-		Assertions.assertEquals(
-			"time", _definition.resolvePostgresType(Map.of("format", "TIME")));
-	}
-
-	@Test
-	void testResolvePostgresTypeDefaultFormat() {
+	public void testResolvePostgresTypeDefaultFormat() {
 		Assertions.assertEquals(
 			"timestamp",
 			_definition.resolvePostgresType(Map.of("format", "DATETIME")));
 	}
 
 	@Test
-	void testValidateLocalDateTime() {
-		_definition.validate(
-			"field", LocalDateTime.now(), Collections.emptyMap());
+	public void testResolvePostgresTypeNoConfig() {
+		Assertions.assertEquals(
+			"timestamp",
+			_definition.resolvePostgresType(Collections.emptyMap()));
 	}
 
 	@Test
-	void testValidateLocalDate() {
-		_definition.validate("field", LocalDate.now(), Collections.emptyMap());
+	public void testResolvePostgresTypeNullConfig() {
+		Assertions.assertEquals(
+			"timestamp", _definition.resolvePostgresType(null));
 	}
 
 	@Test
-	void testValidateLocalTime() {
-		_definition.validate("field", LocalTime.now(), Collections.emptyMap());
+	public void testResolvePostgresTypeTime() {
+		Assertions.assertEquals(
+			"time", _definition.resolvePostgresType(Map.of("format", "TIME")));
 	}
 
 	@Test
-	void testValidateDateTimeString() {
+	public void testValidateDateString() {
+		_definition.validate("field", "2024-01-15", Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateDateTimeString() {
 		_definition.validate(
 			"field", "2024-01-15T10:30:00", Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateDateString() {
-		_definition.validate("field", "2024-01-15", Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateTimeString() {
-		_definition.validate("field", "10:30:00", Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateInvalidString() {
+	public void testValidateInvalidString() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _definition.validate(
@@ -101,9 +80,30 @@ class TemporalTypeDefinitionTest {
 	}
 
 	@Test
-	void testValidateRequiredWithValue() {
+	public void testValidateLocalDate() {
+		_definition.validate("field", LocalDate.now(), Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateLocalDateTime() {
+		_definition.validate(
+			"field", LocalDateTime.now(), Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateLocalTime() {
+		_definition.validate("field", LocalTime.now(), Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateRequiredWithValue() {
 		_definition.validate(
 			"field", "2024-01-15T10:30:00", Map.of("required", Boolean.TRUE));
+	}
+
+	@Test
+	public void testValidateTimeString() {
+		_definition.validate("field", "10:30:00", Collections.emptyMap());
 	}
 
 	private final TemporalTypeDefinition _definition =

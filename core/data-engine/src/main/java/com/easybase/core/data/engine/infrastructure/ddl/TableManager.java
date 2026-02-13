@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -22,8 +22,7 @@ import org.springframework.stereotype.Component;
 public class TableManager {
 
 	public void createTableIfNotExists(String table) {
-		var tableBuilder = _dslContext.createTableIfNotExists(
-			DSL.name(table));
+		var tableBuilder = _dslContext.createTableIfNotExists(DSL.name(table));
 
 		var idColumn = SQLDataType.UUID;
 		idColumn = idColumn.nullable(false);
@@ -50,8 +49,7 @@ public class TableManager {
 	}
 
 	public void dropTableIfExists(String table) {
-		var dropBuilder = _dslContext.dropTableIfExists(
-			DSL.name(table));
+		var dropBuilder = _dslContext.dropTableIfExists(DSL.name(table));
 
 		dropBuilder = (DropTableStep)dropBuilder.cascade();
 

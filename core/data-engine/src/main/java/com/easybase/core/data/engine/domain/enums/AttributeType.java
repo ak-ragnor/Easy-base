@@ -10,6 +10,6 @@ package com.easybase.core.data.engine.domain.enums;
  */
 public enum AttributeType {
 
-	BINARY, BOOLEAN, DECIMAL, INTEGER, JSON, STRING, TEMPORAL, UUID;
+	BINARY, BOOLEAN, DECIMAL, INTEGER, JSON, STRING, TEMPORAL, UUID
 
 }

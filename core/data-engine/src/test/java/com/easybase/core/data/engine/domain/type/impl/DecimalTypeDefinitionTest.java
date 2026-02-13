@@ -22,49 +22,39 @@ import org.junit.jupiter.api.Test;
 class DecimalTypeDefinitionTest {
 
 	@Test
-	void testGetType() {
+	public void testGetType() {
 		Assertions.assertEquals(AttributeType.DECIMAL, _definition.getType());
 	}
 
 	@Test
-	void testResolvePostgresType() {
+	public void testResolvePostgresType() {
 		Assertions.assertEquals(
 			"numeric", _definition.resolvePostgresType(null));
 	}
 
 	@Test
-	void testValidateBigDecimal() {
+	public void testValidateBigDecimal() {
 		_definition.validate(
 			"field", new BigDecimal("123.45"), Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateInteger() {
-		_definition.validate("field", 42, Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateLong() {
-		_definition.validate("field", 123456789L, Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateFloat() {
-		_definition.validate("field", 3.14f, Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateDouble() {
+	public void testValidateDouble() {
 		_definition.validate("field", 3.14159, Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateNumericString() {
-		_definition.validate("field", "123.45", Collections.emptyMap());
+	public void testValidateFloat() {
+		_definition.validate("field", 3.14f, Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateInvalidString() {
+	public void testValidateInteger() {
+		_definition.validate("field", 42, Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateInvalidString() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _definition.validate(
@@ -72,35 +62,55 @@ class DecimalTypeDefinitionTest {
 	}
 
 	@Test
-	void testValidateNullValueNoConfigThrowsNpe() {
+	public void testValidateLong() {
+		_definition.validate("field", 123456789L, Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateMaxFails() {
+		Assertions.assertThrows(
+			ValidationException.class,
+			() -> _definition.validate("field", 200, Map.of("max", 100)));
+	}
+
+	@Test
+	public void testValidateMaxPasses() {
+		_definition.validate("field", 50, Map.of("max", 100));
+	}
+
+	@Test
+	public void testValidateMinFails() {
+		Assertions.assertThrows(
+			ValidationException.class,
+			() -> _definition.validate("field", 5, Map.of("min", 10)));
+	}
+
+	@Test
+	public void testValidateMinPasses() {
+		_definition.validate("field", 50, Map.of("min", 10));
+	}
+
+	@Test
+	public void testValidateNullValueNoConfigThrowsNpe() {
 		Assertions.assertThrows(
 			NullPointerException.class,
 			() -> _definition.validate("field", null, Collections.emptyMap()));
 	}
 
 	@Test
-	void testValidateNullValueNullConfigThrowsNpe() {
+	public void testValidateNullValueNullConfigThrowsNpe() {
 		Assertions.assertThrows(
 			NullPointerException.class,
 			() -> _definition.validate("field", null, null));
 	}
 
 	@Test
-	void testValidateRequiredNullValue() {
-		Assertions.assertThrows(
-			ValidationException.class,
-			() -> _definition.validate(
-				"field", null, Map.of("required", Boolean.TRUE)));
+	public void testValidateNumericString() {
+		_definition.validate("field", "123.45", Collections.emptyMap());
 	}
 
 	@Test
-	void testValidatePrecisionPasses() {
-		_definition.validate(
-			"field", new BigDecimal("123.45"), Map.of("precision", 5));
-	}
-
-	@Test
-	void testValidatePrecisionFails() {
+	public void testValidatePrecisionFails() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _definition.validate(
@@ -108,13 +118,21 @@ class DecimalTypeDefinitionTest {
 	}
 
 	@Test
-	void testValidateScalePasses() {
+	public void testValidatePrecisionPasses() {
 		_definition.validate(
-			"field", new BigDecimal("123.45"), Map.of("scale", 2));
+			"field", new BigDecimal("123.45"), Map.of("precision", 5));
 	}
 
 	@Test
-	void testValidateScaleFails() {
+	public void testValidateRequiredNullValue() {
+		Assertions.assertThrows(
+			ValidationException.class,
+			() -> _definition.validate(
+				"field", null, Map.of("required", Boolean.TRUE)));
+	}
+
+	@Test
+	public void testValidateScaleFails() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _definition.validate(
@@ -122,27 +140,9 @@ class DecimalTypeDefinitionTest {
 	}
 
 	@Test
-	void testValidateMinPasses() {
-		_definition.validate("field", 50, Map.of("min", 10));
-	}
-
-	@Test
-	void testValidateMinFails() {
-		Assertions.assertThrows(
-			ValidationException.class,
-			() -> _definition.validate("field", 5, Map.of("min", 10)));
-	}
-
-	@Test
-	void testValidateMaxPasses() {
-		_definition.validate("field", 50, Map.of("max", 100));
-	}
-
-	@Test
-	void testValidateMaxFails() {
-		Assertions.assertThrows(
-			ValidationException.class,
-			() -> _definition.validate("field", 200, Map.of("max", 100)));
+	public void testValidateScalePasses() {
+		_definition.validate(
+			"field", new BigDecimal("123.45"), Map.of("scale", 2));
 	}
 
 	private final DecimalTypeDefinition _definition =

@@ -50,12 +50,11 @@ public class BinaryTypeDefinition implements AttributeTypeDefinition {
 		}
 
 		try {
-			Base64.getDecoder(
-			).decode(
-				value.toString()
-			);
+			Base64.Decoder decoder = Base64.getDecoder();
+
+			decoder.decode(value.toString());
 		}
-		catch (IllegalArgumentException exception) {
+		catch (IllegalArgumentException illegalArgumentException) {
 			throw new ValidationException(
 				fieldName, value.toString(),
 				"expected a Base64-encoded binary value");

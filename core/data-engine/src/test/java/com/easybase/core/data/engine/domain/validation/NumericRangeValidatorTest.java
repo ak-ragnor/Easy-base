@@ -19,49 +19,24 @@ import org.junit.jupiter.api.Test;
 class NumericRangeValidatorTest {
 
 	@Test
-	void testNoRangeConfig() {
-		_validator.validate("field", 50, Collections.emptyMap());
+	public void testDecimalRange() {
+		_validator.validate("field", 5.5, Map.of("min", 1.0, "max", 10.0));
 	}
 
 	@Test
-	void testMinPasses() {
-		_validator.validate("field", 10, Map.of("min", 10));
-	}
-
-	@Test
-	void testMinFails() {
-		Assertions.assertThrows(
-			ValidationException.class,
-			() -> _validator.validate("field", 5, Map.of("min", 10)));
-	}
-
-	@Test
-	void testMaxPasses() {
-		_validator.validate("field", 100, Map.of("max", 100));
-	}
-
-	@Test
-	void testMaxFails() {
+	public void testMaxFails() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _validator.validate("field", 200, Map.of("max", 100)));
 	}
 
 	@Test
-	void testMinAndMaxPasses() {
-		_validator.validate("field", 50, Map.of("min", 10, "max", 100));
+	public void testMaxPasses() {
+		_validator.validate("field", 100, Map.of("max", 100));
 	}
 
 	@Test
-	void testMinAndMaxFailsBelowMin() {
-		Assertions.assertThrows(
-			ValidationException.class,
-			() -> _validator.validate(
-				"field", 5, Map.of("min", 10, "max", 100)));
-	}
-
-	@Test
-	void testMinAndMaxFailsAboveMax() {
+	public void testMinAndMaxFailsAboveMax() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _validator.validate(
@@ -69,8 +44,33 @@ class NumericRangeValidatorTest {
 	}
 
 	@Test
-	void testDecimalRange() {
-		_validator.validate("field", 5.5, Map.of("min", 1.0, "max", 10.0));
+	public void testMinAndMaxFailsBelowMin() {
+		Assertions.assertThrows(
+			ValidationException.class,
+			() -> _validator.validate(
+				"field", 5, Map.of("min", 10, "max", 100)));
+	}
+
+	@Test
+	public void testMinAndMaxPasses() {
+		_validator.validate("field", 50, Map.of("min", 10, "max", 100));
+	}
+
+	@Test
+	public void testMinFails() {
+		Assertions.assertThrows(
+			ValidationException.class,
+			() -> _validator.validate("field", 5, Map.of("min", 10)));
+	}
+
+	@Test
+	public void testMinPasses() {
+		_validator.validate("field", 10, Map.of("min", 10));
+	}
+
+	@Test
+	public void testNoRangeConfig() {
+		_validator.validate("field", 50, Collections.emptyMap());
 	}
 
 	private final NumericRangeValidator _validator =

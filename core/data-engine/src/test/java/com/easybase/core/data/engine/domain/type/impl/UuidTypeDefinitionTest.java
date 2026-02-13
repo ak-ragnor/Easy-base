@@ -21,30 +21,17 @@ import org.junit.jupiter.api.Test;
 class UuidTypeDefinitionTest {
 
 	@Test
-	void testGetType() {
+	public void testGetType() {
 		Assertions.assertEquals(AttributeType.UUID, _definition.getType());
 	}
 
 	@Test
-	void testResolvePostgresType() {
+	public void testResolvePostgresType() {
 		Assertions.assertEquals("uuid", _definition.resolvePostgresType(null));
 	}
 
 	@Test
-	void testValidateUuidInstance() {
-		_definition.validate(
-			"field", UUID.randomUUID(), Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateValidUuidString() {
-		_definition.validate(
-			"field", "550e8400-e29b-41d4-a716-446655440000",
-			Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateInvalidUuidString() {
+	public void testValidateInvalidUuidString() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _definition.validate(
@@ -52,9 +39,22 @@ class UuidTypeDefinitionTest {
 	}
 
 	@Test
-	void testValidateRequiredWithValue() {
+	public void testValidateRequiredWithValue() {
 		_definition.validate(
 			"field", UUID.randomUUID(), Map.of("required", Boolean.TRUE));
+	}
+
+	@Test
+	public void testValidateUuidInstance() {
+		_definition.validate(
+			"field", UUID.randomUUID(), Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateValidUuidString() {
+		_definition.validate(
+			"field", "550e8400-e29b-41d4-a716-446655440000",
+			Collections.emptyMap());
 	}
 
 	private final UuidTypeDefinition _definition = new UuidTypeDefinition();

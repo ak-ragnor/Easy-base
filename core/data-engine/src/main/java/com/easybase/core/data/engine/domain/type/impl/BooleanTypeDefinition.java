@@ -48,12 +48,13 @@ public class BooleanTypeDefinition implements AttributeTypeDefinition {
 			return;
 		}
 
-		String strValue = value.toString(
-		).toLowerCase();
+		String string = value.toString();
+
+		String strValue = string.toLowerCase();
 
 		if (!strValue.equals("true") && !strValue.equals("false")) {
 			throw new ValidationException(
-				fieldName, value.toString(), "must be a valid boolean value");
+				fieldName, string, "must be a valid boolean value");
 		}
 	}
 

@@ -14,10 +14,11 @@ import java.util.Map;
  */
 public interface AttributeTypeDefinition {
 
-	AttributeType getType();
+	public AttributeType getType();
 
-	String resolvePostgresType(Map<String, Object> config);
+	public String resolvePostgresType(Map<String, Object> config);
 
-	void validate(String fieldName, Object value, Map<String, Object> config);
+	public void validate(
+		String fieldName, Object value, Map<String, Object> config);
 
 }

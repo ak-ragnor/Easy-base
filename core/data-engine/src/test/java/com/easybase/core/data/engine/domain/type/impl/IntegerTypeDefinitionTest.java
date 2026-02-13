@@ -22,39 +22,18 @@ import org.junit.jupiter.api.Test;
 class IntegerTypeDefinitionTest {
 
 	@Test
-	void testGetType() {
+	public void testGetType() {
 		Assertions.assertEquals(AttributeType.INTEGER, _definition.getType());
 	}
 
 	@Test
-	void testResolvePostgresTypeNoConfig() {
-		Assertions.assertEquals(
-			"integer", _definition.resolvePostgresType(null));
-	}
-
-	@Test
-	void testResolvePostgresTypeEmptyConfig() {
+	public void testResolvePostgresTypeEmptyConfig() {
 		Assertions.assertEquals(
 			"integer", _definition.resolvePostgresType(Collections.emptyMap()));
 	}
 
 	@Test
-	void testResolvePostgresTypeWithinIntRange() {
-		Assertions.assertEquals(
-			"integer",
-			_definition.resolvePostgresType(Map.of("min", 0, "max", 1000)));
-	}
-
-	@Test
-	void testResolvePostgresTypeMinBelowIntRange() {
-		Assertions.assertEquals(
-			"bigint",
-			_definition.resolvePostgresType(
-				Map.of("min", (long)Integer.MIN_VALUE - 1)));
-	}
-
-	@Test
-	void testResolvePostgresTypeMaxAboveIntRange() {
+	public void testResolvePostgresTypeMaxAboveIntRange() {
 		Assertions.assertEquals(
 			"bigint",
 			_definition.resolvePostgresType(
@@ -62,64 +41,99 @@ class IntegerTypeDefinitionTest {
 	}
 
 	@Test
-	void testValidateInteger() {
-		_definition.validate("field", 42, Collections.emptyMap());
+	public void testResolvePostgresTypeMinBelowIntRange() {
+		Assertions.assertEquals(
+			"bigint",
+			_definition.resolvePostgresType(
+				Map.of("min", (long)Integer.MIN_VALUE - 1)));
 	}
 
 	@Test
-	void testValidateLong() {
-		_definition.validate("field", 123456789L, Collections.emptyMap());
+	public void testResolvePostgresTypeNoConfig() {
+		Assertions.assertEquals(
+			"integer", _definition.resolvePostgresType(null));
 	}
 
 	@Test
-	void testValidateShort() {
-		_definition.validate("field", (short)10, Collections.emptyMap());
+	public void testResolvePostgresTypeWithinIntRange() {
+		Assertions.assertEquals(
+			"integer",
+			_definition.resolvePostgresType(Map.of("min", 0, "max", 1000)));
 	}
 
 	@Test
-	void testValidateByte() {
-		_definition.validate("field", (byte)5, Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateBigInteger() {
+	public void testValidateBigInteger() {
 		_definition.validate(
 			"field", BigInteger.valueOf(999), Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateNumberWithNoFraction() {
-		_definition.validate("field", 10.0, Collections.emptyMap());
+	public void testValidateByte() {
+		_definition.validate("field", (byte)5, Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateNumberWithFractionFails() {
-		Assertions.assertThrows(
-			ValidationException.class,
-			() -> _definition.validate("field", 3.5, Collections.emptyMap()));
+	public void testValidateInteger() {
+		_definition.validate("field", 42, Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateValidIntegerString() {
-		_definition.validate("field", "12345", Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateInvalidString() {
+	public void testValidateInvalidString() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _definition.validate("field", "abc", Collections.emptyMap()));
 	}
 
 	@Test
-	void testValidateNullValueThrowsNpe() {
+	public void testValidateLong() {
+		_definition.validate("field", 123456789L, Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateMaxFails() {
+		Assertions.assertThrows(
+			ValidationException.class,
+			() -> _definition.validate("field", 200, Map.of("max", 100)));
+	}
+
+	@Test
+	public void testValidateMaxPasses() {
+		_definition.validate("field", 50, Map.of("max", 100));
+	}
+
+	@Test
+	public void testValidateMinFails() {
+		Assertions.assertThrows(
+			ValidationException.class,
+			() -> _definition.validate("field", 3, Map.of("min", 5)));
+	}
+
+	@Test
+	public void testValidateMinPasses() {
+		_definition.validate("field", 10, Map.of("min", 5));
+	}
+
+	@Test
+	public void testValidateNullValueThrowsNpe() {
 		Assertions.assertThrows(
 			NullPointerException.class,
 			() -> _definition.validate("field", null, Collections.emptyMap()));
 	}
 
 	@Test
-	void testValidateRequiredNullValue() {
+	public void testValidateNumberWithFractionFails() {
+		Assertions.assertThrows(
+			ValidationException.class,
+			() -> _definition.validate("field", 3.5, Collections.emptyMap()));
+	}
+
+	@Test
+	public void testValidateNumberWithNoFraction() {
+		_definition.validate("field", 10.0, Collections.emptyMap());
+	}
+
+	@Test
+	public void testValidateRequiredNullValue() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _definition.validate(
@@ -127,27 +141,13 @@ class IntegerTypeDefinitionTest {
 	}
 
 	@Test
-	void testValidateMinPasses() {
-		_definition.validate("field", 10, Map.of("min", 5));
+	public void testValidateShort() {
+		_definition.validate("field", (short)10, Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateMinFails() {
-		Assertions.assertThrows(
-			ValidationException.class,
-			() -> _definition.validate("field", 3, Map.of("min", 5)));
-	}
-
-	@Test
-	void testValidateMaxPasses() {
-		_definition.validate("field", 50, Map.of("max", 100));
-	}
-
-	@Test
-	void testValidateMaxFails() {
-		Assertions.assertThrows(
-			ValidationException.class,
-			() -> _definition.validate("field", 200, Map.of("max", 100)));
+	public void testValidateValidIntegerString() {
+		_definition.validate("field", "12345", Collections.emptyMap());
 	}
 
 	private final IntegerTypeDefinition _definition =

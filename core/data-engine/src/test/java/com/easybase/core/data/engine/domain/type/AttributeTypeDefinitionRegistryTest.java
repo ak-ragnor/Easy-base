@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 class AttributeTypeDefinitionRegistryTest {
 
 	@Test
-	void testGetDescriptorReturnsCorrectDefinition() {
+	public void testGetDescriptorReturnsCorrectDefinition() {
 		StringTypeDefinition stringDef = new StringTypeDefinition();
 		IntegerTypeDefinition integerDef = new IntegerTypeDefinition();
 
@@ -35,7 +35,7 @@ class AttributeTypeDefinitionRegistryTest {
 	}
 
 	@Test
-	void testGetDescriptorThrowsForUnregisteredType() {
+	public void testGetDescriptorThrowsForUnregisteredType() {
 		AttributeTypeDefinitionRegistry registry =
 			new AttributeTypeDefinitionRegistry(Collections.emptyList());
 

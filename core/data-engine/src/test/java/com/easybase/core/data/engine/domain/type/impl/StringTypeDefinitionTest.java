@@ -20,64 +20,35 @@ import org.junit.jupiter.api.Test;
 class StringTypeDefinitionTest {
 
 	@Test
-	void testGetType() {
+	public void testGetType() {
 		Assertions.assertEquals(AttributeType.STRING, _definition.getType());
 	}
 
 	@Test
-	void testResolvePostgresTypeNoConfig() {
+	public void testResolvePostgresTypeNoConfig() {
 		Assertions.assertEquals(
 			"text", _definition.resolvePostgresType(Collections.emptyMap()));
 	}
 
 	@Test
-	void testResolvePostgresTypeNullConfig() {
+	public void testResolvePostgresTypeNullConfig() {
 		Assertions.assertEquals("text", _definition.resolvePostgresType(null));
 	}
 
 	@Test
-	void testResolvePostgresTypeWithMaxLength() {
+	public void testResolvePostgresTypeWithMaxLength() {
 		Assertions.assertEquals(
 			"varchar",
 			_definition.resolvePostgresType(Map.of("maxLength", 255)));
 	}
 
 	@Test
-	void testValidateString() {
-		_definition.validate("field", "hello", Collections.emptyMap());
-	}
-
-	@Test
-	void testValidateEmptyString() {
+	public void testValidateEmptyString() {
 		_definition.validate("field", "", Collections.emptyMap());
 	}
 
 	@Test
-	void testValidateNonStringFails() {
-		Assertions.assertThrows(
-			ValidationException.class,
-			() -> _definition.validate("field", 123, Collections.emptyMap()));
-	}
-
-	@Test
-	void testValidateMinLengthPasses() {
-		_definition.validate("field", "abc", Map.of("minLength", 3));
-	}
-
-	@Test
-	void testValidateMinLengthFails() {
-		Assertions.assertThrows(
-			ValidationException.class,
-			() -> _definition.validate("field", "ab", Map.of("minLength", 3)));
-	}
-
-	@Test
-	void testValidateMaxLengthPasses() {
-		_definition.validate("field", "abc", Map.of("maxLength", 5));
-	}
-
-	@Test
-	void testValidateMaxLengthFails() {
+	public void testValidateMaxLengthFails() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _definition.validate(
@@ -85,12 +56,31 @@ class StringTypeDefinitionTest {
 	}
 
 	@Test
-	void testValidatePatternPasses() {
-		_definition.validate("field", "abc", Map.of("pattern", "^[a-z]+$"));
+	public void testValidateMaxLengthPasses() {
+		_definition.validate("field", "abc", Map.of("maxLength", 5));
 	}
 
 	@Test
-	void testValidatePatternFails() {
+	public void testValidateMinLengthFails() {
+		Assertions.assertThrows(
+			ValidationException.class,
+			() -> _definition.validate("field", "ab", Map.of("minLength", 3)));
+	}
+
+	@Test
+	public void testValidateMinLengthPasses() {
+		_definition.validate("field", "abc", Map.of("minLength", 3));
+	}
+
+	@Test
+	public void testValidateNonStringFails() {
+		Assertions.assertThrows(
+			ValidationException.class,
+			() -> _definition.validate("field", 123, Collections.emptyMap()));
+	}
+
+	@Test
+	public void testValidatePatternFails() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _definition.validate(
@@ -98,9 +88,19 @@ class StringTypeDefinitionTest {
 	}
 
 	@Test
-	void testValidateRequiredWithValue() {
+	public void testValidatePatternPasses() {
+		_definition.validate("field", "abc", Map.of("pattern", "^[a-z]+$"));
+	}
+
+	@Test
+	public void testValidateRequiredWithValue() {
 		_definition.validate(
 			"field", "hello", Map.of("required", Boolean.TRUE));
+	}
+
+	@Test
+	public void testValidateString() {
+		_definition.validate("field", "hello", Collections.emptyMap());
 	}
 
 	private final StringTypeDefinition _definition = new StringTypeDefinition();

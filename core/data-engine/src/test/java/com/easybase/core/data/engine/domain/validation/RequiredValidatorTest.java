@@ -19,26 +19,26 @@ import org.junit.jupiter.api.Test;
 class RequiredValidatorTest {
 
 	@Test
-	void testNullValueWithoutRequiredConfig() {
+	public void testNonNullValueWithRequiredTrue() {
+		_validator.validate("field", "value", Map.of("required", Boolean.TRUE));
+	}
+
+	@Test
+	public void testNullValueWithoutRequiredConfig() {
 		_validator.validate("field", null, Collections.emptyMap());
 	}
 
 	@Test
-	void testNullValueWithRequiredFalse() {
+	public void testNullValueWithRequiredFalse() {
 		_validator.validate("field", null, Map.of("required", Boolean.FALSE));
 	}
 
 	@Test
-	void testNullValueWithRequiredTrue() {
+	public void testNullValueWithRequiredTrue() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _validator.validate(
 				"field", null, Map.of("required", Boolean.TRUE)));
-	}
-
-	@Test
-	void testNonNullValueWithRequiredTrue() {
-		_validator.validate("field", "value", Map.of("required", Boolean.TRUE));
 	}
 
 	private final RequiredValidator _validator = new RequiredValidator();

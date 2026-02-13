@@ -52,17 +52,19 @@ public class DecimalTypeDefinition implements AttributeTypeDefinition {
 		}
 
 		if (value instanceof Integer || value instanceof Long) {
-			return BigDecimal.valueOf(((Number)value).longValue());
+			Number number = (Number)value;
+
+			return BigDecimal.valueOf(number.longValue());
 		}
 
-		if (value instanceof Float || value instanceof Double) {
+		if (value instanceof Double || value instanceof Float) {
 			return new BigDecimal(value.toString());
 		}
 
 		try {
 			return new BigDecimal(value.toString());
 		}
-		catch (NumberFormatException exception) {
+		catch (NumberFormatException numberFormatException) {
 			throw new ValidationException(
 				fieldName, value.toString(), "expected a decimal value");
 		}

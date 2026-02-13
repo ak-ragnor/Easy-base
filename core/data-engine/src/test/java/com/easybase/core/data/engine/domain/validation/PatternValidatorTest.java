@@ -19,17 +19,19 @@ import org.junit.jupiter.api.Test;
 class PatternValidatorTest {
 
 	@Test
-	void testNoPatternConfig() {
+	public void testEmailPattern() {
+		_validator.validate(
+			"field", "test@example.com",
+			Map.of("pattern", "^[\\w.]+@[\\w.]+$"));
+	}
+
+	@Test
+	public void testNoPatternConfig() {
 		_validator.validate("field", "anything", Collections.emptyMap());
 	}
 
 	@Test
-	void testPatternMatches() {
-		_validator.validate("field", "abc", Map.of("pattern", "^[a-z]+$"));
-	}
-
-	@Test
-	void testPatternDoesNotMatch() {
+	public void testPatternDoesNotMatch() {
 		Assertions.assertThrows(
 			ValidationException.class,
 			() -> _validator.validate(
@@ -37,10 +39,8 @@ class PatternValidatorTest {
 	}
 
 	@Test
-	void testEmailPattern() {
-		_validator.validate(
-			"field", "test@example.com",
-			Map.of("pattern", "^[\\w.]+@[\\w.]+$"));
+	public void testPatternMatches() {
+		_validator.validate("field", "abc", Map.of("pattern", "^[a-z]+$"));
 	}
 
 	private final PatternValidator _validator = new PatternValidator();
