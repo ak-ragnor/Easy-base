@@ -18,12 +18,15 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 /**
  * @author Akhash R
  */
 @Component
+@Slf4j
 public class TemporalTypeDefinition implements AttributeTypeDefinition {
 
 	@Override
@@ -69,6 +72,10 @@ public class TemporalTypeDefinition implements AttributeTypeDefinition {
 	}
 
 	private void _validateType(String fieldName, Object value) {
+		if (value == null) {
+			return;
+		}
+
 		if (value instanceof LocalDate || value instanceof LocalDateTime ||
 			value instanceof LocalTime) {
 
@@ -83,6 +90,7 @@ public class TemporalTypeDefinition implements AttributeTypeDefinition {
 			return;
 		}
 		catch (Exception exception) {
+			log.debug("Failed to parse '{}' as LocalDateTime", str);
 		}
 
 		try {
@@ -91,6 +99,7 @@ public class TemporalTypeDefinition implements AttributeTypeDefinition {
 			return;
 		}
 		catch (Exception exception) {
+			log.debug("Failed to parse '{}' as LocalDate", str);
 		}
 
 		try {
@@ -99,6 +108,7 @@ public class TemporalTypeDefinition implements AttributeTypeDefinition {
 			return;
 		}
 		catch (Exception exception) {
+			log.debug("Failed to parse '{}' as LocalTime", str);
 		}
 
 		throw new ValidationException(

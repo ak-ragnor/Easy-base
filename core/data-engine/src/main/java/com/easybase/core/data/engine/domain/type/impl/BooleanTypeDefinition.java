@@ -44,6 +44,10 @@ public class BooleanTypeDefinition implements AttributeTypeDefinition {
 	}
 
 	private void _validateType(String fieldName, Object value) {
+		if (value == null) {
+			return;
+		}
+
 		if (value instanceof Boolean) {
 			return;
 		}

@@ -20,6 +20,10 @@ public class NumericRangeValidator implements Validator {
 	public void validate(
 		String fieldName, Object value, Map<String, Object> config) {
 
+		if (value == null) {
+			return;
+		}
+
 		BigDecimal numericValue = new BigDecimal(value.toString());
 
 		BigDecimal min = _toBigDecimal(config.get("min"));
@@ -42,10 +46,6 @@ public class NumericRangeValidator implements Validator {
 	private BigDecimal _toBigDecimal(Object value) {
 		if (value == null) {
 			return null;
-		}
-
-		if (value instanceof Number) {
-			return new BigDecimal(value.toString());
 		}
 
 		return new BigDecimal(value.toString());

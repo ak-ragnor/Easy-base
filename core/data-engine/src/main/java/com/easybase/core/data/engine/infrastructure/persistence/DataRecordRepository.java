@@ -231,6 +231,6 @@ public class DataRecordRepository {
 	}
 
 	private final DSLContext _dslContext;
-	private final ObjectMapper _objectMapper = new ObjectMapper();
+	private final ObjectMapper _objectMapper;
 
 }

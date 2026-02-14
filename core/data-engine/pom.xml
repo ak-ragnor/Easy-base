@@ -47,6 +47,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.google.re2j</groupId>
+			<artifactId>re2j</artifactId>
+			<version>1.7</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.jooq</groupId>
 			<artifactId>jooq</artifactId>
 			<version>3.19.8</version>

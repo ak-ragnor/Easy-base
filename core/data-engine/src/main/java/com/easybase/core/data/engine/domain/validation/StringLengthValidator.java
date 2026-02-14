@@ -18,6 +18,10 @@ public class StringLengthValidator implements Validator {
 	public void validate(
 		String fieldName, Object value, Map<String, Object> config) {
 
+		if (value == null) {
+			return;
+		}
+
 		String str = value.toString();
 
 		Integer minLength = _toInteger(config.get("minLength"));

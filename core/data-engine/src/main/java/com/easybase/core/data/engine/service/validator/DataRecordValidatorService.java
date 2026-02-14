@@ -29,18 +29,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class DataRecordValidatorService {
 
-	public void validate(
-		UUID tenantId, String collectionName, Map<String, Object> data) {
-
-		Collection collection = _collectionLocalService.fetchCollection(
-			tenantId, collectionName);
-
-		if (collection == null) {
-			log.warn("Collection not found for validation: {}", collectionName);
-
-			return;
-		}
-
+	public void validate(Collection collection, Map<String, Object> data) {
 		if (collection.getAttributes() == null) {
 			return;
 		}
@@ -50,16 +39,21 @@ public class DataRecordValidatorService {
 		}
 	}
 
+	public void validate(
+		UUID tenantId, String collectionName, Map<String, Object> data) {
+
+		Collection collection = _collectionLocalService.getCollection(
+			tenantId, collectionName);
+
+		validate(collection, data);
+	}
+
 	private void _validateAttribute(
 		Attribute attribute, Map<String, Object> data) {
 
 		String fieldName = attribute.getName();
 
 		Object value = data.get(fieldName);
-
-		if (value == null) {
-			return;
-		}
 
 		Map<String, Object> config = attribute.getConfig();
 

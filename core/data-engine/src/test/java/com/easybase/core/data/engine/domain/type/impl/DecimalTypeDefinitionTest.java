@@ -91,17 +91,16 @@ class DecimalTypeDefinitionTest {
 	}
 
 	@Test
-	public void testValidateNullValueNoConfigThrowsNpe() {
-		Assertions.assertThrows(
-			NullPointerException.class,
-			() -> _definition.validate("field", null, Collections.emptyMap()));
-	}
-
-	@Test
-	public void testValidateNullValueNullConfigThrowsNpe() {
+	public void testValidateNullConfigThrowsNpe() {
 		Assertions.assertThrows(
 			NullPointerException.class,
 			() -> _definition.validate("field", null, null));
+	}
+
+	@Test
+	public void testValidateNullValueNoRequired() {
+		Assertions.assertDoesNotThrow(
+			() -> _definition.validate("field", null, Collections.emptyMap()));
 	}
 
 	@Test

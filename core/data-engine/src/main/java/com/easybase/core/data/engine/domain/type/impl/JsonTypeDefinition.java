@@ -8,6 +8,7 @@ package com.easybase.core.data.engine.domain.type.impl;
 import com.easybase.common.exception.ValidationException;
 import com.easybase.core.data.engine.domain.enums.AttributeType;
 import com.easybase.core.data.engine.domain.type.AttributeTypeDefinition;
+import com.easybase.core.data.engine.domain.validation.NumericRangeValidator;
 import com.easybase.core.data.engine.domain.validation.RequiredValidator;
 import com.easybase.core.data.engine.domain.validation.Validator;
 
@@ -43,10 +44,16 @@ public class JsonTypeDefinition implements AttributeTypeDefinition {
 
 		_validateType(fieldName, value);
 
-		_requiredValidator.validate(fieldName, value, config);
+		for (Validator validator : _validators) {
+			validator.validate(fieldName, value, config);
+		}
 	}
 
 	private void _validateType(String fieldName, Object value) {
+		if (value == null) {
+			return;
+		}
+
 		if (value instanceof Map) {
 			return;
 		}
@@ -68,6 +75,7 @@ public class JsonTypeDefinition implements AttributeTypeDefinition {
 	}
 
 	private final ObjectMapper _objectMapper;
-	private final Validator _requiredValidator = new RequiredValidator();
+	private final List<Validator> _validators = List.of(
+			new RequiredValidator());
 
 }

@@ -114,9 +114,8 @@ class IntegerTypeDefinitionTest {
 	}
 
 	@Test
-	public void testValidateNullValueThrowsNpe() {
-		Assertions.assertThrows(
-			NullPointerException.class,
+	public void testValidateNullValueNoRequired() {
+		Assertions.assertDoesNotThrow(
 			() -> _definition.validate("field", null, Collections.emptyMap()));
 	}
 
