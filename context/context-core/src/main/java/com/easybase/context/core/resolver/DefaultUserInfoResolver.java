@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -12,9 +12,9 @@ import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.service.TenantLocalService;
 import com.easybase.core.user.entity.User;
 import com.easybase.core.user.repository.UserRepository;
+import com.easybase.core.user.service.UserLocalService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
@@ -43,21 +43,7 @@ public class DefaultUserInfoResolver
 	protected UserInfo createAnonymousInstance() {
 		Tenant tenant = _tenantLocalService.getDefaultTenant();
 
-		Optional<User> optionalGuestUser =
-			_userRepository.findActiveByEmailAndTenantId(
-				_guestEmail, tenant.getId());
-
-		User guestUser;
-
-		if (optionalGuestUser.isPresent()) {
-			guestUser = optionalGuestUser.get();
-		}
-		else {
-			throw new IllegalStateException(
-				"Guest user not found. Ensure UserInitializer ran successfully.");
-		}
-
-		return toInfo(guestUser);
+		return toInfo(_userLocalService.getUser(_guestEmail, tenant.getId()));
 	}
 
 	@Override
@@ -99,6 +85,7 @@ public class DefaultUserInfoResolver
 	private String _guestEmail;
 
 	private final TenantLocalService _tenantLocalService;
+	private final UserLocalService _userLocalService;
 	private final UserRepository _userRepository;
 
 }

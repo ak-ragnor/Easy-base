@@ -16,8 +16,6 @@ import com.easybase.core.user.repository.UserRepository;
 import com.easybase.core.user.service.UserLocalService;
 import com.easybase.infrastructure.auth.constants.SystemRoles;
 
-import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -117,10 +115,7 @@ public class UserInitializer implements ApplicationRunner {
 		if (_userRepository.existsByEmailAndTenantId(email, tenant.getId())) {
 			log.info("Default user already exists: {}", email);
 
-			Optional<User> user = _userRepository.findByEmailAndTenantId(
-				email, tenant.getId());
-
-			return user.orElseThrow();
+			return _userLocalService.getUser(email, tenant.getId());
 		}
 
 		try {
