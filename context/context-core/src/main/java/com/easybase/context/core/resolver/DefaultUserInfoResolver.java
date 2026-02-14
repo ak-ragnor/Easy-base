@@ -5,15 +5,23 @@
 
 package com.easybase.context.core.resolver;
 
+import com.easybase.common.util.ListUtil;
 import com.easybase.context.api.domain.UserInfo;
 import com.easybase.context.api.port.AbstractDefaultResolver;
 import com.easybase.context.api.port.UserInfoResolver;
+import com.easybase.core.auth.domain.entity.ResourceAction;
+import com.easybase.core.auth.domain.entity.RolePermission;
+import com.easybase.core.auth.service.ResourceActionLocalService;
+import com.easybase.core.auth.service.RolePermissionLocalService;
+import com.easybase.core.auth.service.util.BitMaskUtil;
+import com.easybase.core.role.service.RoleLocalService;
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.service.TenantLocalService;
 import com.easybase.core.user.domain.entity.User;
 import com.easybase.core.user.infrastructure.presistence.repository.UserRepository;
 import com.easybase.core.user.service.UserLocalService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,22 +76,46 @@ public class DefaultUserInfoResolver
 	}
 
 	private List<String> _extractRoles(User user) {
-
-		// TODO: Implement role extraction
-
-		return List.of();
+		return _roleLocalService.getUserAuthorities(user.getId());
 	}
 
 	private List<String> _extractScopes(User user) {
+		List<UUID> roleIds = _roleLocalService.getActiveRoleIdsByUserId(
+			user.getId());
 
-		// TODO: Implement scope extraction
+		if (ListUtil.isEmpty(roleIds)) {
+			return List.of();
+		}
 
-		return List.of();
+		List<RolePermission> rolePermissions =
+			_rolePermissionLocalService.getPermissionsForRoles(roleIds);
+
+		List<String> scopes = new ArrayList<>();
+
+		for (RolePermission rolePermission : rolePermissions) {
+			List<ResourceAction> resourceActions =
+				_resourceActionLocalService.getActiveResourceActions(
+					rolePermission.getResourceType());
+
+			for (ResourceAction resourceAction : resourceActions) {
+				if (BitMaskUtil.hasBit(
+						rolePermission.getPermissionsMask(),
+						resourceAction.getBitValue())) {
+
+					scopes.add(resourceAction.getActionKey());
+				}
+			}
+		}
+
+		return scopes;
 	}
 
 	@Value("${easy-base.guest.email:guest@easybase.com}")
 	private String _guestEmail;
 
+	private final ResourceActionLocalService _resourceActionLocalService;
+	private final RoleLocalService _roleLocalService;
+	private final RolePermissionLocalService _rolePermissionLocalService;
 	private final TenantLocalService _tenantLocalService;
 	private final UserLocalService _userLocalService;
 	private final UserRepository _userRepository;
