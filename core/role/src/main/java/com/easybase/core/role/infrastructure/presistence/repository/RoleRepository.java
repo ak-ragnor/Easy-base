@@ -1,11 +1,11 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.role.repository;
+package com.easybase.core.role.infrastructure.presistence.repository;
 
-import com.easybase.core.role.entity.Role;
+import com.easybase.core.role.domain.entity.Role;
 import com.easybase.infrastructure.data.repository.SingleKeyBaseRepository;
 
 import java.util.List;
@@ -27,8 +27,6 @@ public interface RoleRepository extends SingleKeyBaseRepository<Role> {
 	public boolean existsByNameAndSystemTrue(String name);
 
 	public boolean existsByNameAndTenantId(String name, UUID tenantId);
-
-	public Optional<Role> findByName(String name);
 
 	public Optional<Role> findByNameAndSystemTrue(String name);
 

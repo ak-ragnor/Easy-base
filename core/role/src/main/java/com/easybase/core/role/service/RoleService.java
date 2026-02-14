@@ -1,12 +1,12 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 package com.easybase.core.role.service;
 
-import com.easybase.core.role.entity.Role;
-import com.easybase.core.role.entity.UserRole;
+import com.easybase.core.role.domain.entity.Role;
+import com.easybase.core.role.domain.entity.UserRole;
 
 import java.time.Instant;
 
