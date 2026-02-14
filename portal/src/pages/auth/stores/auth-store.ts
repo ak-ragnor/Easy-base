@@ -6,14 +6,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import { getUserFromToken, isTokenExpired, isTokenExpiringSoon } from '@/lib/token-storage';
 import authService from '@/pages/auth/services/auth-service.ts';
-
-import {
-  getUserFromToken,
-  isTokenExpired,
-  isTokenExpiringSoon,
-} from '../../../lib/token-storage.ts';
-import type { AuthError, TokenResponse, User } from '../../../types/auth.ts';
+import type { AuthError, TokenResponse, User } from '@/types/auth';
 
 interface AuthState {
   // State
@@ -24,6 +19,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: AuthError | null;
+  sessionWarning: boolean;
 
   // Actions
   login: (userName: string, password: string) => Promise<void>;
@@ -32,6 +28,35 @@ interface AuthState {
   clearAuth: () => void;
   clearError: () => void;
   checkAuth: () => void;
+  initializeAuth: () => void;
+}
+
+// Module-level state for refresh deduplication and interval management
+let refreshPromise: Promise<void> | null = null;
+let authCheckIntervalId: ReturnType<typeof setInterval> | null = null;
+
+function startAuthCheckInterval() {
+  stopAuthCheckInterval();
+  authCheckIntervalId = setInterval(
+    () => {
+      useAuthStore.getState().checkAuth();
+    },
+    5 * 60 * 1000
+  );
+}
+
+function stopAuthCheckInterval() {
+  if (authCheckIntervalId !== null) {
+    clearInterval(authCheckIntervalId);
+    authCheckIntervalId = null;
+  }
+}
+
+function toAuthError(error: unknown): AuthError {
+  if (error instanceof Error) {
+    return { message: error.message };
+  }
+  return { message: 'An unexpected error occurred' };
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -45,8 +70,12 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      sessionWarning: false,
 
-      // Login action
+      /**
+       * Authenticate a user with their credentials.
+       * On success, stores tokens, decodes user info, and starts background auth checks.
+       */
       login: async (userName: string, password: string) => {
         set({ isLoading: true, error: null });
 
@@ -68,9 +97,11 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
             error: null,
+            sessionWarning: false,
           });
+
+          startAuthCheckInterval();
         } catch (error) {
-          const authError = error as AuthError;
           set({
             user: null,
             accessToken: null,
@@ -78,13 +109,16 @@ export const useAuthStore = create<AuthState>()(
             sessionId: null,
             isAuthenticated: false,
             isLoading: false,
-            error: authError,
+            error: toAuthError(error),
           });
           throw error;
         }
       },
 
-      // Logout action
+      /**
+       * End the current session. Calls the logout API and clears all auth state
+       * regardless of whether the API call succeeds.
+       */
       logout: async () => {
         const { sessionId } = get();
 
@@ -97,6 +131,7 @@ export const useAuthStore = create<AuthState>()(
           console.error('Logout error:', error);
           // Continue with logout even if API call fails
         } finally {
+          stopAuthCheckInterval();
           // Clear all auth state
           set({
             user: null,
@@ -106,11 +141,15 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             isLoading: false,
             error: null,
+            sessionWarning: false,
           });
         }
       },
 
-      // Refresh tokens action
+      /**
+       * Refresh the access token using the stored refresh token.
+       * Concurrent calls are deduplicated — only one refresh request is in-flight at a time.
+       */
       refreshTokens: async () => {
         const { refreshToken } = get();
 
@@ -119,32 +158,45 @@ export const useAuthStore = create<AuthState>()(
           return;
         }
 
-        try {
-          const response: TokenResponse = await authService.refreshToken(refreshToken);
-
-          // Extract updated user info from new token
-          const user = getUserFromToken(response.accessToken);
-
-          if (!user) {
-            throw new Error('Failed to decode user information from token');
-          }
-
-          set({
-            user,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
-            sessionId: response.sessionId,
-            isAuthenticated: true,
-          });
-        } catch (error) {
-          console.error('Token refresh failed:', error);
-          get().clearAuth();
-          throw error;
+        // Deduplicate concurrent refresh calls
+        if (refreshPromise) {
+          return refreshPromise;
         }
+
+        refreshPromise = (async () => {
+          try {
+            const response: TokenResponse = await authService.refreshToken(refreshToken);
+
+            // Extract updated user info from new token
+            const user = getUserFromToken(response.accessToken);
+
+            if (!user) {
+              throw new Error('Failed to decode user information from token');
+            }
+
+            set({
+              user,
+              accessToken: response.accessToken,
+              refreshToken: response.refreshToken,
+              sessionId: response.sessionId,
+              isAuthenticated: true,
+              sessionWarning: false,
+            });
+          } catch (error) {
+            console.error('Token refresh failed:', error);
+            get().clearAuth();
+            throw error;
+          } finally {
+            refreshPromise = null;
+          }
+        })();
+
+        return refreshPromise;
       },
 
       // Clear authentication state
       clearAuth: () => {
+        stopAuthCheckInterval();
         set({
           user: null,
           accessToken: null,
@@ -153,6 +205,7 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           isLoading: false,
           error: null,
+          sessionWarning: false,
         });
       },
 
@@ -161,7 +214,11 @@ export const useAuthStore = create<AuthState>()(
         set({ error: null });
       },
 
-      // Check authentication status
+      /**
+       * Check the current auth status. Triggers a token refresh if the access token
+       * is expired or expiring soon. Sets `sessionWarning` when the token is
+       * within 2 minutes of expiry.
+       */
       checkAuth: () => {
         const { accessToken, refreshToken } = get();
 
@@ -186,7 +243,14 @@ export const useAuthStore = create<AuthState>()(
           return;
         }
 
-        // Check if access token is expiring soon
+        // Session expiry warning (within 2 minutes)
+        if (isTokenExpiringSoon(accessToken, 120)) {
+          set({ sessionWarning: true });
+        } else {
+          set({ sessionWarning: false });
+        }
+
+        // Check if access token is expiring soon (within 5 minutes)
         if (isTokenExpiringSoon(accessToken, 300)) {
           // Refresh in background if expiring within 5 minutes
           if (refreshToken && !isTokenExpired(refreshToken)) {
@@ -196,6 +260,19 @@ export const useAuthStore = create<AuthState>()(
                 console.error('Background token refresh failed:', error);
               });
           }
+        }
+      },
+
+      /**
+       * Initialize auth state on app load. Checks stored tokens and starts
+       * the background auth check interval if authenticated.
+       */
+      initializeAuth: () => {
+        get().checkAuth();
+
+        const { isAuthenticated } = get();
+        if (isAuthenticated) {
+          startAuthCheckInterval();
         }
       },
     }),
@@ -218,16 +295,7 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-// Auto-check auth status on mount and periodically
+// Auto-initialize auth on load
 if (typeof window !== 'undefined') {
-  // Check auth on initial load
-  useAuthStore.getState().checkAuth();
-
-  // Check auth every 5 minutes
-  setInterval(
-    () => {
-      useAuthStore.getState().checkAuth();
-    },
-    5 * 60 * 1000
-  );
+  useAuthStore.getState().initializeAuth();
 }

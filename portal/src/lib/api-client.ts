@@ -8,6 +8,8 @@ import axios from 'axios';
 
 import type { AuthError } from '../types/auth';
 
+import { isValidTokenFormat } from './token-storage';
+
 // Create axios instance with base configuration
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL as string,
@@ -28,7 +30,7 @@ apiClient.interceptors.request.use(
         const parsed = JSON.parse(authStorage) as { state?: { accessToken?: string } };
         const accessToken = parsed.state?.accessToken;
 
-        if (accessToken && config.headers) {
+        if (accessToken && isValidTokenFormat(accessToken) && config.headers) {
           config.headers.Authorization = `Bearer ${accessToken}`;
         }
       } catch (error) {

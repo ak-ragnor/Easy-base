@@ -16,9 +16,7 @@ import { useAuthStore } from '@/pages/auth/stores/auth-store';
 // Validation schema
 const loginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email address').required('Email is required'),
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
+  password: Yup.string().required('Password is required'),
 });
 
 interface LoginFormValues {
@@ -31,18 +29,17 @@ export const LoginForm = ({ className, ...props }: React.ComponentProps<'div'>) 
   const { login, isLoading, error, clearError } = useAuthStore();
 
   const initialValues: LoginFormValues = {
-    email: '',
+    email: '@easybase.com',
     password: '',
   };
 
   const handleSubmit = async (values: LoginFormValues) => {
     try {
       clearError();
-      await login(values.email, values.password);
-      // Navigate to dashboard on successful login
-      navigate('/dashboard');
+      await login(values.email.trim(), values.password);
+
+      await navigate('/dashboard');
     } catch (err) {
-      // Error is already set in the store
       console.error('Login failed:', err);
     }
   };
@@ -78,7 +75,7 @@ export const LoginForm = ({ className, ...props }: React.ComponentProps<'div'>) 
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder={initialValues.email}
                   value={values.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
