@@ -1,22 +1,20 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 package com.easybase.initializer;
 
-import com.easybase.core.role.entity.Role;
-import com.easybase.core.role.entity.UserRole;
-import com.easybase.core.role.repository.UserRoleRepository;
+import com.easybase.core.role.domain.entity.Role;
+import com.easybase.core.role.domain.entity.UserRole;
+import com.easybase.core.role.infrastructure.presistence.repository.UserRoleRepository;
 import com.easybase.core.role.service.RoleLocalService;
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.service.TenantLocalService;
-import com.easybase.core.user.entity.User;
-import com.easybase.core.user.repository.UserRepository;
+import com.easybase.core.user.domain.entity.User;
+import com.easybase.core.user.infrastructure.presistence.repository.UserRepository;
 import com.easybase.core.user.service.UserLocalService;
 import com.easybase.infrastructure.auth.constants.SystemRoles;
-
-import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 
@@ -117,10 +115,7 @@ public class UserInitializer implements ApplicationRunner {
 		if (_userRepository.existsByEmailAndTenantId(email, tenant.getId())) {
 			log.info("Default user already exists: {}", email);
 
-			Optional<User> user = _userRepository.findByEmailAndTenantId(
-				email, tenant.getId());
-
-			return user.orElseThrow();
+			return _userLocalService.getUser(email, tenant.getId());
 		}
 
 		try {

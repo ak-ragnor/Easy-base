@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -7,7 +7,7 @@ package com.easybase.api.auth.controller;
 
 import com.easybase.api.auth.dto.ResourceActionDto;
 import com.easybase.api.auth.dto.mapper.ResourceActionMapper;
-import com.easybase.core.auth.entity.ResourceAction;
+import com.easybase.core.auth.domain.entity.ResourceAction;
 import com.easybase.core.auth.service.ResourceActionService;
 
 import java.util.List;

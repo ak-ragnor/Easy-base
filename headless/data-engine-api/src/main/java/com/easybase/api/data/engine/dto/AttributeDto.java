@@ -1,17 +1,18 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 package com.easybase.api.data.engine.dto;
 
-import com.easybase.core.data.engine.enums.AttributeType;
+import com.easybase.core.data.engine.domain.enums.AttributeType;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Map;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -27,6 +28,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class AttributeDto {
+
+	@SuppressWarnings("unused")
+	private Map<String, Object> config;
 
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private UUID id;

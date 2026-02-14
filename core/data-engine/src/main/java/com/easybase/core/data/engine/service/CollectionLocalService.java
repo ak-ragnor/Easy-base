@@ -1,12 +1,12 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 package com.easybase.core.data.engine.service;
 
-import com.easybase.core.data.engine.entity.Attribute;
-import com.easybase.core.data.engine.entity.Collection;
+import com.easybase.core.data.engine.domain.entity.Attribute;
+import com.easybase.core.data.engine.domain.entity.Collection;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +42,15 @@ public interface CollectionLocalService {
 	 * @throws com.easybase.common.exception.ResourceNotFoundException if collection not found
 	 */
 	public void deleteCollection(UUID collectionId);
+
+	/**
+	 * Fetches a collection by tenant and name
+	 *
+	 * @param tenantId the tenant ID
+	 * @param collectionName the collection name
+	 * @return the collection, or null if not found
+	 */
+	public Collection fetchCollection(UUID tenantId, String collectionName);
 
 	/**
 	 * Gets a collection by ID.

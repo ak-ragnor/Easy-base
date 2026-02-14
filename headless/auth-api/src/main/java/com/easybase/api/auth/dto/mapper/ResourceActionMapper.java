@@ -1,12 +1,12 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 package com.easybase.api.auth.dto.mapper;
 
 import com.easybase.api.auth.dto.ResourceActionDto;
-import com.easybase.core.auth.entity.ResourceAction;
+import com.easybase.core.auth.domain.entity.ResourceAction;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
 import org.springframework.stereotype.Component;

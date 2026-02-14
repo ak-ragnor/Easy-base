@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -10,8 +10,8 @@ import com.easybase.api.role.dto.UserRoleAssignmentDto;
 import com.easybase.api.role.dto.mapper.RoleMapper;
 import com.easybase.api.role.dto.mapper.UserRoleAssignmentMapper;
 import com.easybase.context.api.domain.ServiceContext;
-import com.easybase.core.role.entity.Role;
-import com.easybase.core.role.entity.UserRole;
+import com.easybase.core.role.domain.entity.Role;
+import com.easybase.core.role.domain.entity.UserRole;
 import com.easybase.core.role.service.RoleService;
 
 import jakarta.validation.Valid;

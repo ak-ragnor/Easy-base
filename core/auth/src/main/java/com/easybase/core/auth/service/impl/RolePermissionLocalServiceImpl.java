@@ -1,14 +1,14 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 package com.easybase.core.auth.service.impl;
 
-import com.easybase.core.auth.entity.RolePermission;
-import com.easybase.core.auth.repository.RolePermissionRepository;
+import com.easybase.core.auth.domain.entity.RolePermission;
+import com.easybase.core.auth.infrastructure.presistence.repository.RolePermissionRepository;
 import com.easybase.core.auth.service.RolePermissionLocalService;
-import com.easybase.core.auth.util.BitMaskUtil;
+import com.easybase.core.auth.service.util.BitMaskUtil;
 
 import java.util.List;
 import java.util.Optional;

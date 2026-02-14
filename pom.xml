@@ -136,5 +136,27 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>formatChanged</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<configuration>
+							<commandlineArgs>-Dsource.properties.file=${project.basedir}/source-formatter.properties -Dsource.files=${source.changed.files}</commandlineArgs>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>java</goal>
+								</goals>
+								<phase>validate</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 </project>

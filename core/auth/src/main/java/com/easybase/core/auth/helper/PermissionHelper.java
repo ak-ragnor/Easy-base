@@ -1,14 +1,14 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 package com.easybase.core.auth.helper;
 
 import com.easybase.common.util.ListUtil;
-import com.easybase.core.auth.entity.ResourceAction;
+import com.easybase.core.auth.domain.entity.ResourceAction;
 import com.easybase.core.auth.service.ResourceActionLocalService;
-import com.easybase.core.auth.util.BitMaskUtil;
+import com.easybase.core.auth.service.util.BitMaskUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,31 +109,6 @@ public class PermissionHelper {
 		}
 
 		return actionKeys;
-	}
-
-	/**
-	 * Validate that all action keys exist and are active.
-	 *
-	 * @param resourceType the resource type
-	 * @param actionKeys list of action keys to validate
-	 * @throws IllegalArgumentException if any action is invalid or inactive
-	 */
-	public void validateActions(String resourceType, List<String> actionKeys) {
-		for (String actionKey : actionKeys) {
-			ResourceAction action =
-				_resourceActionLocalService.getResourceAction(
-					resourceType, actionKey);
-
-			if (action == null) {
-				throw new IllegalArgumentException(
-					"Unknown action: " + resourceType + "." + actionKey);
-			}
-
-			if (!action.isActive()) {
-				throw new IllegalArgumentException(
-					"Action is not active: " + resourceType + "." + actionKey);
-			}
-		}
 	}
 
 	private final ResourceActionLocalService _resourceActionLocalService;

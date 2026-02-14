@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -8,7 +8,7 @@ package com.easybase.api.user.controller;
 import com.easybase.api.user.dto.UserDto;
 import com.easybase.api.user.dto.mapper.UserMapper;
 import com.easybase.context.api.domain.ServiceContext;
-import com.easybase.core.user.entity.User;
+import com.easybase.core.user.domain.entity.User;
 import com.easybase.core.user.service.UserService;
 import com.easybase.infrastructure.api.dto.response.ApiResponse;
 

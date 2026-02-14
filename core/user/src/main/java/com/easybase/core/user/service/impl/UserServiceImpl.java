@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -7,8 +7,8 @@ package com.easybase.core.user.service.impl;
 
 import com.easybase.context.api.util.PermissionChecker;
 import com.easybase.core.user.action.UserActions;
-import com.easybase.core.user.entity.User;
-import com.easybase.core.user.entity.UserCredential;
+import com.easybase.core.user.domain.entity.User;
+import com.easybase.core.user.domain.entity.UserCredential;
 import com.easybase.core.user.service.UserLocalService;
 import com.easybase.core.user.service.UserService;
 

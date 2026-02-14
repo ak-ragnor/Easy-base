@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -7,8 +7,8 @@ package com.easybase.core.auth.service.impl;
 
 import com.easybase.common.exception.ConflictException;
 import com.easybase.common.exception.ResourceNotFoundException;
-import com.easybase.core.auth.entity.ResourceAction;
-import com.easybase.core.auth.repository.ResourceActionRepository;
+import com.easybase.core.auth.domain.entity.ResourceAction;
+import com.easybase.core.auth.infrastructure.presistence.repository.ResourceActionRepository;
 import com.easybase.core.auth.service.ResourceActionLocalService;
 
 import java.util.List;

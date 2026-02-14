@@ -1,12 +1,12 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 package com.easybase.api.data.engine.dto.mapper;
 
 import com.easybase.api.data.engine.dto.AttributeDto;
-import com.easybase.core.data.engine.entity.Attribute;
+import com.easybase.core.data.engine.domain.entity.Attribute;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
 import org.springframework.stereotype.Component;
@@ -25,6 +25,7 @@ public class AttributeMapper implements BaseMapper<Attribute, AttributeDto> {
 
 		return new AttributeDto() {
 			{
+				setConfig(attribute.getConfig());
 				setId(attribute.getId());
 				setName(attribute.getName());
 				setType(attribute.getDataType());
@@ -41,6 +42,7 @@ public class AttributeMapper implements BaseMapper<Attribute, AttributeDto> {
 
 		Attribute attribute = new Attribute();
 
+		attribute.setConfig(attributeDto.getConfig());
 		attribute.setName(attributeDto.getName());
 		attribute.setDataType(attributeDto.getType());
 		attribute.setIndexed(attributeDto.isIndexed());

@@ -1,13 +1,13 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 package com.easybase.api.system.controller;
 
+import com.easybase.core.system.domain.entity.SystemInfo;
+import com.easybase.core.system.infrastructure.presistence.repository.SystemInfoRepository;
 import com.easybase.infrastructure.api.dto.response.ApiResponse;
-import com.easybase.system.entity.SystemInfo;
-import com.easybase.system.repository.SystemInfoRepository;
 
 import java.time.LocalDateTime;
 

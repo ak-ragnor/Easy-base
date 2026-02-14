@@ -1,15 +1,15 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 package com.easybase.core.data.engine.service.impl;
 
 import com.easybase.common.exception.ResourceNotFoundException;
-import com.easybase.core.data.engine.entity.DataRecord;
-import com.easybase.core.data.engine.repository.DataRecordRepository;
+import com.easybase.core.data.engine.domain.entity.DataRecord;
+import com.easybase.core.data.engine.infrastructure.persistence.DataRecordRepository;
 import com.easybase.core.data.engine.service.DataRecordLocalService;
-import com.easybase.core.data.engine.service.validator.DataRecordValidator;
+import com.easybase.core.data.engine.service.validator.DataRecordValidatorService;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class DataRecordLocalServiceImpl implements DataRecordLocalService {
 	public DataRecord createRecord(
 		UUID tenantId, String table, Map<String, Object> data) {
 
-		_dataRecordValidator.validate(tenantId, table, data);
+		_dataRecordValidatorService.validate(tenantId, table, data);
 
 		return _dataRecordRepository.insert(
 			tenantId, table, UUID.randomUUID(), data);
@@ -62,12 +62,12 @@ public class DataRecordLocalServiceImpl implements DataRecordLocalService {
 	public DataRecord updateRecord(
 		UUID tenantId, String table, UUID id, Map<String, Object> data) {
 
-		_dataRecordValidator.validate(tenantId, table, data);
+		_dataRecordValidatorService.validate(tenantId, table, data);
 
 		return _dataRecordRepository.update(tenantId, table, id, data);
 	}
 
 	private final DataRecordRepository _dataRecordRepository;
-	private final DataRecordValidator _dataRecordValidator;
+	private final DataRecordValidatorService _dataRecordValidatorService;
 
 }

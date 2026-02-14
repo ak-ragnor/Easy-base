@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -7,7 +7,7 @@ package com.easybase.api.user.dto.mapper;
 
 import com.easybase.api.user.dto.UserDto;
 import com.easybase.core.tenant.entity.Tenant;
-import com.easybase.core.user.entity.User;
+import com.easybase.core.user.domain.entity.User;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
 import java.time.Instant;

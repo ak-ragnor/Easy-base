@@ -1,15 +1,15 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 package com.easybase.initializer;
 
-import com.easybase.core.auth.entity.ResourceAction;
-import com.easybase.core.auth.entity.RolePermission;
+import com.easybase.core.auth.domain.entity.ResourceAction;
+import com.easybase.core.auth.domain.entity.RolePermission;
 import com.easybase.core.auth.helper.PermissionHelper;
-import com.easybase.core.auth.repository.ResourceActionRepository;
-import com.easybase.core.auth.repository.RolePermissionRepository;
+import com.easybase.core.auth.infrastructure.presistence.repository.ResourceActionRepository;
+import com.easybase.core.auth.infrastructure.presistence.repository.RolePermissionRepository;
 import com.easybase.infrastructure.auth.annotation.ActionDefinition;
 import com.easybase.infrastructure.auth.annotation.ActionRoles;
 

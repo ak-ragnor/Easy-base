@@ -1,12 +1,12 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 package com.easybase.core.data.engine.service;
 
-import com.easybase.core.data.engine.entity.Attribute;
-import com.easybase.core.data.engine.entity.Collection;
+import com.easybase.core.data.engine.domain.entity.Attribute;
+import com.easybase.core.data.engine.domain.entity.Collection;
 
 import java.util.List;
 import java.util.UUID;
