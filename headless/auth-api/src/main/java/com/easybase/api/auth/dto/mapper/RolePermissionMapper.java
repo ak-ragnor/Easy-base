@@ -8,7 +8,7 @@ package com.easybase.api.auth.dto.mapper;
 import com.easybase.api.auth.dto.PermissionDto;
 import com.easybase.api.auth.dto.RolePermissionDto;
 import com.easybase.common.util.ListUtil;
-import com.easybase.core.auth.entity.RolePermission;
+import com.easybase.core.auth.domain.entity.RolePermission;
 import com.easybase.core.auth.helper.PermissionHelper;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 

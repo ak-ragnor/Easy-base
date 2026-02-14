@@ -7,7 +7,7 @@ package com.easybase.core.role.service.impl;
 
 import com.easybase.common.exception.ConflictException;
 import com.easybase.common.exception.ResourceNotFoundException;
-import com.easybase.core.auth.repository.RolePermissionRepository;
+import com.easybase.core.auth.infrastructure.presistence.repository.RolePermissionRepository;
 import com.easybase.core.role.entity.Role;
 import com.easybase.core.role.entity.UserRole;
 import com.easybase.core.role.repository.RoleRepository;

@@ -6,8 +6,8 @@
 package com.easybase.core.data.engine.service.impl;
 
 import com.easybase.context.api.util.PermissionChecker;
-import com.easybase.core.auth.constants.ResourceActionConstants;
-import com.easybase.core.auth.util.ActionKeyUtil;
+import com.easybase.core.auth.service.constants.ResourceActionConstants;
+import com.easybase.core.auth.service.util.ActionKeyUtil;
 import com.easybase.core.data.engine.domain.entity.DataRecord;
 import com.easybase.core.data.engine.service.DataRecordLocalService;
 import com.easybase.core.data.engine.service.DataRecordService;

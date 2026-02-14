@@ -5,7 +5,7 @@
 
 package com.easybase.core.auth.service;
 
-import com.easybase.core.auth.entity.RolePermission;
+import com.easybase.core.auth.domain.entity.RolePermission;
 
 import java.util.List;
 import java.util.UUID;

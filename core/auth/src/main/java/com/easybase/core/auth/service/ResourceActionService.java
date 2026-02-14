@@ -5,7 +5,7 @@
 
 package com.easybase.core.auth.service;
 
-import com.easybase.core.auth.entity.ResourceAction;
+import com.easybase.core.auth.domain.entity.ResourceAction;
 
 import java.util.List;
 import java.util.UUID;

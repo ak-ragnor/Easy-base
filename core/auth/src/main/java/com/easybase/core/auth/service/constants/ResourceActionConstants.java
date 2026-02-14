@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.auth.constants;
+package com.easybase.core.auth.service.constants;
 
 /**
  * @author Akhash R

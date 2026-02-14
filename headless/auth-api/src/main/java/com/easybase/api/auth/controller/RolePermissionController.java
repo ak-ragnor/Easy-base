@@ -9,7 +9,7 @@ import com.easybase.api.auth.dto.PermissionDto;
 import com.easybase.api.auth.dto.RolePermissionDto;
 import com.easybase.api.auth.dto.mapper.RolePermissionMapper;
 import com.easybase.common.util.ListUtil;
-import com.easybase.core.auth.entity.RolePermission;
+import com.easybase.core.auth.domain.entity.RolePermission;
 import com.easybase.core.auth.helper.PermissionHelper;
 import com.easybase.core.auth.service.RolePermissionService;
 

@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.auth.entity;
+package com.easybase.core.auth.domain.entity;
 
-import com.easybase.core.auth.util.BitMaskUtil;
+import com.easybase.core.auth.service.util.BitMaskUtil;
 import com.easybase.infrastructure.data.entity.CompositeKeyBaseEntity;
 
 import jakarta.persistence.Column;

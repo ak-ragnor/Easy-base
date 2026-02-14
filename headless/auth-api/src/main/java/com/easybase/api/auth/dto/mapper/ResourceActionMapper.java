@@ -6,7 +6,7 @@
 package com.easybase.api.auth.dto.mapper;
 
 import com.easybase.api.auth.dto.ResourceActionDto;
-import com.easybase.core.auth.entity.ResourceAction;
+import com.easybase.core.auth.domain.entity.ResourceAction;
 import com.easybase.infrastructure.api.dto.mapper.BaseMapper;
 
 import org.springframework.stereotype.Component;

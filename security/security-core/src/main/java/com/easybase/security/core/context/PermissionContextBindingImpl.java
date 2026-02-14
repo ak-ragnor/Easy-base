@@ -7,10 +7,10 @@ package com.easybase.security.core.context;
 
 import com.easybase.context.api.domain.PermissionContext;
 import com.easybase.context.api.port.PermissionContextProvider;
-import com.easybase.core.auth.entity.ResourceAction;
-import com.easybase.core.auth.entity.RolePermission;
-import com.easybase.core.auth.repository.ResourceActionRepository;
-import com.easybase.core.auth.repository.RolePermissionRepository;
+import com.easybase.core.auth.domain.entity.ResourceAction;
+import com.easybase.core.auth.domain.entity.RolePermission;
+import com.easybase.core.auth.infrastructure.presistence.repository.ResourceActionRepository;
+import com.easybase.core.auth.infrastructure.presistence.repository.RolePermissionRepository;
 import com.easybase.core.role.entity.Role;
 import com.easybase.core.role.service.RoleLocalService;
 import com.easybase.security.api.dto.AuthenticatedPrincipalData;

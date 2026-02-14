@@ -7,7 +7,7 @@ package com.easybase.core.auth.service.impl;
 
 import com.easybase.context.api.util.PermissionChecker;
 import com.easybase.core.auth.action.PermissionActions;
-import com.easybase.core.auth.entity.RolePermission;
+import com.easybase.core.auth.domain.entity.RolePermission;
 import com.easybase.core.auth.helper.PermissionHelper;
 import com.easybase.core.auth.service.RolePermissionLocalService;
 import com.easybase.core.auth.service.RolePermissionService;

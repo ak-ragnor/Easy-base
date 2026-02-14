@@ -7,7 +7,7 @@ package com.easybase.api.auth.controller;
 
 import com.easybase.api.auth.dto.ResourceActionDto;
 import com.easybase.api.auth.dto.mapper.ResourceActionMapper;
-import com.easybase.core.auth.entity.ResourceAction;
+import com.easybase.core.auth.domain.entity.ResourceAction;
 import com.easybase.core.auth.service.ResourceActionService;
 
 import java.util.List;

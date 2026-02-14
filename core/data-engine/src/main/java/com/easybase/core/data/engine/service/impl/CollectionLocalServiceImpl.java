@@ -7,10 +7,10 @@ package com.easybase.core.data.engine.service.impl;
 
 import com.easybase.common.exception.ConflictException;
 import com.easybase.common.exception.ResourceNotFoundException;
-import com.easybase.core.auth.constants.ResourceActionConstants;
-import com.easybase.core.auth.entity.ResourceAction;
+import com.easybase.core.auth.domain.entity.ResourceAction;
 import com.easybase.core.auth.service.ResourceActionLocalService;
-import com.easybase.core.auth.util.ActionKeyUtil;
+import com.easybase.core.auth.service.constants.ResourceActionConstants;
+import com.easybase.core.auth.service.util.ActionKeyUtil;
 import com.easybase.core.data.engine.domain.entity.Attribute;
 import com.easybase.core.data.engine.domain.entity.Collection;
 import com.easybase.core.data.engine.domain.type.AttributeTypeDefinition;

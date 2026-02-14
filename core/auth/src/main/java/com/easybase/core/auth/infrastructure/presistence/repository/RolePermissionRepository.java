@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.auth.repository;
+package com.easybase.core.auth.infrastructure.presistence.repository;
 
-import com.easybase.core.auth.entity.RolePermission;
+import com.easybase.core.auth.domain.entity.RolePermission;
 import com.easybase.infrastructure.data.repository.CompositeKeyBaseRepository;
 
 import java.util.List;

@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.core.auth.repository;
+package com.easybase.core.auth.infrastructure.presistence.repository;
 
-import com.easybase.core.auth.entity.ResourceAction;
+import com.easybase.core.auth.domain.entity.ResourceAction;
 import com.easybase.infrastructure.data.repository.SingleKeyBaseRepository;
 
 import java.util.List;
@@ -24,8 +24,6 @@ public interface ResourceActionRepository
 
 	public boolean existsByResourceTypeAndActionKey(
 		String resourceType, String actionKey);
-
-	public Optional<ResourceAction> findByActionKey(String actionKey);
 
 	public List<ResourceAction> findByActiveTrue();
 
