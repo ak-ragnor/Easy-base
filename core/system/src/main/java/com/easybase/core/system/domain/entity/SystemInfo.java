@@ -1,9 +1,9 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-package com.easybase.system.entity;
+package com.easybase.core.system.domain.entity;
 
 import com.easybase.infrastructure.data.entity.SingleKeyBaseEntity;
 
