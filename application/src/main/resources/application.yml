@@ -1,4 +1,10 @@
 easy-base:
+    docmediastore:
+        file:
+            included: png,jpeg,jpg
+            size: 500000000
+        root:
+            folder: file_system
     initialization:
         admin-user:
             display-name: Administrator
@@ -7,12 +13,6 @@ easy-base:
             last-name: User
             password: admin123
         enabled: true
-    docmediastore:
-        root:
-            folder: file_system
-        file:
-            included: png,jpeg,jpg
-            size: 500000000
 logging:
     level:
         com.easybase: DEBUG

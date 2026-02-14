@@ -8,8 +8,6 @@ package com.easybase.store.processor.base;
 import java.io.File;
 import java.io.IOException;
 
-import org.springframework.web.multipart.MultipartFile;
-
 /**
  * @author Saura
  */
