@@ -11,8 +11,8 @@ import com.easybase.core.role.infrastructure.presistence.repository.UserRoleRepo
 import com.easybase.core.role.service.RoleLocalService;
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.service.TenantLocalService;
-import com.easybase.core.user.entity.User;
-import com.easybase.core.user.repository.UserRepository;
+import com.easybase.core.user.domain.entity.User;
+import com.easybase.core.user.infrastructure.presistence.repository.UserRepository;
 import com.easybase.core.user.service.UserLocalService;
 import com.easybase.infrastructure.auth.constants.SystemRoles;
 

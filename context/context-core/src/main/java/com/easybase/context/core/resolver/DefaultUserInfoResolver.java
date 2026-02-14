@@ -10,8 +10,8 @@ import com.easybase.context.api.port.AbstractDefaultResolver;
 import com.easybase.context.api.port.UserInfoResolver;
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.service.TenantLocalService;
-import com.easybase.core.user.entity.User;
-import com.easybase.core.user.repository.UserRepository;
+import com.easybase.core.user.domain.entity.User;
+import com.easybase.core.user.infrastructure.presistence.repository.UserRepository;
 import com.easybase.core.user.service.UserLocalService;
 
 import java.util.List;

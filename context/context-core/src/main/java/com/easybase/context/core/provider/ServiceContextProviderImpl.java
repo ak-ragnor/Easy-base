@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -15,8 +15,8 @@ import com.easybase.context.api.port.UserInfoResolver;
 import com.easybase.context.core.impl.ServiceContextImpl;
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.service.TenantLocalService;
-import com.easybase.core.user.entity.User;
-import com.easybase.core.user.repository.UserRepository;
+import com.easybase.core.user.domain.entity.User;
+import com.easybase.core.user.infrastructure.presistence.repository.UserRepository;
 import com.easybase.security.api.dto.AuthenticatedPrincipalData;
 
 import java.util.Map;
