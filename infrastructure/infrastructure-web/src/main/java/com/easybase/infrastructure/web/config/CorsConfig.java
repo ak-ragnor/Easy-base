@@ -8,6 +8,7 @@ package com.easybase.infrastructure.web.config;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -15,7 +16,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 /**
- * CORS (Cross-Origin Resource Sharing) configuration
+ * CORS (Cross-Origin Resource Sharing) configuration.
  *
  * @author Akhash R
  */
@@ -26,12 +27,7 @@ public class CorsConfig {
 	public CorsFilter corsFilter() {
 		CorsConfiguration config = new CorsConfiguration();
 
-        // Allow requests from frontend development servers
-        config.setAllowedOrigins(Arrays.asList(
-            "http://localhost:5173",  // Vite default port
-            "http://localhost:5174",  // Vite alternate port
-            "http://localhost:3000"   // Common React/Next.js port
-        ));
+		config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
 
 		// Allow all HTTP methods
 
@@ -64,5 +60,8 @@ public class CorsConfig {
 
 		return new CorsFilter(source);
 	}
+
+	@Value("${cors.allowed.origins}")
+	private String allowedOrigins;
 
 }
