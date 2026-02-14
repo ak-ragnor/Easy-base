@@ -44,6 +44,15 @@ public interface CollectionLocalService {
 	public void deleteCollection(UUID collectionId);
 
 	/**
+	 * Fetches a collection by tenant and name
+	 *
+	 * @param tenantId the tenant ID
+	 * @param collectionName the collection name
+	 * @return the collection, or null if not found
+	 */
+	public Collection fetchCollection(UUID tenantId, String collectionName);
+
+	/**
 	 * Gets a collection by ID.
 	 *
 	 * @param collectionId the collection ID

@@ -6,7 +6,6 @@
 package com.easybase.core.data.engine.infrastructure.persistence;
 
 import com.easybase.core.data.engine.domain.entity.Collection;
-import com.easybase.core.tenant.entity.Tenant;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -22,11 +21,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CollectionRepository extends JpaRepository<Collection, UUID> {
 
-	public boolean existsByTenantAndName(Tenant tenant, String name);
-
 	public boolean existsByTenantIdAndName(UUID tenantId, String name);
-
-	public Optional<Collection> findByTenantAndName(Tenant tenant, String name);
 
 	public Page<Collection> findByTenantId(UUID tenantId, Pageable pageable);
 

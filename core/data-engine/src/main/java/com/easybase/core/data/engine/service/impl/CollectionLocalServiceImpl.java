@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -121,6 +122,15 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 		log.info(
 			"Dropped collection name={} tenant={}", collection.getName(),
 			tenant.getId());
+	}
+
+	@Transactional(readOnly = true)
+	public Collection fetchCollection(UUID tenantId, String collectionName) {
+		Optional<Collection> collectionOptional =
+			_collectionRepository.findByTenantIdAndName(
+				tenantId, collectionName);
+
+		return collectionOptional.orElse(null);
 	}
 
 	@Transactional(readOnly = true)

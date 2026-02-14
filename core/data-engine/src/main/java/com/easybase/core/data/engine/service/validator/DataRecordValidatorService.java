@@ -9,11 +9,10 @@ import com.easybase.core.data.engine.domain.entity.Attribute;
 import com.easybase.core.data.engine.domain.entity.Collection;
 import com.easybase.core.data.engine.domain.type.AttributeTypeDefinition;
 import com.easybase.core.data.engine.domain.type.AttributeTypeDefinitionRegistry;
-import com.easybase.core.data.engine.infrastructure.persistence.CollectionRepository;
+import com.easybase.core.data.engine.service.CollectionLocalService;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
@@ -33,11 +32,8 @@ public class DataRecordValidatorService {
 	public void validate(
 		UUID tenantId, String collectionName, Map<String, Object> data) {
 
-		Optional<Collection> optionalCollection =
-			_collectionRepository.findByTenantIdAndName(
-				tenantId, collectionName);
-
-		Collection collection = optionalCollection.orElse(null);
+		Collection collection = _collectionLocalService.fetchCollection(
+			tenantId, collectionName);
 
 		if (collection == null) {
 			log.warn("Collection not found for validation: {}", collectionName);
@@ -77,7 +73,7 @@ public class DataRecordValidatorService {
 		attributeTypeDefinition.validate(fieldName, value, config);
 	}
 
-	private final CollectionRepository _collectionRepository;
+	private final CollectionLocalService _collectionLocalService;
 	private final AttributeTypeDefinitionRegistry _descriptorRegistry;
 
 }
