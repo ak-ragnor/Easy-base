@@ -35,6 +35,55 @@ interface AuthState {
 let refreshPromise: Promise<void> | null = null;
 let authCheckIntervalId: ReturnType<typeof setInterval> | null = null;
 
+// Cross-tab auth synchronization via BroadcastChannel
+type AuthBroadcastMessage =
+  | { type: 'TOKEN_REFRESHED'; accessToken: string; refreshToken: string; sessionId: string }
+  | { type: 'LOGOUT' };
+
+let authChannel: BroadcastChannel | null = null;
+
+function getAuthChannel(): BroadcastChannel | null {
+  if (typeof window === 'undefined' || typeof BroadcastChannel === 'undefined') {
+    return null;
+  }
+  if (!authChannel) {
+    authChannel = new BroadcastChannel('easybase-auth');
+    authChannel.onmessage = (event: MessageEvent<AuthBroadcastMessage>) => {
+      const msg = event.data;
+      if (msg.type === 'LOGOUT') {
+        stopAuthCheckInterval();
+        useAuthStore.setState({
+          user: null,
+          accessToken: null,
+          refreshToken: null,
+          sessionId: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: null,
+          sessionWarning: false,
+        });
+      } else if (msg.type === 'TOKEN_REFRESHED') {
+        const user = getUserFromToken(msg.accessToken);
+        if (user) {
+          useAuthStore.setState({
+            user,
+            accessToken: msg.accessToken,
+            refreshToken: msg.refreshToken,
+            sessionId: msg.sessionId,
+            isAuthenticated: true,
+            sessionWarning: false,
+          });
+        }
+      }
+    };
+  }
+  return authChannel;
+}
+
+function broadcastAuth(msg: AuthBroadcastMessage) {
+  getAuthChannel()?.postMessage(msg);
+}
+
 function startAuthCheckInterval() {
   stopAuthCheckInterval();
   authCheckIntervalId = setInterval(
@@ -100,6 +149,13 @@ export const useAuthStore = create<AuthState>()(
             sessionWarning: false,
           });
 
+          broadcastAuth({
+            type: 'TOKEN_REFRESHED',
+            accessToken: response.accessToken,
+            refreshToken: response.refreshToken,
+            sessionId: response.sessionId,
+          });
+
           startAuthCheckInterval();
         } catch (error) {
           set({
@@ -132,6 +188,7 @@ export const useAuthStore = create<AuthState>()(
           // Continue with logout even if API call fails
         } finally {
           stopAuthCheckInterval();
+          broadcastAuth({ type: 'LOGOUT' });
           // Clear all auth state
           set({
             user: null,
@@ -181,6 +238,13 @@ export const useAuthStore = create<AuthState>()(
               sessionId: response.sessionId,
               isAuthenticated: true,
               sessionWarning: false,
+            });
+
+            broadcastAuth({
+              type: 'TOKEN_REFRESHED',
+              accessToken: response.accessToken,
+              refreshToken: response.refreshToken,
+              sessionId: response.sessionId,
             });
           } catch (error) {
             console.error('Token refresh failed:', error);
@@ -295,7 +359,8 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-// Auto-initialize auth on load
+// Auto-initialize auth on load and set up cross-tab sync
 if (typeof window !== 'undefined') {
+  getAuthChannel();
   useAuthStore.getState().initializeAuth();
 }
