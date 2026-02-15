@@ -38,9 +38,9 @@ spring:
         name: easy-base
     datasource:
         driver-class-name: org.postgresql.Driver
-        password: root
+        password: # fill your password
         url: jdbc:postgresql://localhost:5432/easybase
-        username: postgres
+        username: # fill your username
     jackson:
         deserialization:
             fail-on-unknown-properties: false
