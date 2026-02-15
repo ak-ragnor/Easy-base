@@ -17,6 +17,7 @@ import {
   Send,
   Settings2,
   SquareTerminal,
+  Users,
 } from 'lucide-react';
 
 import { NavMain } from '@/components/nav-main';
@@ -40,6 +41,11 @@ const data = {
       url: '/dashboard',
       icon: SquareTerminal,
       isActive: true,
+    },
+    {
+      title: 'Users',
+      url: '/users',
+      icon: Users,
     },
     {
       title: 'Settings',

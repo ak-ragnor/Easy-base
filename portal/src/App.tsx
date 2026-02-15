@@ -8,6 +8,7 @@ import { Component, lazy, Suspense } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
+import { Toaster } from '@/components/ui/sonner';
 import { useAuthStore } from '@/pages/auth/stores/auth-store';
 
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -26,6 +27,9 @@ const DashboardPage = lazy(() =>
 );
 const SettingsPage = lazy(() =>
   import('./pages/settings/SettingsPage').then(m => ({ default: m.SettingsPage }))
+);
+const UsersPage = lazy(() =>
+  import('./pages/users/UsersPage').then(m => ({ default: m.UsersPage }))
 );
 
 // Error Boundary
@@ -80,6 +84,7 @@ const App = () => {
 
   return (
     <ErrorBoundary>
+      <Toaster richColors />
       <BrowserRouter>
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
@@ -113,7 +118,7 @@ const App = () => {
             >
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/settings" element={<SettingsPage />} />
-              {/* Add more protected routes here - they all share the same sidebar */}
+              <Route path="/users" element={<UsersPage />} />
             </Route>
 
             {/* 404 - Not found */}
