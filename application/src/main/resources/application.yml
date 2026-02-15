@@ -57,7 +57,7 @@ spring:
                 format_sql: true
         show-sql: true
     profiles:
-        active: development
+        default: local
     servlet:
         multipart:
             max-file-size: 100MB
