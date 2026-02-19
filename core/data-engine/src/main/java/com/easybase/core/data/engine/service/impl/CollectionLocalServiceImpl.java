@@ -13,6 +13,7 @@ import com.easybase.core.auth.service.constants.ResourceActionConstants;
 import com.easybase.core.auth.service.util.ActionKeyUtil;
 import com.easybase.core.data.engine.domain.entity.Attribute;
 import com.easybase.core.data.engine.domain.entity.Collection;
+import com.easybase.core.data.engine.domain.enums.AttributeType;
 import com.easybase.core.data.engine.domain.type.AttributeTypeDefinition;
 import com.easybase.core.data.engine.domain.type.AttributeTypeDefinitionRegistry;
 import com.easybase.core.data.engine.infrastructure.ddl.IndexManager;
@@ -23,6 +24,7 @@ import com.easybase.core.data.engine.service.util.NamingUtils;
 import com.easybase.core.tenant.entity.Tenant;
 import com.easybase.core.tenant.repository.TenantRepository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -97,6 +99,8 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 				}
 			}
 		}
+
+		_setupSearchVector(tableName, attributes);
 
 		_createResourceActions(collectionName);
 
@@ -193,8 +197,6 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 
 		potentiallyModifiedAttributes.retainAll(newAttributeMap.keySet());
 
-		// Remove old attributes
-
 		for (String attrName : removedAttributes) {
 			Attribute oldAttr = currentAttributeMap.get(attrName);
 
@@ -204,8 +206,6 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 
 			collection.removeAttribute(oldAttr);
 		}
-
-		// Add new attributes
 
 		for (String attrName : addedAttributes) {
 			Attribute newAttr = newAttributeMap.get(attrName);
@@ -223,8 +223,6 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 						newAttr.getConfig()));
 			}
 		}
-
-		// Update existing attributes
 
 		for (String attrName : potentiallyModifiedAttributes) {
 			Attribute currentAttr = currentAttributeMap.get(attrName);
@@ -260,6 +258,8 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 		}
 
 		collection = _collectionRepository.save(collection);
+
+		_setupSearchVector(tableName, collection.getAttributes());
 
 		log.info(
 			"Updated collection name={} tenant={}", collection.getName(),
@@ -327,6 +327,26 @@ public class CollectionLocalServiceImpl implements CollectionLocalService {
 		}
 
 		return tenantOptional.get();
+	}
+
+	private void _setupSearchVector(
+		String tableName, List<Attribute> attributes) {
+
+		if (attributes == null) {
+			return;
+		}
+
+		List<String> textAttributes = new ArrayList<>();
+
+		for (Attribute attr : attributes) {
+			if (attr.getDataType() == AttributeType.STRING) {
+				textAttributes.add(attr.getName());
+			}
+		}
+
+		if (!textAttributes.isEmpty()) {
+			_tableManager.addSearchVector(tableName, textAttributes);
+		}
 	}
 
 	private Map<String, Attribute> _toAttributeMap(

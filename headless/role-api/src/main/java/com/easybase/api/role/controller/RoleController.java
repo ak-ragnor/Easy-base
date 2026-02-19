@@ -9,10 +9,15 @@ import com.easybase.api.role.dto.RoleDto;
 import com.easybase.api.role.dto.UserRoleAssignmentDto;
 import com.easybase.api.role.dto.mapper.RoleMapper;
 import com.easybase.api.role.dto.mapper.UserRoleAssignmentMapper;
+import com.easybase.common.util.PageUtil;
 import com.easybase.context.api.domain.ServiceContext;
 import com.easybase.core.role.domain.entity.Role;
 import com.easybase.core.role.domain.entity.UserRole;
 import com.easybase.core.role.service.RoleService;
+import com.easybase.core.search.SearchUtil;
+import com.easybase.infrastructure.api.dto.response.ApiPageResponse;
+import com.easybase.infrastructure.search.QueryResult;
+import com.easybase.infrastructure.search.SearchContext;
 
 import jakarta.validation.Valid;
 
@@ -21,6 +26,9 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +37,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -81,16 +90,42 @@ public class RoleController {
 	}
 
 	/**
-	 * Get all available roles
+	 * Query roles for the current tenant with filtering, searching,
+	 * sorting, and pagination.
 	 *
-	 * @return list of roles
+	 * @return paginated list of roles
 	 */
 	@GetMapping
-	public List<RoleDto> getRoles() {
-		List<Role> roles = _roleService.getAvailableRoles(
-			_serviceContext.tenantId());
+	public ApiPageResponse<RoleDto> getRoles(
+		@RequestParam(required = false) String filter,
+		@RequestParam(required = false) String search,
+		@PageableDefault(
+			direction = Sort.Direction.ASC, size = 20, sort = "name"
+		)
+		Pageable pageable) {
 
-		return _roleMapper.toDto(roles);
+		SearchContext context = SearchContext.builder(
+		).entityType(
+			"role"
+		).tenantId(
+			_serviceContext.tenantId()
+		).filter(
+			filter
+		).search(
+			search
+		).sort(
+			PageUtil.sortFrom(pageable)
+		).page(
+			pageable.getPageNumber()
+		).size(
+			pageable.getPageSize()
+		).build();
+
+		QueryResult<RoleDto> result = _searchUtil.<Role, RoleDto>search(
+			context, role -> _roleMapper.toDto(role));
+
+		return ApiPageResponse.success(
+			result.getContent(), PageUtil.from(result));
 	}
 
 	/**
@@ -166,6 +201,7 @@ public class RoleController {
 
 	private final RoleMapper _roleMapper;
 	private final RoleService _roleService;
+	private final SearchUtil _searchUtil;
 	private final ServiceContext _serviceContext;
 	private final UserRoleAssignmentMapper _userRoleAssignmentMapper;
 

@@ -18,6 +18,7 @@
 		<module>infrastructure-api</module>
 		<module>infrastructure-auth</module>
 		<module>infrastructure-data</module>
+		<module>infrastructure-search</module>
 		<module>infrastructure-web</module>
 	</modules>
 
@@ -26,6 +27,12 @@
 			<dependency>
 				<groupId>com.easybase</groupId>
 				<artifactId>easy-base-infrastructure-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.easybase</groupId>
+				<artifactId>easy-base-infrastructure-search</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 

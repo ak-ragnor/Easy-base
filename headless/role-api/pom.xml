@@ -32,9 +32,21 @@
 			<version>1.0.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-infrastructure-search</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-role</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-search-engine</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -42,6 +54,11 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>

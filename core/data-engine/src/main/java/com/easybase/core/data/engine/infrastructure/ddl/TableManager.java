@@ -5,7 +5,13 @@
 
 package com.easybase.core.data.engine.infrastructure.ddl;
 
+import com.easybase.common.util.ListUtil;
+
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.jooq.DSLContext;
 import org.jooq.DropTableStep;
@@ -19,7 +25,30 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class TableManager {
+
+	public void addSearchVector(String table, List<String> textAttributeNames) {
+		if (ListUtil.isEmpty(textAttributeNames)) {
+			return;
+		}
+
+		_dslContext.execute(
+			"ALTER TABLE {0} ADD COLUMN IF NOT EXISTS search_vector tsvector",
+			DSL.table(DSL.name(table)));
+
+		_triggerManager.createSearchVectorTrigger(table, textAttributeNames);
+
+		_indexManager.createSearchVectorGinIndex(table);
+
+		_dslContext.execute(
+			"UPDATE {0} SET search_vector = search_vector",
+			DSL.table(DSL.name(table)));
+
+		log.info(
+			"Added FTS search_vector to table {} for attributes: {}", table,
+			textAttributeNames);
+	}
 
 	public void createTableIfNotExists(String table) {
 		var tableBuilder = _dslContext.createTableIfNotExists(DSL.name(table));
@@ -57,6 +86,7 @@ public class TableManager {
 	}
 
 	private final DSLContext _dslContext;
+	private final IndexManager _indexManager;
 	private final TriggerManager _triggerManager;
 
 }
