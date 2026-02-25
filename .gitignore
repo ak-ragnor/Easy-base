@@ -29,6 +29,8 @@ application-local.yml
 .claude/
 CLAUDE.markdown
 .mcp.json
+.agents/
+skills-lock.json
 
 ### Mac OS ###
 .DS_Store
