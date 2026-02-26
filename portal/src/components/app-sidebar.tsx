@@ -16,6 +16,7 @@ import {
   PieChart,
   Send,
   Settings2,
+  Shield,
   SquareTerminal,
   Users,
 } from 'lucide-react';
@@ -46,6 +47,11 @@ const data = {
       title: 'Users',
       url: '/users',
       icon: Users,
+    },
+    {
+      title: 'Roles',
+      url: '/roles',
+      icon: Shield,
     },
     {
       title: 'Settings',

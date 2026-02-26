@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -14,21 +14,18 @@ import { PageHeader } from '@/layouts/PageHeader';
 import { DeleteUserDialog } from './components/DeleteUserDialog';
 import { UserFormSheet } from './components/UserFormSheet';
 import { UsersTable } from './components/UsersTable';
-import { UsersTableSkeleton } from './components/UsersTableSkeleton';
-import { useUserStore } from './stores/user-store';
+import { useUserStore } from './stores/userStore.ts';
 import type { CreateUserRequest, UpdateUserRequest, UserDto } from './types/user';
 
 export const UsersPage = () => {
-  const { users, isLoading, fetchUsers, createUser, updateUser, deleteUser } = useUserStore();
+  const { createUser, updateUser, deleteUser } = useUserStore();
+
+  const refetchRef = useRef<(() => void) | null>(null);
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserDto | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingUser, setDeletingUser] = useState<UserDto | null>(null);
-
-  useEffect(() => {
-    void fetchUsers();
-  }, [fetchUsers]);
 
   const handleAddUser = () => {
     setEditingUser(null);
@@ -55,6 +52,7 @@ export const UsersPage = () => {
           await createUser(values as CreateUserRequest);
           toast.success('User created successfully');
         }
+        refetchRef.current?.();
       } catch (error) {
         const message = error instanceof Error ? error.message : 'An error occurred';
         toast.error(message);
@@ -69,6 +67,7 @@ export const UsersPage = () => {
       try {
         await deleteUser(userId);
         toast.success('User deleted successfully');
+        refetchRef.current?.();
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to delete user';
         toast.error(message);
@@ -90,11 +89,7 @@ export const UsersPage = () => {
           </Button>
         </div>
 
-        {isLoading ? (
-          <UsersTableSkeleton />
-        ) : (
-          <UsersTable users={users} onEdit={handleEdit} onDelete={handleDeleteClick} />
-        )}
+        <UsersTable onEdit={handleEdit} onDelete={handleDeleteClick} onRefetchRef={refetchRef} />
       </div>
 
       <UserFormSheet

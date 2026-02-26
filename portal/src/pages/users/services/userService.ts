@@ -4,6 +4,7 @@
  */
 
 import apiClient from '@/lib/api-client';
+import type { ApiPagedResponse, PagedResult, TableQueryParams } from '@/types/table';
 
 import type { ApiResponse, CreateUserRequest, UpdateUserRequest, UserDto } from '../types/user';
 
@@ -35,6 +36,20 @@ class UserService {
 
   async deleteUser(userId: string): Promise<void> {
     await apiClient.delete(`${this.BASE_PATH}/${userId}`);
+  }
+
+  async queryUsers(params: TableQueryParams): Promise<PagedResult<UserDto>> {
+    const response = await apiClient.get<ApiPagedResponse<UserDto>>(this.BASE_PATH, {
+      params: {
+        page: params.page,
+        size: params.size,
+        ...(params.sort && { sort: params.sort }),
+        ...(params.search && { search: params.search }),
+        ...(params.filter && { filter: params.filter }),
+      },
+    });
+    const { data, page, size, totalElements, totalPages, first, last } = response.data;
+    return { data, page, size, totalElements, totalPages, first, last };
   }
 }
 

@@ -4,7 +4,7 @@
  */
 
 import type { Column } from '@tanstack/react-table';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
@@ -17,15 +17,23 @@ export const DataTableColumnHeader = <TData, TValue>({
   column,
   title,
 }: DataTableColumnHeaderProps<TData, TValue>) => {
+  const sorted = column.getIsSorted();
+
   return (
     <Button
       variant="ghost"
       size="sm"
       className="-ml-3"
-      onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      onClick={() => column.toggleSorting(sorted === 'asc')}
     >
       {title}
-      <ArrowUpDown className="ml-2 size-4" />
+      {sorted === 'asc' ? (
+        <ArrowUp className="ml-2 size-4" />
+      ) : sorted === 'desc' ? (
+        <ArrowDown className="ml-2 size-4" />
+      ) : (
+        <ArrowUpDown className="ml-2 size-4" />
+      )}
     </Button>
   );
 };

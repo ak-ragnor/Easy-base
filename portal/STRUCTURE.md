@@ -44,7 +44,7 @@ portal/src/
 │ └── auth.ts # TypeScript types
 │
 ├── hooks/
-│ └── use-mobile.ts # Custom hooks
+│ └── useMobile.ts # Custom hooks
 │
 ├── App.tsx # Main app with routes
 └── main.tsx # Entry point

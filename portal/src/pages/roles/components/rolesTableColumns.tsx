@@ -16,17 +16,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import type { UserDto } from '../types/user';
+import type { RoleDto } from '../types/role';
 
-interface UsersTableColumnsOptions {
-  onEdit: (user: UserDto) => void;
-  onDelete: (user: UserDto) => void;
+interface RolesTableColumnsOptions {
+  onEdit: (role: RoleDto) => void;
+  onDelete: (role: RoleDto) => void;
 }
 
-export const getUsersTableColumns = ({
+export const getRolesTableColumns = ({
   onEdit,
   onDelete,
-}: UsersTableColumnsOptions): Array<ColumnDef<UserDto, unknown>> => [
+}: RolesTableColumnsOptions): Array<ColumnDef<RoleDto, unknown>> => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -49,22 +49,16 @@ export const getUsersTableColumns = ({
     enableHiding: false,
   },
   {
-    id: 'name',
-    accessorFn: row => `${row.firstName} ${row.lastName}`,
+    accessorKey: 'name',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+    cell: ({ row }) => <span className="font-medium">{row.getValue<string>('name')}</span>,
+  },
+  {
+    accessorKey: 'description',
+    header: 'Description',
     cell: ({ row }) => (
-      <span className="font-medium">
-        {row.original.firstName} {row.original.lastName}
-      </span>
+      <span className="text-muted-foreground">{row.getValue<string>('description') || '—'}</span>
     ),
-  },
-  {
-    accessorKey: 'email',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
-  },
-  {
-    accessorKey: 'displayName',
-    header: 'Display Name',
   },
   {
     accessorKey: 'createdAt',
@@ -75,7 +69,7 @@ export const getUsersTableColumns = ({
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original;
+      const role = row.original;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -85,11 +79,11 @@ export const getUsersTableColumns = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(user)}>
+            <DropdownMenuItem onClick={() => onEdit(role)}>
               <Pencil className="size-4" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem variant="destructive" onClick={() => onDelete(user)}>
+            <DropdownMenuItem variant="destructive" onClick={() => onDelete(role)}>
               <Trash2 className="size-4" />
               Delete
             </DropdownMenuItem>

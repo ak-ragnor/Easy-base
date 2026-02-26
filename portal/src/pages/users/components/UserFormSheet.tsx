@@ -63,6 +63,7 @@ export const UserFormSheet = ({ open, onOpenChange, user, onSubmit }: UserFormSh
   const handleSubmit = async (values: FormValues) => {
     if (isEdit) {
       const request: UpdateUserRequest = {
+        email: user.email,
         firstName: values.firstName,
         lastName: values.lastName,
         displayName: values.displayName,

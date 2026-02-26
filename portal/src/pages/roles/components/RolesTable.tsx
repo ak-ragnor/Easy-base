@@ -10,21 +10,21 @@ import type { RefObject } from 'react';
 import { DataTable } from '@/components/DataTable';
 import { useTableQuery } from '@/hooks/useTableQuery.ts';
 
-import userService from '../services/userService.ts';
-import type { UserDto } from '../types/user';
+import roleService from '../services/roleService.ts';
+import type { RoleDto } from '../types/role';
 
-import { getUsersTableColumns } from './usersTableColumns.tsx';
+import { getRolesTableColumns } from './rolesTableColumns.tsx';
 
-interface UsersTableProps {
-  onEdit: (user: UserDto) => void;
-  onDelete: (user: UserDto) => void;
+interface RolesTableProps {
+  onEdit: (role: RoleDto) => void;
+  onDelete: (role: RoleDto) => void;
   onRefetchRef?: RefObject<(() => void) | null>;
 }
 
-export const UsersTable = ({ onEdit, onDelete, onRefetchRef }: UsersTableProps) => {
-  const tableQuery = useTableQuery<UserDto>({
-    queryFn: useCallback(params => userService.queryUsers(params), []),
-    defaultPageSize: 10,
+export const RolesTable = ({ onEdit, onDelete, onRefetchRef }: RolesTableProps) => {
+  const tableQuery = useTableQuery<RoleDto>({
+    queryFn: useCallback(params => roleService.queryRoles(params), []),
+    defaultPageSize: 20,
     defaultSort: '-updatedAt',
   });
 
@@ -34,7 +34,7 @@ export const UsersTable = ({ onEdit, onDelete, onRefetchRef }: UsersTableProps) 
     }
   }, [tableQuery.refetch, onRefetchRef]);
 
-  const columns = useMemo(() => getUsersTableColumns({ onEdit, onDelete }), [onEdit, onDelete]);
+  const columns = useMemo(() => getRolesTableColumns({ onEdit, onDelete }), [onEdit, onDelete]);
 
   return (
     <DataTable

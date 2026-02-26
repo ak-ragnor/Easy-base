@@ -31,6 +31,9 @@ const SettingsPage = lazy(() =>
 const UsersPage = lazy(() =>
   import('./pages/users/UsersPage').then(m => ({ default: m.UsersPage }))
 );
+const RolesPage = lazy(() =>
+  import('./pages/roles/RolesPage').then(m => ({ default: m.RolesPage }))
+);
 
 // Error Boundary
 interface ErrorBoundaryState {
@@ -119,6 +122,7 @@ const App = () => {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/users" element={<UsersPage />} />
+              <Route path="/roles" element={<RolesPage />} />
             </Route>
 
             {/* 404 - Not found */}
