@@ -4,7 +4,8 @@
  */
 
 import type { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { Check, Copy, MoreHorizontal, Pencil, Trash2, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { DataTableColumnHeader } from '@/components/DataTableColumnHeader';
 import { Button } from '@/components/ui/button';
@@ -49,6 +50,30 @@ export const getRolesTableColumns = ({
     enableHiding: false,
   },
   {
+    accessorKey: 'id',
+    header: 'ID',
+    cell: ({ row }) => {
+      const id = row.getValue<string>('id');
+      return (
+        <div className="flex items-center gap-1">
+          <span className="text-muted-foreground font-mono text-xs">{id.slice(0, 8)}…</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-5 shrink-0"
+            onClick={() => {
+              navigator.clipboard.writeText(id);
+              toast.success('ID copied');
+            }}
+          >
+            <Copy className="size-3" />
+            <span className="sr-only">Copy ID</span>
+          </Button>
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: 'name',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
     cell: ({ row }) => <span className="font-medium">{row.getValue<string>('name')}</span>,
@@ -61,9 +86,40 @@ export const getRolesTableColumns = ({
     ),
   },
   {
-    accessorKey: 'createdAt',
+    accessorKey: 'active',
+    header: 'Active',
+    cell: ({ row }) =>
+      row.getValue<boolean>('active') ? (
+        <Check className="size-4 text-green-500" />
+      ) : (
+        <X className="text-muted-foreground size-4" />
+      ),
+  },
+  {
+    accessorKey: 'system',
+    header: 'System',
+    cell: ({ row }) =>
+      row.getValue<boolean>('system') ? (
+        <Check className="size-4 text-blue-500" />
+      ) : (
+        <X className="text-muted-foreground size-4" />
+      ),
+  },
+  {
+    accessorKey: 'createdDate',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
-    cell: ({ row }) => new Date(row.getValue<string>('createdAt')).toLocaleDateString(),
+    cell: ({ row }) => {
+      const val = row.getValue<string>('createdDate');
+      return val ? new Date(val).toLocaleDateString() : '—';
+    },
+  },
+  {
+    accessorKey: 'lastModifiedDate',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Updated At" />,
+    cell: ({ row }) => {
+      const val = row.getValue<string>('lastModifiedDate');
+      return val ? new Date(val).toLocaleDateString() : '—';
+    },
   },
   {
     id: 'actions',

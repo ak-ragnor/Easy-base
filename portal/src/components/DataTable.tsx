@@ -18,9 +18,17 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
+import type { ReactNode } from 'react';
 
 import { DataTableToolbar } from '@/components/DataTableToolbar';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -49,6 +57,7 @@ interface ServerModeProps<TData> {
   searchValue: string;
   onSearchModeChange: (mode: SearchMode) => void;
   onSearchValueChange: (value: string) => void;
+  actions?: ReactNode;
 }
 
 // --- Client mode props ---
@@ -150,6 +159,7 @@ export const DataTable = <TData,>(props: DataTableProps<TData>) => {
           onSearchModeChange={serverProps!.onSearchModeChange}
           onSearchValueChange={serverProps!.onSearchValueChange}
           table={table as unknown as Parameters<typeof DataTableToolbar>[0]['table']}
+          actions={serverProps!.actions}
         />
       ) : (
         <DataTableToolbar
@@ -213,9 +223,27 @@ export const DataTable = <TData,>(props: DataTableProps<TData>) => {
       {/* Pagination footer */}
       {isServer ? (
         <div className="flex items-center justify-between px-2">
-          <div className="text-muted-foreground text-sm">
-            Page {serverProps!.pageIndex + 1} of {serverProps!.pageCount} &middot;{' '}
-            {serverProps!.totalElements} results
+          <div className="flex items-center gap-2">
+            <Select
+              value={String(serverProps!.pageSize)}
+              onValueChange={value => serverProps!.onPaginationChange(0, Number(value))}
+              disabled={serverProps!.isLoading}
+            >
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[10, 20, 50, 100].map(size => (
+                  <SelectItem key={size} value={String(size)}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <span className="text-muted-foreground text-sm">
+              Page {serverProps!.pageIndex + 1} of {serverProps!.pageCount} &middot;{' '}
+              {serverProps!.totalElements} results
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Button

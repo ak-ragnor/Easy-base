@@ -5,6 +5,7 @@
 
 import { Component, lazy, Suspense } from 'react';
 
+import { Loader2 } from 'lucide-react';
 import type { ErrorInfo, ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
@@ -78,7 +79,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryStat
 
 const LoadingFallback = () => (
   <div className="flex min-h-screen items-center justify-center">
-    <div className="text-muted-foreground">Loading...</div>
+    <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
   </div>
 );
 

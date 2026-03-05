@@ -5,6 +5,7 @@
 
 import type { Table } from '@tanstack/react-table';
 import { ChevronDown, Search, X } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,6 +25,7 @@ interface ServerToolbarProps {
   onSearchModeChange: (mode: SearchMode) => void;
   onSearchValueChange: (value: string) => void;
   table: Table<unknown>;
+  actions?: ReactNode;
 }
 
 // Client mode toolbar props
@@ -33,6 +35,7 @@ interface ClientToolbarProps {
   onGlobalFilterChange: (value: string) => void;
   searchPlaceholder?: string;
   table: Table<unknown>;
+  actions?: ReactNode;
 }
 
 type DataTableToolbarProps = ServerToolbarProps | ClientToolbarProps;
@@ -122,6 +125,9 @@ export const DataTableToolbar = (props: DataTableToolbarProps) => {
             ))}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Slot for additional action buttons (e.g. Add User, API Preview) */}
+      {props.actions}
     </div>
   );
 };

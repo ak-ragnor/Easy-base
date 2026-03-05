@@ -8,8 +8,10 @@ export interface RoleDto {
   name: string;
   description: string;
   tenantId: string;
-  createdAt: string;
-  updatedAt: string;
+  active: boolean;
+  system: boolean;
+  createdDate: string;
+  lastModifiedDate: string;
 }
 
 export interface CreateRoleRequest {

@@ -5,7 +5,7 @@
 
 import { useCallback, useEffect, useMemo } from 'react';
 
-import type { RefObject } from 'react';
+import type { ReactNode, RefObject } from 'react';
 
 import { DataTable } from '@/components/DataTable';
 import { useTableQuery } from '@/hooks/useTableQuery.ts';
@@ -19,9 +19,10 @@ interface RolesTableProps {
   onEdit: (role: RoleDto) => void;
   onDelete: (role: RoleDto) => void;
   onRefetchRef?: RefObject<(() => void) | null>;
+  actions?: ReactNode;
 }
 
-export const RolesTable = ({ onEdit, onDelete, onRefetchRef }: RolesTableProps) => {
+export const RolesTable = ({ onEdit, onDelete, onRefetchRef, actions }: RolesTableProps) => {
   const tableQuery = useTableQuery<RoleDto>({
     queryFn: useCallback(params => roleService.queryRoles(params), []),
     defaultPageSize: 20,
@@ -47,14 +48,18 @@ export const RolesTable = ({ onEdit, onDelete, onRefetchRef }: RolesTableProps) 
       pageSize={tableQuery.pageSize}
       isLoading={tableQuery.isLoading || tableQuery.isPending}
       onPaginationChange={(pi, ps) => {
-        tableQuery.setPage(pi);
-        tableQuery.setPageSize(ps);
+        if (ps !== tableQuery.pageSize) {
+          tableQuery.setPageSize(ps);
+        } else {
+          tableQuery.setPage(pi);
+        }
       }}
       onSortingChange={tableQuery.setSort}
       searchMode={tableQuery.searchMode}
       searchValue={tableQuery.searchValue}
       onSearchModeChange={tableQuery.setSearchMode}
       onSearchValueChange={tableQuery.setSearchValue}
+      actions={actions}
     />
   );
 };

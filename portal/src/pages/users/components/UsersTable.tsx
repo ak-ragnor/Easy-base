@@ -5,7 +5,7 @@
 
 import { useCallback, useEffect, useMemo } from 'react';
 
-import type { RefObject } from 'react';
+import type { ReactNode, RefObject } from 'react';
 
 import { DataTable } from '@/components/DataTable';
 import { useTableQuery } from '@/hooks/useTableQuery.ts';
@@ -19,9 +19,10 @@ interface UsersTableProps {
   onEdit: (user: UserDto) => void;
   onDelete: (user: UserDto) => void;
   onRefetchRef?: RefObject<(() => void) | null>;
+  actions?: ReactNode;
 }
 
-export const UsersTable = ({ onEdit, onDelete, onRefetchRef }: UsersTableProps) => {
+export const UsersTable = ({ onEdit, onDelete, onRefetchRef, actions }: UsersTableProps) => {
   const tableQuery = useTableQuery<UserDto>({
     queryFn: useCallback(params => userService.queryUsers(params), []),
     defaultPageSize: 10,
@@ -47,14 +48,18 @@ export const UsersTable = ({ onEdit, onDelete, onRefetchRef }: UsersTableProps) 
       pageSize={tableQuery.pageSize}
       isLoading={tableQuery.isLoading || tableQuery.isPending}
       onPaginationChange={(pi, ps) => {
-        tableQuery.setPage(pi);
-        tableQuery.setPageSize(ps);
+        if (ps !== tableQuery.pageSize) {
+          tableQuery.setPageSize(ps);
+        } else {
+          tableQuery.setPage(pi);
+        }
       }}
       onSortingChange={tableQuery.setSort}
       searchMode={tableQuery.searchMode}
       searchValue={tableQuery.searchValue}
       onSearchModeChange={tableQuery.setSearchMode}
       onSearchValueChange={tableQuery.setSearchValue}
+      actions={actions}
     />
   );
 };

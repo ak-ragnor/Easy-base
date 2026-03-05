@@ -4,7 +4,8 @@
  */
 
 import type { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { Copy, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { DataTableColumnHeader } from '@/components/DataTableColumnHeader';
 import { Button } from '@/components/ui/button';
@@ -47,6 +48,30 @@ export const getUsersTableColumns = ({
     ),
     enableSorting: false,
     enableHiding: false,
+  },
+  {
+    accessorKey: 'id',
+    header: 'ID',
+    cell: ({ row }) => {
+      const id = row.getValue<string>('id');
+      return (
+        <div className="flex items-center gap-1">
+          <span className="text-muted-foreground font-mono text-xs">{id.slice(0, 8)}…</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-5 shrink-0"
+            onClick={() => {
+              navigator.clipboard.writeText(id);
+              toast.success('ID copied');
+            }}
+          >
+            <Copy className="size-3" />
+            <span className="sr-only">Copy ID</span>
+          </Button>
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'firstName',

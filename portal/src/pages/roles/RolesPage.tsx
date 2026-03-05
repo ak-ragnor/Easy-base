@@ -82,14 +82,17 @@ export const RolesPage = () => {
       <PageHeader breadcrumbs={[{ label: 'Roles' }]} />
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="flex items-center justify-end">
-          <Button onClick={handleAddRole}>
-            <Plus className="size-4" />
-            Add Role
-          </Button>
-        </div>
-
-        <RolesTable onEdit={handleEdit} onDelete={handleDeleteClick} onRefetchRef={refetchRef} />
+        <RolesTable
+          onEdit={handleEdit}
+          onDelete={handleDeleteClick}
+          onRefetchRef={refetchRef}
+          actions={
+            <Button onClick={handleAddRole}>
+              <Plus className="size-4" />
+              Add Role
+            </Button>
+          }
+        />
       </div>
 
       <RoleFormSheet

@@ -82,14 +82,17 @@ export const UsersPage = () => {
       <PageHeader breadcrumbs={[{ label: 'Users' }]} />
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="flex items-center justify-end">
-          <Button onClick={handleAddUser}>
-            <Plus className="size-4" />
-            Add User
-          </Button>
-        </div>
-
-        <UsersTable onEdit={handleEdit} onDelete={handleDeleteClick} onRefetchRef={refetchRef} />
+        <UsersTable
+          onEdit={handleEdit}
+          onDelete={handleDeleteClick}
+          onRefetchRef={refetchRef}
+          actions={
+            <Button onClick={handleAddUser}>
+              <Plus className="size-4" />
+              Add User
+            </Button>
+          }
+        />
       </div>
 
       <UserFormSheet
