@@ -5,14 +5,11 @@
 
 package com.easybase.core.user.service.query;
 
-import com.easybase.core.search.metadata.QueryMetadataContributor;
+import com.easybase.core.search.metadata.AbstractSingleKeyMetadataContributor;
 import com.easybase.core.user.action.UserActions;
-
-import java.time.LocalDateTime;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
@@ -20,21 +17,12 @@ import org.springframework.stereotype.Component;
  * @author Akhash R
  */
 @Component
-public class UserMetadataContributor implements QueryMetadataContributor {
+public class UserMetadataContributor
+	extends AbstractSingleKeyMetadataContributor {
 
 	@Override
 	public String getEntityType() {
 		return _ENTITY_TYPE;
-	}
-
-	@Override
-	public Map<String, Class<?>> getFieldTypes() {
-		return _fieldTypes;
-	}
-
-	@Override
-	public Set<String> getFilterableFields() {
-		return _filterableFields;
 	}
 
 	@Override
@@ -48,23 +36,30 @@ public class UserMetadataContributor implements QueryMetadataContributor {
 	}
 
 	@Override
-	public Set<String> getSortableFields() {
-		return _sortableFields;
+	protected Map<String, Class<?>> entityFieldTypes() {
+		return _entityFieldTypes;
+	}
+
+	@Override
+	protected Set<String> entityFilterableFields() {
+		return _entityFilterableFields;
+	}
+
+	@Override
+	protected Set<String> entitySortableFields() {
+		return _entitySortableFields;
 	}
 
 	private static final String _ENTITY_TYPE = "user";
 
-	private static final Map<String, Class<?>> _fieldTypes = Map.of(
-		"createdAt", LocalDateTime.class, "displayName", String.class, "email",
-		String.class, "firstName", String.class, "id", UUID.class, "lastName",
-		String.class, "updatedAt", LocalDateTime.class);
-	private static final Set<String> _filterableFields = Set.of(
-		"createdAt", "displayName", "email", "firstName", "id", "lastName",
-		"updatedAt");
+	private static final Map<String, Class<?>> _entityFieldTypes = Map.of(
+		"displayName", String.class, "email", String.class, "firstName",
+		String.class, "lastName", String.class);
+	private static final Set<String> _entityFilterableFields = Set.of(
+		"displayName", "email", "firstName", "lastName");
+	private static final Set<String> _entitySortableFields = Set.of(
+		"displayName", "email", "firstName", "lastName");
 	private static final Set<String> _searchableFields = Set.of(
 		"displayName", "email", "firstName", "lastName");
-	private static final Set<String> _sortableFields = Set.of(
-		"createdAt", "displayName", "email", "firstName", "id", "lastName",
-		"updatedAt");
 
 }

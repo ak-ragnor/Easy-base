@@ -6,7 +6,7 @@
 package com.easybase.core.role.service.query;
 
 import com.easybase.core.role.action.RoleActions;
-import com.easybase.core.search.metadata.QueryMetadataContributor;
+import com.easybase.core.search.metadata.AbstractSingleKeyMetadataContributor;
 
 import java.util.Map;
 import java.util.Set;
@@ -18,21 +18,12 @@ import org.springframework.stereotype.Component;
  * @author Akhash R
  */
 @Component
-public class RoleMetadataContributor implements QueryMetadataContributor {
+public class RoleMetadataContributor
+	extends AbstractSingleKeyMetadataContributor {
 
 	@Override
 	public String getEntityType() {
 		return "role";
-	}
-
-	@Override
-	public Map<String, Class<?>> getFieldTypes() {
-		return _fieldTypes;
-	}
-
-	@Override
-	public Set<String> getFilterableFields() {
-		return _filterableFields;
 	}
 
 	@Override
@@ -46,18 +37,28 @@ public class RoleMetadataContributor implements QueryMetadataContributor {
 	}
 
 	@Override
-	public Set<String> getSortableFields() {
-		return _sortableFields;
+	protected Map<String, Class<?>> entityFieldTypes() {
+		return _entityFieldTypes;
 	}
 
-	private static final Map<String, Class<?>> _fieldTypes = Map.of(
-		"active", Boolean.class, "description", String.class, "id", UUID.class,
-		"name", String.class, "system", Boolean.class, "tenantId", UUID.class);
-	private static final Set<String> _filterableFields = Set.of(
-		"active", "description", "id", "name", "system", "tenantId");
+	@Override
+	protected Set<String> entityFilterableFields() {
+		return _entityFilterableFields;
+	}
+
+	@Override
+	protected Set<String> entitySortableFields() {
+		return _entitySortableFields;
+	}
+
+	private static final Map<String, Class<?>> _entityFieldTypes = Map.of(
+		"active", Boolean.class, "description", String.class, "name",
+		String.class, "system", Boolean.class, "tenantId", UUID.class);
+	private static final Set<String> _entityFilterableFields = Set.of(
+		"active", "description", "name", "system", "tenantId");
+	private static final Set<String> _entitySortableFields = Set.of(
+		"active", "name", "system");
 	private static final Set<String> _searchableFields = Set.of(
 		"description", "name");
-	private static final Set<String> _sortableFields = Set.of(
-		"active", "id", "name", "system");
 
 }

@@ -14,12 +14,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 
-import java.time.LocalDateTime;
-
-import java.util.Map;
 import java.util.UUID;
-
-import lombok.RequiredArgsConstructor;
 
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 
@@ -31,8 +26,15 @@ import org.springframework.stereotype.Component;
  * @author Akhash R
  */
 @Component
-@RequiredArgsConstructor
 public class UserQueryEngine extends AbstractJpaQueryEngine<User> {
+
+	public UserQueryEngine(
+		UserMetadataContributor contributor, UserRepository userRepository) {
+
+		super(contributor);
+
+		_userRepository = userRepository;
+	}
 
 	@Override
 	protected Specification<User> baseSpec(UUID tenantId) {
@@ -43,11 +45,6 @@ public class UserQueryEngine extends AbstractJpaQueryEngine<User> {
 				cb.equal(tenantPath.get("id"), tenantId),
 				cb.equal(root.get("deleted"), false));
 		};
-	}
-
-	@Override
-	protected Map<String, Class<?>> getFieldTypes() {
-		return _fieldTypes;
 	}
 
 	@Override
@@ -66,11 +63,6 @@ public class UserQueryEngine extends AbstractJpaQueryEngine<User> {
 					Boolean.class, cb.literal(searchTerm)));
 		};
 	}
-
-	private static final Map<String, Class<?>> _fieldTypes = Map.of(
-		"createdAt", LocalDateTime.class, "displayName", String.class, "email",
-		String.class, "firstName", String.class, "id", UUID.class, "lastName",
-		String.class, "updatedAt", LocalDateTime.class);
 
 	private final UserRepository _userRepository;
 

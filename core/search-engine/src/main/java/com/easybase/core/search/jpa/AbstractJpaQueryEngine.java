@@ -6,6 +6,7 @@
 package com.easybase.core.search.jpa;
 
 import com.easybase.common.exception.InvalidRequestException;
+import com.easybase.core.search.metadata.QueryMetadataContributor;
 import com.easybase.infrastructure.search.FilterCondition;
 import com.easybase.infrastructure.search.FilterNode;
 import com.easybase.infrastructure.search.FilterOperator;
@@ -19,10 +20,12 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -75,6 +78,10 @@ public abstract class AbstractJpaQueryEngine<E> {
 			page.getTotalElements());
 	}
 
+	protected AbstractJpaQueryEngine(QueryMetadataContributor contributor) {
+		_contributor = contributor;
+	}
+
 	protected abstract Specification<E> baseSpec(UUID tenantId);
 
 	protected Sort defaultSort() {
@@ -82,7 +89,7 @@ public abstract class AbstractJpaQueryEngine<E> {
 	}
 
 	protected Map<String, Class<?>> getFieldTypes() {
-		return Collections.emptyMap();
+		return _contributor.getFieldTypes();
 	}
 
 	protected abstract JpaSpecificationExecutor<E> getRepository();
@@ -213,12 +220,42 @@ public abstract class AbstractJpaQueryEngine<E> {
 			return value;
 		}
 
+		if (targetType == Instant.class) {
+			try {
+				return Instant.parse(value);
+			}
+			catch (DateTimeParseException dateTimeParseException1) {
+				try {
+					LocalDateTime localDateTime = LocalDateTime.parse(value);
+
+					return localDateTime.toInstant(ZoneOffset.UTC);
+				}
+				catch (DateTimeParseException dateTimeParseException2) {
+					throw new InvalidRequestException(
+						"Invalid datetime value: " + value,
+						dateTimeParseException2);
+				}
+			}
+		}
+
 		if (targetType == LocalDateTime.class) {
-			return LocalDateTime.parse(value);
+			try {
+				return LocalDateTime.parse(value);
+			}
+			catch (DateTimeParseException dateTimeParseException) {
+				throw new InvalidRequestException(
+					"Invalid datetime value: " + value, dateTimeParseException);
+			}
 		}
 
 		if (targetType == UUID.class) {
-			return UUID.fromString(value);
+			try {
+				return UUID.fromString(value);
+			}
+			catch (IllegalArgumentException illegalArgumentException) {
+				throw new InvalidRequestException(
+					"Invalid UUID value: " + value, illegalArgumentException);
+			}
 		}
 
 		if ((targetType == Long.class) || (targetType == long.class)) {
@@ -247,5 +284,7 @@ public abstract class AbstractJpaQueryEngine<E> {
 
 		return value;
 	}
+
+	private final QueryMetadataContributor _contributor;
 
 }
