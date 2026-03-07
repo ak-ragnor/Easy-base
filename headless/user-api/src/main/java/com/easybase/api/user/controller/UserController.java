@@ -9,7 +9,7 @@ import com.easybase.api.user.dto.UserDto;
 import com.easybase.api.user.dto.mapper.UserMapper;
 import com.easybase.common.util.PageUtil;
 import com.easybase.context.api.domain.ServiceContext;
-import com.easybase.core.search.SearchUtil;
+import com.easybase.core.search.SearchService;
 import com.easybase.core.user.domain.entity.User;
 import com.easybase.core.user.service.UserService;
 import com.easybase.infrastructure.api.dto.response.ApiPageResponse;
@@ -132,7 +132,7 @@ public class UserController {
 			pageable.getPageSize()
 		).build();
 
-		QueryResult<UserDto> result = _searchUtil.<User, UserDto>search(
+		QueryResult<UserDto> result = _searchService.<User, UserDto>search(
 			context, _userMapper::toDto);
 
 		return ApiPageResponse.success(
@@ -177,7 +177,7 @@ public class UserController {
 		return ApiResponse.success(_userMapper.toDto(user));
 	}
 
-	private final SearchUtil _searchUtil;
+	private final SearchService _searchService;
 	private final ServiceContext _serviceContext;
 	private final UserMapper _userMapper;
 	private final UserService _userService;

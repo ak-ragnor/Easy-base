@@ -14,7 +14,7 @@ import com.easybase.context.api.domain.ServiceContext;
 import com.easybase.core.role.domain.entity.Role;
 import com.easybase.core.role.domain.entity.UserRole;
 import com.easybase.core.role.service.RoleService;
-import com.easybase.core.search.SearchUtil;
+import com.easybase.core.search.SearchService;
 import com.easybase.infrastructure.api.dto.response.ApiPageResponse;
 import com.easybase.infrastructure.search.QueryResult;
 import com.easybase.infrastructure.search.SearchContext;
@@ -121,7 +121,7 @@ public class RoleController {
 			pageable.getPageSize()
 		).build();
 
-		QueryResult<RoleDto> result = _searchUtil.<Role, RoleDto>search(
+		QueryResult<RoleDto> result = _searchService.<Role, RoleDto>search(
 			context, role -> _roleMapper.toDto(role));
 
 		return ApiPageResponse.success(
@@ -201,7 +201,7 @@ public class RoleController {
 
 	private final RoleMapper _roleMapper;
 	private final RoleService _roleService;
-	private final SearchUtil _searchUtil;
+	private final SearchService _searchService;
 	private final ServiceContext _serviceContext;
 	private final UserRoleAssignmentMapper _userRoleAssignmentMapper;
 

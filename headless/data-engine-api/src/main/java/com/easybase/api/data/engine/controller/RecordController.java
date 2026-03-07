@@ -13,7 +13,7 @@ import com.easybase.core.data.engine.domain.entity.Collection;
 import com.easybase.core.data.engine.domain.entity.DataRecord;
 import com.easybase.core.data.engine.service.CollectionLocalService;
 import com.easybase.core.data.engine.service.DataRecordService;
-import com.easybase.core.search.SearchUtil;
+import com.easybase.core.search.SearchService;
 import com.easybase.infrastructure.api.dto.response.ApiPageResponse;
 import com.easybase.infrastructure.api.dto.response.ApiResponse;
 import com.easybase.infrastructure.search.QueryResult;
@@ -142,7 +142,7 @@ public class RecordController {
 		}
 
 		QueryResult<DataRecordDto> result =
-			_searchUtil.<DataRecord, DataRecordDto>search(
+			_searchService.<DataRecord, DataRecordDto>search(
 				context, record -> _dataRecordMapper.toDto(record));
 
 		return ResponseEntity.ok(
@@ -169,7 +169,7 @@ public class RecordController {
 	private final CollectionLocalService _collectionLocalService;
 	private final DataRecordMapper _dataRecordMapper;
 	private final DataRecordService _dataRecordService;
-	private final SearchUtil _searchUtil;
+	private final SearchService _searchService;
 	private final ServiceContext _serviceContext;
 
 }

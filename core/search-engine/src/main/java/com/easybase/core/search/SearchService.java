@@ -30,9 +30,9 @@ import org.springframework.stereotype.Component;
  * @author Akhash R
  */
 @Component
-public class SearchUtil {
+public class SearchService {
 
-	public SearchUtil(
+	public SearchService(
 		List<QueryAdapter<?>> adapters,
 		List<QueryMetadataContributor> contributors,
 		PermissionChecker permissionChecker) {
