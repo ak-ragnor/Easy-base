@@ -5,9 +5,11 @@
 
 import { Component, lazy, Suspense } from 'react';
 
+import { Loader2 } from 'lucide-react';
 import type { ErrorInfo, ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
+import { Toaster } from '@/components/ui/sonner';
 import { useAuthStore } from '@/pages/auth/stores/auth-store';
 
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -26,6 +28,12 @@ const DashboardPage = lazy(() =>
 );
 const SettingsPage = lazy(() =>
   import('./pages/settings/SettingsPage').then(m => ({ default: m.SettingsPage }))
+);
+const UsersPage = lazy(() =>
+  import('./pages/users/UsersPage').then(m => ({ default: m.UsersPage }))
+);
+const RolesPage = lazy(() =>
+  import('./pages/roles/RolesPage').then(m => ({ default: m.RolesPage }))
 );
 
 // Error Boundary
@@ -71,7 +79,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryStat
 
 const LoadingFallback = () => (
   <div className="flex min-h-screen items-center justify-center">
-    <div className="text-muted-foreground">Loading...</div>
+    <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
   </div>
 );
 
@@ -80,6 +88,7 @@ const App = () => {
 
   return (
     <ErrorBoundary>
+      <Toaster richColors />
       <BrowserRouter>
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
@@ -113,7 +122,8 @@ const App = () => {
             >
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/settings" element={<SettingsPage />} />
-              {/* Add more protected routes here - they all share the same sidebar */}
+              <Route path="/users" element={<UsersPage />} />
+              <Route path="/roles" element={<RolesPage />} />
             </Route>
 
             {/* 404 - Not found */}

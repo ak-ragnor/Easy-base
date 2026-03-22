@@ -7,20 +7,27 @@ package com.easybase.api.user.controller;
 
 import com.easybase.api.user.dto.UserDto;
 import com.easybase.api.user.dto.mapper.UserMapper;
+import com.easybase.common.util.PageUtil;
 import com.easybase.context.api.domain.ServiceContext;
+import com.easybase.core.search.SearchService;
 import com.easybase.core.user.domain.entity.User;
 import com.easybase.core.user.service.UserService;
+import com.easybase.infrastructure.api.dto.response.ApiPageResponse;
 import com.easybase.infrastructure.api.dto.response.ApiResponse;
+import com.easybase.infrastructure.search.QueryResult;
+import com.easybase.infrastructure.search.SearchContext;
 
 import jakarta.validation.Valid;
 
-import java.util.List;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -89,18 +96,47 @@ public class UserController {
 	}
 
 	/**
-	 * Get all users for the current tenant.
+	 * Query users for the current tenant with filtering, searching,
+	 * sorting, and pagination.
 	 *
-	 * @return list of users
+	 * @return paginated list of users
 	 */
 	@GetMapping
-	public ApiResponse<List<UserDto>> getUsers() {
-		log.debug(
-			"Fetching all users for tenant: {}", _serviceContext.tenantId());
+	public ApiPageResponse<UserDto> getUsers(
+		@RequestParam(required = false) String filter,
+		@RequestParam(required = false) String search,
+		@PageableDefault(
+			direction = Sort.Direction.DESC, size = 20, sort = "updatedAt"
+		)
+		Pageable pageable) {
 
-		return ApiResponse.success(
-			_userMapper.toDto(
-				_userService.getUsers(_serviceContext.tenantId())));
+		log.debug(
+			"Querying users for tenant: {} filter={} search={} page={} size={}",
+			_serviceContext.tenantId(), filter, search,
+			pageable.getPageNumber(), pageable.getPageSize());
+
+		SearchContext context = SearchContext.builder(
+		).entityType(
+			"user"
+		).tenantId(
+			_serviceContext.tenantId()
+		).filter(
+			filter
+		).search(
+			search
+		).sort(
+			PageUtil.sortFrom(pageable)
+		).page(
+			pageable.getPageNumber()
+		).size(
+			pageable.getPageSize()
+		).build();
+
+		QueryResult<UserDto> result = _searchService.<User, UserDto>search(
+			context, _userMapper::toDto);
+
+		return ApiPageResponse.success(
+			result.getContent(), PageUtil.from(result));
 	}
 
 	/**
@@ -141,6 +177,7 @@ public class UserController {
 		return ApiResponse.success(_userMapper.toDto(user));
 	}
 
+	private final SearchService _searchService;
 	private final ServiceContext _serviceContext;
 	private final UserMapper _userMapper;
 	private final UserService _userService;

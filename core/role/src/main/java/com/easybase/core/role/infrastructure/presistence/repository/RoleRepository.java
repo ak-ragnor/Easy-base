@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -22,7 +23,8 @@ import org.springframework.stereotype.Repository;
  * @author Akhash R
  */
 @Repository
-public interface RoleRepository extends SingleKeyBaseRepository<Role> {
+public interface RoleRepository
+	extends JpaSpecificationExecutor<Role>, SingleKeyBaseRepository<Role> {
 
 	public boolean existsByNameAndSystemTrue(String name);
 

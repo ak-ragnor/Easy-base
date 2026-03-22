@@ -36,11 +36,15 @@ server:
 spring:
     application:
         name: easy-base
+    flyway:
+        baseline-on-migrate: true
+        enabled: true
+        locations: classpath:db/migration
     datasource:
         driver-class-name: org.postgresql.Driver
-        password: root
+        password: # fill your password
         url: jdbc:postgresql://localhost:5432/easybase
-        username: postgres
+        username: # fill your username
     jackson:
         deserialization:
             fail-on-unknown-properties: false
@@ -57,7 +61,7 @@ spring:
                 format_sql: true
         show-sql: true
     profiles:
-        active: development
+        default: local
     servlet:
         multipart:
             max-file-size: 100MB

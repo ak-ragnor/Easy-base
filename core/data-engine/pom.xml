@@ -24,6 +24,18 @@
 
 		<dependency>
 			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-infrastructure-search</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-search-engine</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.easybase</groupId>
 			<artifactId>easy-base-common-exception</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>

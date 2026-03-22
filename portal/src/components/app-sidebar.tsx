@@ -16,7 +16,9 @@ import {
   PieChart,
   Send,
   Settings2,
+  Shield,
   SquareTerminal,
+  Users,
 } from 'lucide-react';
 
 import { NavMain } from '@/components/nav-main';
@@ -40,6 +42,16 @@ const data = {
       url: '/dashboard',
       icon: SquareTerminal,
       isActive: true,
+    },
+    {
+      title: 'Users',
+      url: '/users',
+      icon: Users,
+    },
+    {
+      title: 'Roles',
+      url: '/roles',
+      icon: Shield,
     },
     {
       title: 'Settings',

@@ -38,6 +38,14 @@ public class IndexManager {
 			DSL.name(indexName), DSL.table(DSL.name(table)));
 	}
 
+	public void createSearchVectorGinIndex(String table) {
+		String indexName = table + "_search_vector_gin_idx";
+
+		_dslContext.execute(
+			"CREATE INDEX IF NOT EXISTS {0} ON {1} USING GIN (search_vector)",
+			DSL.name(indexName), DSL.table(DSL.name(table)));
+	}
+
 	public void dropAttributeIndexIfExists(String table, String attributeName) {
 		String indexName = String.format("%s_%s_idx", table, attributeName);
 

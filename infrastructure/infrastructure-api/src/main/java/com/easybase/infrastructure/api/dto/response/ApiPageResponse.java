@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 EasyBase
+ * SPDX-FileCopyrightText: (c) 2026 EasyBase
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
@@ -23,10 +23,6 @@ public class ApiPageResponse<T> extends ApiResponse<List<T>> {
 		List<T> content, Page<?> page) {
 
 		return new ApiPageResponse<>(content, page);
-	}
-
-	public static <T> ApiPageResponse<T> success(Page<T> page) {
-		return new ApiPageResponse<>(page.getContent(), page);
 	}
 
 	private ApiPageResponse(List<T> data, Page<?> page) {

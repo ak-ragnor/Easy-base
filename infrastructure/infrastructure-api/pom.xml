@@ -15,6 +15,13 @@
 	<description>HTTP API infrastructure contracts and DTOs</description>
 
 	<dependencies>
+		<!-- Common exception types for query validation -->
+		<dependency>
+			<groupId>com.easybase</groupId>
+			<artifactId>easy-base-common-exception</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- JSON serialization support -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

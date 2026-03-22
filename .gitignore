@@ -6,6 +6,8 @@ target/
 # dependencies
 easy-base-admin-portal/node_modules/
 
+### Local Spring profile ###
+application-local.yml
 
 ### IntelliJ IDEA ###
 .idea
@@ -26,6 +28,9 @@ easy-base-admin-portal/node_modules/
 .vscode/
 .claude/
 CLAUDE.markdown
+.mcp.json
+.agents/
+skills-lock.json
 
 ### Mac OS ###
 .DS_Store

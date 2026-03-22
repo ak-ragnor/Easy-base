@@ -11,6 +11,7 @@ import com.easybase.infrastructure.data.repository.TenantAwareRepository;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -22,7 +23,8 @@ import org.springframework.stereotype.Repository;
  * @author Akhash R
  */
 @Repository
-public interface UserRepository extends TenantAwareRepository<User> {
+public interface UserRepository
+	extends JpaSpecificationExecutor<User>, TenantAwareRepository<User> {
 
 	public boolean existsByEmailAndTenantId(String email, UUID tenantId);
 

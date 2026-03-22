@@ -28,6 +28,7 @@
 		<maven.compiler.target>17</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<liferay.source.formatter.version>1.0.1193</liferay.source.formatter.version>
+		<flyway.version>10.4.1</flyway.version>
 		<skipTests>true</skipTests>
 		<maven.test.skip>true</maven.test.skip>
 	</properties>
